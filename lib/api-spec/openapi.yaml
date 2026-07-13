@@ -3,13 +3,21 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: API specification for TechStock inventory manager
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: proveedores
+    description: Supplier operations
+  - name: equipos
+    description: Inventory item operations
+  - name: caja
+    description: Cash register movement operations
+  - name: analytics
+    description: Dashboard summary and investment recommendations
 paths:
   /healthz:
     get:
@@ -24,7 +32,307 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /proveedores:
+    get:
+      operationId: listProveedores
+      tags: [proveedores]
+      summary: List suppliers
+      responses:
+        "200":
+          description: List of suppliers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Proveedor"
+    post:
+      operationId: createProveedor
+      tags: [proveedores]
+      summary: Create a supplier
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProveedorInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Proveedor"
+
+  /proveedores/{id}:
+    get:
+      operationId: getProveedor
+      tags: [proveedores]
+      summary: Get a supplier
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "200":
+          description: Supplier
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Proveedor"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateProveedor
+      tags: [proveedores]
+      summary: Update a supplier
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProveedorUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Proveedor"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteProveedor
+      tags: [proveedores]
+      summary: Delete a supplier
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+
+  /equipos:
+    get:
+      operationId: listEquipos
+      tags: [equipos]
+      summary: List inventory items
+      parameters:
+        - name: estado
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/EstadoEquipo"
+        - name: categoria
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/Categoria"
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of inventory items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Equipo"
+    post:
+      operationId: createEquipo
+      tags: [equipos]
+      summary: Register a purchased item into inventory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EquipoInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Equipo"
+
+  /equipos/{id}:
+    get:
+      operationId: getEquipo
+      tags: [equipos]
+      summary: Get an inventory item
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "200":
+          description: Inventory item
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Equipo"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateEquipo
+      tags: [equipos]
+      summary: Update an inventory item's details
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EquipoUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Equipo"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteEquipo
+      tags: [equipos]
+      summary: Delete an inventory item
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+
+  /equipos/{id}/venta:
+    patch:
+      operationId: registrarVentaEquipo
+      tags: [equipos]
+      summary: Register the sale of an inventory item
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VentaInput"
+      responses:
+        "200":
+          description: Item marked as sold
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Equipo"
+        "404":
+          description: Not found
+
+  /equipos/{id}/reactivar:
+    patch:
+      operationId: reactivarEquipo
+      tags: [equipos]
+      summary: Revert a sold item back to in-stock (undo a sale)
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "200":
+          description: Item reverted to in-stock
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Equipo"
+        "404":
+          description: Not found
+
+  /movimientos-caja:
+    get:
+      operationId: listMovimientosCaja
+      tags: [caja]
+      summary: List cash register movements
+      responses:
+        "200":
+          description: List of cash movements
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MovimientoCaja"
+    post:
+      operationId: createMovimientoCaja
+      tags: [caja]
+      summary: Register a manual cash movement (capital injection, withdrawal, expense)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MovimientoCajaInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MovimientoCaja"
+
+  /movimientos-caja/{id}:
+    delete:
+      operationId: deleteMovimientoCaja
+      tags: [caja]
+      summary: Delete a manual cash movement
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+
+  /analytics/resumen:
+    get:
+      operationId: getResumenCapital
+      tags: [analytics]
+      summary: Dashboard summary — capital, inventory value, cash on hand, and profit stats
+      responses:
+        "200":
+          description: Capital and business summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResumenCapital"
+
+  /analytics/recomendaciones:
+    get:
+      operationId: getRecomendaciones
+      tags: [analytics]
+      summary: Investment recommendations derived from historical purchase/sale data
+      responses:
+        "200":
+          description: List of recommendations grouped by category/brand/model
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Recomendacion"
+
 components:
+  parameters:
+    IdParam:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+
   schemas:
     HealthStatus:
       type: object
@@ -34,3 +342,275 @@ components:
       required:
         - status
 
+    Categoria:
+      type: string
+      enum:
+        - Celular
+        - Notebook
+        - PC Escritorio
+        - Consola
+        - TV
+        - Audifonos
+        - Carcasa
+        - TV Box
+        - Smartwatch
+        - Camara
+        - Lentes
+        - Otro
+
+    EstadoEquipoCondicion:
+      type: string
+      enum:
+        - Nuevo
+        - Usado - Excelente
+        - Usado - Bueno
+        - Usado - Regular
+        - Para repuestos
+
+    EstadoEquipo:
+      type: string
+      description: Lifecycle status within inventory
+      enum:
+        - en_stock
+        - reservado
+        - vendido
+
+    FormaPago:
+      type: string
+      enum:
+        - Efectivo
+        - Transferencia
+        - Tarjeta
+        - Otro
+
+    Proveedor:
+      type: object
+      required: [id, nombre, createdAt]
+      properties:
+        id: { type: integer }
+        nombre: { type: string }
+        telefono: { type: ["string", "null"] }
+        facebook: { type: ["string", "null"] }
+        rut: { type: ["string", "null"] }
+        usuarioMercadolibre: { type: ["string", "null"] }
+        email: { type: ["string", "null"] }
+        direccion: { type: ["string", "null"] }
+        comentarios: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+
+    ProveedorInput:
+      type: object
+      required: [nombre]
+      properties:
+        nombre: { type: string, minLength: 1 }
+        telefono: { type: string }
+        facebook: { type: string }
+        rut: { type: string }
+        usuarioMercadolibre: { type: string }
+        email: { type: string }
+        direccion: { type: string }
+        comentarios: { type: string }
+
+    ProveedorUpdate:
+      type: object
+      properties:
+        nombre: { type: string, minLength: 1 }
+        telefono: { type: ["string", "null"] }
+        facebook: { type: ["string", "null"] }
+        rut: { type: ["string", "null"] }
+        usuarioMercadolibre: { type: ["string", "null"] }
+        email: { type: ["string", "null"] }
+        direccion: { type: ["string", "null"] }
+        comentarios: { type: ["string", "null"] }
+
+    Equipo:
+      type: object
+      required:
+        - id
+        - categoria
+        - equipo
+        - marca
+        - modelo
+        - estadoEquipoCondicion
+        - estado
+        - fechaCompra
+        - formaPagoCompra
+        - precioCompra
+        - gastosExtra
+        - costoTotal
+        - createdAt
+        - updatedAt
+      properties:
+        id: { type: integer }
+        categoria: { $ref: "#/components/schemas/Categoria" }
+        equipo: { type: string, description: "Nombre / descripción del equipo" }
+        marca: { type: string }
+        modelo: { type: string }
+        bateriaPct: { type: ["integer", "null"], minimum: 0, maximum: 100 }
+        imeiSerial: { type: ["string", "null"] }
+        estadoEquipoCondicion: { $ref: "#/components/schemas/EstadoEquipoCondicion" }
+        estado: { $ref: "#/components/schemas/EstadoEquipo" }
+        fechaCompra: { type: string, format: date }
+        proveedorId: { type: ["integer", "null"] }
+        proveedorNombre: { type: ["string", "null"] }
+        formaPagoCompra: { $ref: "#/components/schemas/FormaPago" }
+        precioCompra: { type: number }
+        gastosExtra: { type: number }
+        costoTotal: { type: number }
+        fechaVenta: { type: ["string", "null"], format: date }
+        plataformaVenta: { type: ["string", "null"] }
+        precioVenta: { type: ["number", "null"] }
+        ventaFormaPago:
+          anyOf:
+            - $ref: "#/components/schemas/FormaPagoVenta"
+            - type: "null"
+        ventaNumeroCuotas: { type: ["integer", "null"], minimum: 2 }
+        gananciaNeta: { type: ["number", "null"] }
+        comentarios: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    EquipoInput:
+      type: object
+      required:
+        - categoria
+        - equipo
+        - marca
+        - modelo
+        - estadoEquipoCondicion
+        - fechaCompra
+        - formaPagoCompra
+        - precioCompra
+      properties:
+        categoria: { $ref: "#/components/schemas/Categoria" }
+        equipo: { type: string, minLength: 1 }
+        marca: { type: string, minLength: 1 }
+        modelo: { type: string, minLength: 1 }
+        bateriaPct: { type: integer, minimum: 0, maximum: 100 }
+        imeiSerial: { type: string }
+        estadoEquipoCondicion: { $ref: "#/components/schemas/EstadoEquipoCondicion" }
+        fechaCompra: { type: string, format: date }
+        proveedorId: { type: integer }
+        formaPagoCompra: { $ref: "#/components/schemas/FormaPago" }
+        precioCompra: { type: number, minimum: 0 }
+        gastosExtra: { type: number, minimum: 0, default: 0 }
+        comentarios: { type: string }
+
+    EquipoUpdate:
+      type: object
+      properties:
+        categoria: { $ref: "#/components/schemas/Categoria" }
+        equipo: { type: string, minLength: 1 }
+        marca: { type: string, minLength: 1 }
+        modelo: { type: string, minLength: 1 }
+        bateriaPct: { type: ["integer", "null"], minimum: 0, maximum: 100 }
+        imeiSerial: { type: ["string", "null"] }
+        estadoEquipoCondicion: { $ref: "#/components/schemas/EstadoEquipoCondicion" }
+        fechaCompra: { type: string, format: date }
+        proveedorId: { type: ["integer", "null"] }
+        formaPagoCompra: { $ref: "#/components/schemas/FormaPago" }
+        precioCompra: { type: number, minimum: 0 }
+        gastosExtra: { type: number, minimum: 0 }
+        comentarios: { type: ["string", "null"] }
+
+    FormaPagoVenta:
+      type: string
+      enum:
+        - Contado
+        - Cuotas
+
+    VentaInput:
+      type: object
+      required: [fechaVenta, plataformaVenta, precioVenta]
+      properties:
+        fechaVenta: { type: string, format: date }
+        plataformaVenta: { type: string, minLength: 1 }
+        precioVenta:
+          type: number
+          minimum: 0
+          description: Valor final total de la venta (si es en cuotas, es el total de todas las cuotas).
+        ventaFormaPago:
+          $ref: "#/components/schemas/FormaPagoVenta"
+          default: Contado
+        ventaNumeroCuotas:
+          type: integer
+          minimum: 2
+          description: Cantidad de cuotas, requerido solo si ventaFormaPago es Cuotas.
+
+    TipoMovimiento:
+      type: string
+      enum:
+        - ingreso
+        - egreso
+        - ajuste
+
+    MovimientoCaja:
+      type: object
+      required: [id, tipo, monto, motivo, fecha, createdAt]
+      properties:
+        id: { type: integer }
+        tipo: { $ref: "#/components/schemas/TipoMovimiento" }
+        monto: { type: number }
+        motivo: { type: string }
+        fecha: { type: string, format: date }
+        equipoId: { type: ["integer", "null"] }
+        createdAt: { type: string, format: date-time }
+
+    MovimientoCajaInput:
+      type: object
+      required: [tipo, monto, motivo, fecha]
+      properties:
+        tipo: { $ref: "#/components/schemas/TipoMovimiento" }
+        monto: { type: number }
+        motivo: { type: string, minLength: 1 }
+        fecha: { type: string, format: date }
+
+    ResumenCapital:
+      type: object
+      required:
+        - cajaActual
+        - valorInventario
+        - capitalTotal
+        - gananciaTotalHistorica
+        - gananciaMes
+        - itemsEnStock
+        - itemsReservados
+        - itemsVendidos
+        - ventasUltimos30Dias
+        - comprasUltimos30Dias
+      properties:
+        cajaActual: { type: number }
+        valorInventario: { type: number }
+        capitalTotal: { type: number }
+        gananciaTotalHistorica: { type: number }
+        gananciaMes: { type: number }
+        itemsEnStock: { type: integer }
+        itemsReservados: { type: integer }
+        itemsVendidos: { type: integer }
+        ventasUltimos30Dias: { type: integer }
+        comprasUltimos30Dias: { type: integer }
+
+    Recomendacion:
+      type: object
+      required:
+        - categoria
+        - marca
+        - modelo
+        - unidadesVendidas
+        - avgCostoCompra
+        - avgPrecioVenta
+        - avgGananciaNeta
+        - margenPromedioPct
+        - precioCompraRecomendado
+        - recomendacion
+      properties:
+        categoria: { type: string }
+        marca: { type: string }
+        modelo: { type: string }
+        unidadesVendidas: { type: integer }
+        avgCostoCompra: { type: number }
+        avgPrecioVenta: { type: number }
+        avgGananciaNeta: { type: number }
+        margenPromedioPct: { type: number }
+        precioCompraRecomendado: { type: number }
+        recomendacion: { type: string }
