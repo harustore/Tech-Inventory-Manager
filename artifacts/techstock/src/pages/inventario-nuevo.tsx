@@ -9,6 +9,7 @@ import { useLocation } from "wouter";
 import { ArrowLeft, Loader2, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
+import { formatCurrency } from "@/lib/utils";
 
 export default function InventarioNuevo() {
   const [, setLocation] = useLocation();
@@ -216,7 +217,7 @@ export default function InventarioNuevo() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="precioCompra">Precio de Compra (ARS) <span className="text-red-500">*</span></Label>
+                <Label htmlFor="precioCompra">Precio de Compra (CLP) <span className="text-red-500">*</span></Label>
                 <Input 
                   id="precioCompra" 
                   type="number" 
@@ -229,7 +230,7 @@ export default function InventarioNuevo() {
               </div>
 
               <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="gastosExtra">Gastos Extra (Reparaciones, envíos, etc) (ARS)</Label>
+                <Label htmlFor="gastosExtra">Gastos Extra (Reparaciones, envíos, etc) (CLP)</Label>
                 <Input 
                   id="gastosExtra" 
                   type="number" 
@@ -238,7 +239,7 @@ export default function InventarioNuevo() {
                   value={formData.gastosExtra}
                   onChange={e => setFormData({...formData, gastosExtra: e.target.value})}
                 />
-                <p className="text-xs text-slate-500 mt-1">Costo total: ARS ${(Number(formData.precioCompra) || 0) + (Number(formData.gastosExtra) || 0)}</p>
+                <p className="text-xs text-slate-500 mt-1">Costo total: {formatCurrency((Number(formData.precioCompra) || 0) + (Number(formData.gastosExtra) || 0))}</p>
               </div>
               
               <div className="space-y-2 md:col-span-2">

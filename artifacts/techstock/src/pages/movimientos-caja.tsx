@@ -105,7 +105,7 @@ export default function MovimientosCaja() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="monto">Monto (ARS) <span className="text-red-500">*</span></Label>
+                  <Label htmlFor="monto">Monto (CLP) <span className="text-red-500">*</span></Label>
                   <Input 
                     id="monto" type="number" required min="1" placeholder="0"
                     value={formData.monto} onChange={e => setFormData({...formData, monto: e.target.value})}

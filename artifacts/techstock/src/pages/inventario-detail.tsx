@@ -175,7 +175,7 @@ export default function InventarioDetail() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="precioVenta">
-                        {ventaData.ventaFormaPago === "Cuotas" ? "Valor Final Total (ARS)" : "Precio de Venta (ARS)"}
+                        {ventaData.ventaFormaPago === "Cuotas" ? "Valor Final Total (CLP)" : "Precio de Venta (CLP)"}
                       </Label>
                       <Input 
                         id="precioVenta" type="number" required min="0"
