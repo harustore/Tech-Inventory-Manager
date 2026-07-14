@@ -20,6 +20,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  CuotasPagadasInput,
   Equipo,
   EquipoInput,
   EquipoUpdate,
@@ -953,6 +954,78 @@ export const useRegistrarVentaEquipo = <TError = ErrorType<void>,
         TContext
       > => {
       return useMutation(getRegistrarVentaEquipoMutationOptions(options));
+    }
+
+export const getActualizarCuotasPagadasUrl = (id: number,) => {
+
+
+
+
+  return `/api/equipos/${id}/cuotas-pagadas`
+}
+
+/**
+ * @summary Update how many installments a client has paid for a sale made in cuotas
+ */
+export const actualizarCuotasPagadas = async (id: number,
+    cuotasPagadasInput: CuotasPagadasInput, options?: RequestInit): Promise<Equipo> => {
+
+  return customFetch<Equipo>(getActualizarCuotasPagadasUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(cuotasPagadasInput)
+  }
+);}
+
+
+
+
+
+export const getActualizarCuotasPagadasMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof actualizarCuotasPagadas>>, TError,{id: number;data: BodyType<CuotasPagadasInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof actualizarCuotasPagadas>>, TError,{id: number;data: BodyType<CuotasPagadasInput>}, TContext> => {
+
+const mutationKey = ['actualizarCuotasPagadas'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof actualizarCuotasPagadas>>, {id: number;data: BodyType<CuotasPagadasInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  actualizarCuotasPagadas(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ActualizarCuotasPagadasMutationResult = NonNullable<Awaited<ReturnType<typeof actualizarCuotasPagadas>>>
+    export type ActualizarCuotasPagadasMutationBody = BodyType<CuotasPagadasInput>
+    export type ActualizarCuotasPagadasMutationError = ErrorType<void>
+
+    /**
+ * @summary Update how many installments a client has paid for a sale made in cuotas
+ */
+export const useActualizarCuotasPagadas = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof actualizarCuotasPagadas>>, TError,{id: number;data: BodyType<CuotasPagadasInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof actualizarCuotasPagadas>>,
+        TError,
+        {id: number;data: BodyType<CuotasPagadasInput>},
+        TContext
+      > => {
+      return useMutation(getActualizarCuotasPagadasMutationOptions(options));
     }
 
 export const getReactivarEquipoUrl = (id: number,) => {

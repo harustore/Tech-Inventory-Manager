@@ -157,6 +157,11 @@ export interface Equipo {
      * @nullable
      */
   ventaNumeroCuotas?: number | null;
+  /**
+     * @minimum 0
+     * @nullable
+     */
+  ventaCuotasPagadas?: number | null;
   /** @nullable */
   gananciaNeta?: number | null;
   /** @nullable */
@@ -217,6 +222,14 @@ export interface EquipoUpdate {
   gastosExtra?: number;
   /** @nullable */
   comentarios?: string | null;
+}
+
+export interface CuotasPagadasInput {
+  /**
+     * Cantidad de cuotas que el cliente ya pagó.
+     * @minimum 0
+     */
+  ventaCuotasPagadas: number;
 }
 
 export interface VentaInput {

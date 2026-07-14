@@ -39,6 +39,7 @@ export const equiposTable = pgTable("equipos", {
   precioVenta: numeric("precio_venta", { precision: 12, scale: 2 }),
   ventaFormaPago: text("venta_forma_pago"),
   ventaNumeroCuotas: integer("venta_numero_cuotas"),
+  ventaCuotasPagadas: integer("venta_cuotas_pagadas"),
   gananciaNeta: numeric("ganancia_neta", { precision: 12, scale: 2 }),
   comentarios: text("comentarios"),
   createdAt: timestamp("created_at", { withTimezone: true })

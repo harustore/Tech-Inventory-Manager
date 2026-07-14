@@ -7,6 +7,7 @@
  */
 
 export * from './categoria';
+export * from './cuotasPagadasInput';
 export * from './equipo';
 export * from './equipoInput';
 export * from './equipoUpdate';

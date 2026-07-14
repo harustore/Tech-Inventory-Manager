@@ -234,6 +234,31 @@ paths:
         "404":
           description: Not found
 
+  /equipos/{id}/cuotas-pagadas:
+    patch:
+      operationId: actualizarCuotasPagadas
+      tags: [equipos]
+      summary: Update how many installments a client has paid for a sale made in cuotas
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CuotasPagadasInput"
+      responses:
+        "200":
+          description: Cuotas pagadas updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Equipo"
+        "400":
+          description: Invalid request
+        "404":
+          description: Not found
+
   /equipos/{id}/reactivar:
     patch:
       operationId: reactivarEquipo
@@ -465,6 +490,7 @@ components:
             - $ref: "#/components/schemas/FormaPagoVenta"
             - type: "null"
         ventaNumeroCuotas: { type: ["integer", "null"], minimum: 2 }
+        ventaCuotasPagadas: { type: ["integer", "null"], minimum: 0 }
         gananciaNeta: { type: ["number", "null"] }
         comentarios: { type: ["string", "null"] }
         createdAt: { type: string, format: date-time }
@@ -518,6 +544,15 @@ components:
       enum:
         - Contado
         - Cuotas
+
+    CuotasPagadasInput:
+      type: object
+      required: [ventaCuotasPagadas]
+      properties:
+        ventaCuotasPagadas:
+          type: integer
+          minimum: 0
+          description: Cantidad de cuotas que el cliente ya pagó.
 
     VentaInput:
       type: object

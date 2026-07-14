@@ -49,6 +49,11 @@ export interface Equipo {
      * @nullable
      */
   ventaNumeroCuotas?: number | null;
+  /**
+     * @minimum 0
+     * @nullable
+     */
+  ventaCuotasPagadas?: number | null;
   /** @nullable */
   gananciaNeta?: number | null;
   /** @nullable */

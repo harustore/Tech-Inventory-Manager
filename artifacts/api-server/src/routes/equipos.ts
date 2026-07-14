@@ -16,6 +16,9 @@ import {
   RegistrarVentaEquipoResponse,
   ReactivarEquipoParams,
   ReactivarEquipoResponse,
+  ActualizarCuotasPagadasParams,
+  ActualizarCuotasPagadasBody,
+  ActualizarCuotasPagadasResponse,
 } from "@workspace/api-zod";
 import { requireAuth } from "../middlewares/requireAuth";
 import { toDateOnlyString } from "../lib/dates";
@@ -65,6 +68,7 @@ function equipoWithProveedorSelection() {
     fechaVenta: equiposTable.fechaVenta,
     plataformaVenta: equiposTable.plataformaVenta,
     precioVenta: equiposTable.precioVenta,
+    ventaCuotasPagadas: equiposTable.ventaCuotasPagadas,
     gananciaNeta: equiposTable.gananciaNeta,
     comentarios: equiposTable.comentarios,
     createdAt: equiposTable.createdAt,
@@ -313,6 +317,7 @@ router.patch("/equipos/:id/venta", async (req, res): Promise<void> => {
         precioVenta: String(parsed.data.precioVenta),
         ventaFormaPago,
         ventaNumeroCuotas: ventaFormaPago === "Cuotas" ? parsed.data.ventaNumeroCuotas : null,
+        ventaCuotasPagadas: ventaFormaPago === "Cuotas" ? 0 : null,
         gananciaNeta: String(gananciaNeta),
       })
       .where(eq(equiposTable.id, params.data.id))
@@ -338,6 +343,65 @@ router.patch("/equipos/:id/venta", async (req, res): Promise<void> => {
 
   res.json(
     RegistrarVentaEquipoResponse.parse({
+      ...normalizeEquipo(equipo),
+      proveedorNombre: proveedorNombre?.nombre ?? null,
+    }),
+  );
+});
+
+router.patch("/equipos/:id/cuotas-pagadas", async (req, res): Promise<void> => {
+  const params = ActualizarCuotasPagadasParams.safeParse(req.params);
+  if (!params.success) {
+    res.status(400).json({ error: params.error.message });
+    return;
+  }
+
+  const parsed = ActualizarCuotasPagadasBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.message });
+    return;
+  }
+
+  const [existing] = await db
+    .select()
+    .from(equiposTable)
+    .where(eq(equiposTable.id, params.data.id));
+
+  if (!existing) {
+    res.status(404).json({ error: "Equipo not found" });
+    return;
+  }
+
+  if (existing.estado !== "vendido" || existing.ventaFormaPago !== "Cuotas") {
+    res.status(400).json({ error: "El equipo no fue vendido en cuotas" });
+    return;
+  }
+
+  if (
+    existing.ventaNumeroCuotas !== null &&
+    parsed.data.ventaCuotasPagadas > existing.ventaNumeroCuotas
+  ) {
+    res.status(400).json({
+      error: `ventaCuotasPagadas no puede ser mayor a ventaNumeroCuotas (${existing.ventaNumeroCuotas})`,
+    });
+    return;
+  }
+
+  const [equipo] = await db
+    .update(equiposTable)
+    .set({ ventaCuotasPagadas: parsed.data.ventaCuotasPagadas })
+    .where(eq(equiposTable.id, params.data.id))
+    .returning();
+
+  const [proveedorNombre] = equipo.proveedorId
+    ? await db
+        .select({ nombre: proveedoresTable.nombre })
+        .from(proveedoresTable)
+        .where(eq(proveedoresTable.id, equipo.proveedorId))
+    : [];
+
+  res.json(
+    ActualizarCuotasPagadasResponse.parse({
       ...normalizeEquipo(equipo),
       proveedorNombre: proveedorNombre?.nombre ?? null,
     }),
@@ -376,6 +440,7 @@ router.patch("/equipos/:id/reactivar", async (req, res): Promise<void> => {
         precioVenta: null,
         ventaFormaPago: null,
         ventaNumeroCuotas: null,
+        ventaCuotasPagadas: null,
         gananciaNeta: null,
       })
       .where(eq(equiposTable.id, params.data.id))

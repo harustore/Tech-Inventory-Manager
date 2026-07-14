@@ -1,4 +1,4 @@
-import { useGetEquipo, useDeleteEquipo, useRegistrarVentaEquipo, useReactivarEquipo, getGetEquipoQueryKey } from "@workspace/api-client-react";
+import { useGetEquipo, useDeleteEquipo, useRegistrarVentaEquipo, useReactivarEquipo, useActualizarCuotasPagadas, getGetEquipoQueryKey } from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation, useParams } from "wouter";
@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
 export default function InventarioDetail() {
@@ -37,6 +37,14 @@ export default function InventarioDetail() {
   const deleteEquipo = useDeleteEquipo();
   const registrarVenta = useRegistrarVentaEquipo();
   const reactivar = useReactivarEquipo();
+  const actualizarCuotasPagadas = useActualizarCuotasPagadas();
+  const [cuotasPagadasInput, setCuotasPagadasInput] = useState("");
+
+  useEffect(() => {
+    if (equipo?.ventaFormaPago === "Cuotas") {
+      setCuotasPagadasInput(String(equipo.ventaCuotasPagadas ?? 0));
+    }
+  }, [equipo?.id, equipo?.ventaFormaPago, equipo?.ventaCuotasPagadas]);
 
   const [ventaData, setVentaData] = useState({
     fechaVenta: new Date().toISOString().split('T')[0],
@@ -92,6 +100,21 @@ export default function InventarioDetail() {
       },
       onError: () => {
         toast({ variant: "destructive", title: "Error al reactivar" });
+      }
+    });
+  };
+
+  const handleGuardarCuotasPagadas = () => {
+    actualizarCuotasPagadas.mutate({
+      id: equipoId,
+      data: { ventaCuotasPagadas: Number(cuotasPagadasInput) }
+    }, {
+      onSuccess: (data) => {
+        toast({ title: "Cuotas pagadas actualizadas" });
+        queryClient.setQueryData(getGetEquipoQueryKey(equipoId), data);
+      },
+      onError: () => {
+        toast({ variant: "destructive", title: "Error al actualizar las cuotas pagadas" });
       }
     });
   };
@@ -338,11 +361,65 @@ export default function InventarioDetail() {
                     <span className="font-bold text-emerald-700">{formatCurrency(equipo.precioVenta)}</span>
                   </div>
                   {equipo.ventaFormaPago === "Cuotas" && equipo.ventaNumeroCuotas ? (
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-slate-500">Pago en cuotas</span>
-                      <span className="font-medium text-slate-900">
-                        {equipo.ventaNumeroCuotas} cuotas de {formatCurrency(equipo.precioVenta / equipo.ventaNumeroCuotas)}
-                      </span>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-slate-500">Pago en cuotas</span>
+                        <span className="font-medium text-slate-900">
+                          {equipo.ventaNumeroCuotas} cuotas de {formatCurrency(equipo.precioVenta / equipo.ventaNumeroCuotas)}
+                        </span>
+                      </div>
+                      <div className="rounded-lg bg-slate-50 border border-slate-200 p-3 space-y-2">
+                        <div className="flex justify-between items-center text-sm">
+                          <span className="text-slate-500">Cuotas pagadas</span>
+                          <span className={cn(
+                            "font-semibold",
+                            (equipo.ventaCuotasPagadas ?? 0) >= equipo.ventaNumeroCuotas ? "text-emerald-600" : "text-slate-900"
+                          )}>
+                            {equipo.ventaCuotasPagadas ?? 0} de {equipo.ventaNumeroCuotas}
+                            {(equipo.ventaCuotasPagadas ?? 0) >= equipo.ventaNumeroCuotas && " · Pagado"}
+                          </span>
+                        </div>
+                        <div className="w-full h-2 rounded-full bg-slate-200 overflow-hidden">
+                          <div
+                            className="h-full bg-emerald-500 rounded-full transition-all"
+                            style={{ width: `${Math.min(100, ((equipo.ventaCuotasPagadas ?? 0) / equipo.ventaNumeroCuotas) * 100)}%` }}
+                          />
+                        </div>
+                        <div className="flex items-center gap-2 pt-1">
+                          <Input
+                            type="number" min="0" max={equipo.ventaNumeroCuotas} step="1"
+                            className="h-8 w-20 bg-white"
+                            value={cuotasPagadasInput}
+                            onChange={e => setCuotasPagadasInput(e.target.value)}
+                          />
+                          <Button
+                            type="button" size="sm" variant="outline" className="h-8"
+                            disabled={actualizarCuotasPagadas.isPending || cuotasPagadasInput === ""}
+                            onClick={handleGuardarCuotasPagadas}
+                          >
+                            {actualizarCuotasPagadas.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Guardar"}
+                          </Button>
+                          {(equipo.ventaCuotasPagadas ?? 0) < equipo.ventaNumeroCuotas && (
+                            <Button
+                              type="button" size="sm" variant="ghost" className="h-8 text-emerald-700 hover:text-emerald-800"
+                              disabled={actualizarCuotasPagadas.isPending}
+                              onClick={() => {
+                                const next = (equipo.ventaCuotasPagadas ?? 0) + 1;
+                                setCuotasPagadasInput(String(next));
+                                actualizarCuotasPagadas.mutate({ id: equipoId, data: { ventaCuotasPagadas: next } }, {
+                                  onSuccess: (data) => {
+                                    toast({ title: "Cuota registrada" });
+                                    queryClient.setQueryData(getGetEquipoQueryKey(equipoId), data);
+                                  },
+                                  onError: () => toast({ variant: "destructive", title: "Error al actualizar las cuotas pagadas" })
+                                });
+                              }}
+                            >
+                              + Registrar cuota pagada
+                            </Button>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   ) : (
                     <div className="flex justify-between items-center text-sm">
