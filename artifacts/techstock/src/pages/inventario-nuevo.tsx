@@ -186,18 +186,19 @@ export default function InventarioNuevo() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="proveedorId">Proveedor</Label>
+                <Label htmlFor="proveedorId">¿A quién se lo compraste?</Label>
                 <Select value={formData.proveedorId} onValueChange={(val) => setFormData({...formData, proveedorId: val})}>
                   <SelectTrigger id="proveedorId">
-                    <SelectValue placeholder="Sin proveedor" />
+                    <SelectValue placeholder="Sin contacto registrado" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="none">-- Sin proveedor (Particular) --</SelectItem>
+                    <SelectItem value="none">-- Sin contacto registrado --</SelectItem>
                     {proveedores?.map(prov => (
                       <SelectItem key={prov.id} value={prov.id.toString()}>{prov.nombre}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
+                <p className="text-xs text-slate-500">Sirve para poder ubicarlo si el equipo presenta fallas.</p>
               </div>
 
               <div className="space-y-2">

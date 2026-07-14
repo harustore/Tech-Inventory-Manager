@@ -293,6 +293,12 @@ router.patch("/equipos/:id/venta", async (req, res): Promise<void> => {
     return;
   }
 
+  const ventaFormaPago = parsed.data.ventaFormaPago ?? "Contado";
+  if (ventaFormaPago === "Cuotas" && !parsed.data.ventaNumeroCuotas) {
+    res.status(400).json({ error: "ventaNumeroCuotas es requerido cuando la venta es en cuotas" });
+    return;
+  }
+
   const fechaVenta = toDateOnlyString(parsed.data.fechaVenta);
   const costoTotal = Number(existing.costoTotal);
   const gananciaNeta = parsed.data.precioVenta - costoTotal;
@@ -305,6 +311,8 @@ router.patch("/equipos/:id/venta", async (req, res): Promise<void> => {
         fechaVenta,
         plataformaVenta: parsed.data.plataformaVenta,
         precioVenta: String(parsed.data.precioVenta),
+        ventaFormaPago,
+        ventaNumeroCuotas: ventaFormaPago === "Cuotas" ? parsed.data.ventaNumeroCuotas : null,
         gananciaNeta: String(gananciaNeta),
       })
       .where(eq(equiposTable.id, params.data.id))
@@ -366,6 +374,8 @@ router.patch("/equipos/:id/reactivar", async (req, res): Promise<void> => {
         fechaVenta: null,
         plataformaVenta: null,
         precioVenta: null,
+        ventaFormaPago: null,
+        ventaNumeroCuotas: null,
         gananciaNeta: null,
       })
       .where(eq(equiposTable.id, params.data.id))

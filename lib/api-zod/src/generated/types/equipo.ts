@@ -9,6 +9,7 @@ import type { Categoria } from './categoria';
 import type { EstadoEquipo } from './estadoEquipo';
 import type { EstadoEquipoCondicion } from './estadoEquipoCondicion';
 import type { FormaPago } from './formaPago';
+import type { FormaPagoVenta } from './formaPagoVenta';
 
 export interface Equipo {
   id: number;
@@ -42,6 +43,12 @@ export interface Equipo {
   plataformaVenta?: string | null;
   /** @nullable */
   precioVenta?: number | null;
+  ventaFormaPago?: FormaPagoVenta | null;
+  /**
+     * @minimum 2
+     * @nullable
+     */
+  ventaNumeroCuotas?: number | null;
   /** @nullable */
   gananciaNeta?: number | null;
   /** @nullable */

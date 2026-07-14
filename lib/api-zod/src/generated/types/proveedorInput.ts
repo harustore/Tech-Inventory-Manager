@@ -10,6 +10,9 @@ export interface ProveedorInput {
   /** @minLength 1 */
   nombre: string;
   telefono?: string;
+  facebook?: string;
+  rut?: string;
+  usuarioMercadolibre?: string;
   email?: string;
   direccion?: string;
   comentarios?: string;

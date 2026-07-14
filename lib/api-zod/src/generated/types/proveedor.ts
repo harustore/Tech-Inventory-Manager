@@ -12,6 +12,12 @@ export interface Proveedor {
   /** @nullable */
   telefono?: string | null;
   /** @nullable */
+  facebook?: string | null;
+  /** @nullable */
+  rut?: string | null;
+  /** @nullable */
+  usuarioMercadolibre?: string | null;
+  /** @nullable */
   email?: string | null;
   /** @nullable */
   direccion?: string | null;

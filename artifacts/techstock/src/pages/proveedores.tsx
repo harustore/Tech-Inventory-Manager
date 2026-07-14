@@ -3,7 +3,7 @@ import { useListProveedores, useCreateProveedor, useDeleteProveedor, getListProv
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Plus, Trash2, Mail, Phone, MapPin, Building2, Loader2 } from "lucide-react";
+import { Search, Plus, Trash2, Mail, Phone, MapPin, Building2, Loader2, Facebook, IdCard, ShoppingBag } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -32,36 +32,40 @@ export default function Proveedores() {
   const [formData, setFormData] = useState({
     nombre: "",
     telefono: "",
+    facebook: "",
+    rut: "",
+    usuarioMercadolibre: "",
     email: "",
     direccion: "",
     comentarios: ""
   });
 
-  const filteredProveedores = proveedores?.filter(p => 
+  const filteredProveedores = proveedores?.filter(p =>
     p.nombre.toLowerCase().includes(search.toLowerCase()) ||
-    (p.telefono && p.telefono.includes(search))
+    (p.telefono && p.telefono.includes(search)) ||
+    (p.rut && p.rut.toLowerCase().includes(search.toLowerCase()))
   );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     createProveedor.mutate({ data: formData }, {
       onSuccess: () => {
-        toast({ title: "Proveedor agregado" });
+        toast({ title: "Contacto agregado" });
         setIsOpen(false);
-        setFormData({ nombre: "", telefono: "", email: "", direccion: "", comentarios: "" });
+        setFormData({ nombre: "", telefono: "", facebook: "", rut: "", usuarioMercadolibre: "", email: "", direccion: "", comentarios: "" });
         queryClient.invalidateQueries({ queryKey: getListProveedoresQueryKey() });
       },
       onError: () => {
-        toast({ variant: "destructive", title: "Error al agregar proveedor" });
+        toast({ variant: "destructive", title: "Error al agregar el contacto" });
       }
     });
   };
 
   const handleDelete = (id: number) => {
-    if(!confirm("¿Eliminar proveedor?")) return;
+    if(!confirm("¿Eliminar este contacto?")) return;
     deleteProveedor.mutate({ id }, {
       onSuccess: () => {
-        toast({ title: "Proveedor eliminado" });
+        toast({ title: "Contacto eliminado" });
         queryClient.invalidateQueries({ queryKey: getListProveedoresQueryKey() });
       }
     });
@@ -71,57 +75,80 @@ export default function Proveedores() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Proveedores</h1>
-          <p className="text-slate-500 mt-1">Contactos y fuentes de compra</p>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Contactos de Compra</h1>
+          <p className="text-slate-500 mt-1">Registro de a quién le compraste cada equipo, útil si hay que reclamar por una falla</p>
         </div>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
             <Button className="bg-emerald-500 hover:bg-emerald-600 text-white shadow-sm">
               <Plus className="w-4 h-4 mr-2" />
-              Nuevo Proveedor
+              Nuevo Contacto
             </Button>
           </DialogTrigger>
           <DialogContent>
             <form onSubmit={handleSubmit}>
               <DialogHeader>
-                <DialogTitle>Agregar Proveedor</DialogTitle>
-                <DialogDescription>Registra un nuevo contacto para tus compras.</DialogDescription>
+                <DialogTitle>Agregar Contacto de Compra</DialogTitle>
+                <DialogDescription>Registra a quién le compraste, para poder ubicarlo si el equipo tiene fallas.</DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="space-y-2">
                   <Label htmlFor="nombre">Nombre <span className="text-red-500">*</span></Label>
-                  <Input 
-                    id="nombre" required placeholder="Nombre o Razón Social"
+                  <Input
+                    id="nombre" required placeholder="Nombre de la persona o negocio"
                     value={formData.nombre} onChange={e => setFormData({...formData, nombre: e.target.value})}
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="telefono">Teléfono</Label>
-                    <Input 
-                      id="telefono" placeholder="Ej: +54 9 11..."
+                    <Input
+                      id="telefono" placeholder="Ej: +56 9..."
                       value={formData.telefono} onChange={e => setFormData({...formData, telefono: e.target.value})}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input 
-                      id="email" type="email" placeholder="correo@ejemplo.com"
-                      value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})}
+                    <Label htmlFor="rut">RUT</Label>
+                    <Input
+                      id="rut" placeholder="Ej: 12.345.678-9"
+                      value={formData.rut} onChange={e => setFormData({...formData, rut: e.target.value})}
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="facebook">Facebook</Label>
+                    <Input
+                      id="facebook" placeholder="Nombre de perfil o link"
+                      value={formData.facebook} onChange={e => setFormData({...formData, facebook: e.target.value})}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="usuarioMercadolibre">Usuario Mercado Libre</Label>
+                    <Input
+                      id="usuarioMercadolibre" placeholder="Si la compra fue por la app"
+                      value={formData.usuarioMercadolibre} onChange={e => setFormData({...formData, usuarioMercadolibre: e.target.value})}
                     />
                   </div>
                 </div>
                 <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email" type="email" placeholder="correo@ejemplo.com"
+                    value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
                   <Label htmlFor="direccion">Dirección / Zona</Label>
-                  <Input 
-                    id="direccion" placeholder="Ej: Microcentro, Galería..."
+                  <Input
+                    id="direccion" placeholder="Ej: Providencia, Feria..."
                     value={formData.direccion} onChange={e => setFormData({...formData, direccion: e.target.value})}
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="comentarios">Notas</Label>
-                  <Textarea 
-                    id="comentarios" placeholder="Horarios, condiciones especiales..." className="resize-none"
+                  <Textarea
+                    id="comentarios" placeholder="Otros datos útiles..." className="resize-none"
                     value={formData.comentarios} onChange={e => setFormData({...formData, comentarios: e.target.value})}
                   />
                 </div>
@@ -139,8 +166,8 @@ export default function Proveedores() {
 
       <div className="relative max-w-md">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-        <Input 
-          placeholder="Buscar proveedores..." 
+        <Input
+          placeholder="Buscar por nombre, teléfono o RUT..."
           className="pl-9 bg-white"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -156,8 +183,8 @@ export default function Proveedores() {
       ) : filteredProveedores?.length === 0 ? (
         <div className="text-center py-20 bg-white rounded-xl border border-slate-200 border-dashed">
           <Building2 className="mx-auto h-12 w-12 text-slate-300" />
-          <h3 className="mt-4 text-lg font-semibold text-slate-900">No hay proveedores</h3>
-          <p className="mt-1 text-sm text-slate-500">Añade tu primer proveedor para empezar.</p>
+          <h3 className="mt-4 text-lg font-semibold text-slate-900">No hay contactos registrados</h3>
+          <p className="mt-1 text-sm text-slate-500">Añade tu primer contacto de compra para empezar.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -177,6 +204,24 @@ export default function Proveedores() {
                       <span>{proveedor.telefono}</span>
                     </div>
                   )}
+                  {proveedor.rut && (
+                    <div className="flex items-center gap-2">
+                      <IdCard className="w-4 h-4 text-slate-400 shrink-0" />
+                      <span>{proveedor.rut}</span>
+                    </div>
+                  )}
+                  {proveedor.facebook && (
+                    <div className="flex items-center gap-2">
+                      <Facebook className="w-4 h-4 text-slate-400 shrink-0" />
+                      <span className="truncate">{proveedor.facebook}</span>
+                    </div>
+                  )}
+                  {proveedor.usuarioMercadolibre && (
+                    <div className="flex items-center gap-2">
+                      <ShoppingBag className="w-4 h-4 text-slate-400 shrink-0" />
+                      <span className="truncate">ML: {proveedor.usuarioMercadolibre}</span>
+                    </div>
+                  )}
                   {proveedor.email && (
                     <div className="flex items-center gap-2">
                       <Mail className="w-4 h-4 text-slate-400 shrink-0" />
@@ -189,7 +234,7 @@ export default function Proveedores() {
                       <span className="truncate">{proveedor.direccion}</span>
                     </div>
                   )}
-                  {!proveedor.telefono && !proveedor.email && !proveedor.direccion && (
+                  {!proveedor.telefono && !proveedor.rut && !proveedor.facebook && !proveedor.usuarioMercadolibre && !proveedor.email && !proveedor.direccion && (
                     <p className="text-slate-400 italic">Sin datos de contacto</p>
                   )}
                 </div>

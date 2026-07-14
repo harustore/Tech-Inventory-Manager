@@ -5,11 +5,21 @@
  * API specification for TechStock inventory manager
  * OpenAPI spec version: 0.1.0
  */
+import type { FormaPagoVenta } from './formaPagoVenta';
 
 export interface VentaInput {
   fechaVenta: Date;
   /** @minLength 1 */
   plataformaVenta: string;
-  /** @minimum 0 */
+  /**
+     * Valor final total de la venta (si es en cuotas, es el total de todas las cuotas).
+     * @minimum 0
+     */
   precioVenta: number;
+  ventaFormaPago?: FormaPagoVenta;
+  /**
+     * Cantidad de cuotas, requerido solo si ventaFormaPago es Cuotas.
+     * @minimum 2
+     */
+  ventaNumeroCuotas?: number;
 }

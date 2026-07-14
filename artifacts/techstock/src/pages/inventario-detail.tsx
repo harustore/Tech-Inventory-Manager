@@ -41,7 +41,9 @@ export default function InventarioDetail() {
   const [ventaData, setVentaData] = useState({
     fechaVenta: new Date().toISOString().split('T')[0],
     plataformaVenta: "",
-    precioVenta: ""
+    precioVenta: "",
+    ventaFormaPago: "Contado" as "Contado" | "Cuotas",
+    ventaNumeroCuotas: ""
   });
   
   const [isVentaOpen, setIsVentaOpen] = useState(false);
@@ -66,7 +68,9 @@ export default function InventarioDetail() {
       data: {
         fechaVenta: ventaData.fechaVenta,
         plataformaVenta: ventaData.plataformaVenta,
-        precioVenta: Number(ventaData.precioVenta)
+        precioVenta: Number(ventaData.precioVenta),
+        ventaFormaPago: ventaData.ventaFormaPago,
+        ventaNumeroCuotas: ventaData.ventaFormaPago === "Cuotas" ? Number(ventaData.ventaNumeroCuotas) : undefined
       }
     }, {
       onSuccess: (data) => {
@@ -149,13 +153,51 @@ export default function InventarioDetail() {
                   </DialogHeader>
                   <div className="grid gap-4 py-4">
                     <div className="space-y-2">
-                      <Label htmlFor="precioVenta">Precio de Venta (ARS)</Label>
+                      <Label>Forma de Pago</Label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button
+                          type="button"
+                          variant={ventaData.ventaFormaPago === "Contado" ? "default" : "outline"}
+                          className={ventaData.ventaFormaPago === "Contado" ? "bg-emerald-500 hover:bg-emerald-600" : ""}
+                          onClick={() => setVentaData({...ventaData, ventaFormaPago: "Contado", ventaNumeroCuotas: ""})}
+                        >
+                          Al contado
+                        </Button>
+                        <Button
+                          type="button"
+                          variant={ventaData.ventaFormaPago === "Cuotas" ? "default" : "outline"}
+                          className={ventaData.ventaFormaPago === "Cuotas" ? "bg-emerald-500 hover:bg-emerald-600" : ""}
+                          onClick={() => setVentaData({...ventaData, ventaFormaPago: "Cuotas"})}
+                        >
+                          En cuotas
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="precioVenta">
+                        {ventaData.ventaFormaPago === "Cuotas" ? "Valor Final Total (ARS)" : "Precio de Venta (ARS)"}
+                      </Label>
                       <Input 
                         id="precioVenta" type="number" required min="0"
                         value={ventaData.precioVenta} onChange={e => setVentaData({...ventaData, precioVenta: e.target.value})}
                       />
                       <p className="text-xs text-slate-500">Costo total: {formatCurrency(equipo.costoTotal)}</p>
                     </div>
+                    {ventaData.ventaFormaPago === "Cuotas" && (
+                      <div className="space-y-2">
+                        <Label htmlFor="ventaNumeroCuotas">Número de Cuotas</Label>
+                        <Input
+                          id="ventaNumeroCuotas" type="number" required min="2" step="1"
+                          placeholder="Ej: 3"
+                          value={ventaData.ventaNumeroCuotas} onChange={e => setVentaData({...ventaData, ventaNumeroCuotas: e.target.value})}
+                        />
+                        {Number(ventaData.precioVenta) > 0 && Number(ventaData.ventaNumeroCuotas) > 0 && (
+                          <p className="text-xs text-slate-500">
+                            {ventaData.ventaNumeroCuotas} cuotas de {formatCurrency(Number(ventaData.precioVenta) / Number(ventaData.ventaNumeroCuotas))} c/u
+                          </p>
+                        )}
+                      </div>
+                    )}
                     <div className="space-y-2">
                       <Label htmlFor="fechaVenta">Fecha</Label>
                       <Input 
@@ -292,9 +334,22 @@ export default function InventarioDetail() {
               {isVendido && equipo.precioVenta != null && equipo.gananciaNeta != null && (
                 <div className="space-y-3 pt-6 border-t border-slate-200/60">
                   <div className="flex justify-between items-center text-sm">
-                    <span className="text-emerald-700 font-medium">Precio Venta</span>
+                    <span className="text-emerald-700 font-medium">Valor Final Venta</span>
                     <span className="font-bold text-emerald-700">{formatCurrency(equipo.precioVenta)}</span>
                   </div>
+                  {equipo.ventaFormaPago === "Cuotas" && equipo.ventaNumeroCuotas ? (
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-slate-500">Pago en cuotas</span>
+                      <span className="font-medium text-slate-900">
+                        {equipo.ventaNumeroCuotas} cuotas de {formatCurrency(equipo.precioVenta / equipo.ventaNumeroCuotas)}
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-slate-500">Forma de pago</span>
+                      <span className="font-medium text-slate-900">Al contado</span>
+                    </div>
+                  )}
                   <div className="flex justify-between items-center pt-3">
                     <span className="font-bold text-slate-900">Ganancia Neta</span>
                     <span className={cn(

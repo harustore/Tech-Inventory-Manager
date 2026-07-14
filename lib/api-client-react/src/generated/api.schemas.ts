@@ -66,6 +66,12 @@ export interface Proveedor {
   /** @nullable */
   telefono?: string | null;
   /** @nullable */
+  facebook?: string | null;
+  /** @nullable */
+  rut?: string | null;
+  /** @nullable */
+  usuarioMercadolibre?: string | null;
+  /** @nullable */
   email?: string | null;
   /** @nullable */
   direccion?: string | null;
@@ -78,6 +84,9 @@ export interface ProveedorInput {
   /** @minLength 1 */
   nombre: string;
   telefono?: string;
+  facebook?: string;
+  rut?: string;
+  usuarioMercadolibre?: string;
   email?: string;
   direccion?: string;
   comentarios?: string;
@@ -89,12 +98,26 @@ export interface ProveedorUpdate {
   /** @nullable */
   telefono?: string | null;
   /** @nullable */
+  facebook?: string | null;
+  /** @nullable */
+  rut?: string | null;
+  /** @nullable */
+  usuarioMercadolibre?: string | null;
+  /** @nullable */
   email?: string | null;
   /** @nullable */
   direccion?: string | null;
   /** @nullable */
   comentarios?: string | null;
 }
+
+export type FormaPagoVenta = typeof FormaPagoVenta[keyof typeof FormaPagoVenta];
+
+
+export const FormaPagoVenta = {
+  Contado: 'Contado',
+  Cuotas: 'Cuotas',
+} as const;
 
 export interface Equipo {
   id: number;
@@ -128,6 +151,12 @@ export interface Equipo {
   plataformaVenta?: string | null;
   /** @nullable */
   precioVenta?: number | null;
+  ventaFormaPago?: FormaPagoVenta | null;
+  /**
+     * @minimum 2
+     * @nullable
+     */
+  ventaNumeroCuotas?: number | null;
   /** @nullable */
   gananciaNeta?: number | null;
   /** @nullable */
@@ -194,8 +223,17 @@ export interface VentaInput {
   fechaVenta: string;
   /** @minLength 1 */
   plataformaVenta: string;
-  /** @minimum 0 */
+  /**
+     * Valor final total de la venta (si es en cuotas, es el total de todas las cuotas).
+     * @minimum 0
+     */
   precioVenta: number;
+  ventaFormaPago?: FormaPagoVenta;
+  /**
+     * Cantidad de cuotas, requerido solo si ventaFormaPago es Cuotas.
+     * @minimum 2
+     */
+  ventaNumeroCuotas?: number;
 }
 
 export type TipoMovimiento = typeof TipoMovimiento[keyof typeof TipoMovimiento];

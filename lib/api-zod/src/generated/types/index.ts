@@ -13,6 +13,7 @@ export * from './equipoUpdate';
 export * from './estadoEquipo';
 export * from './estadoEquipoCondicion';
 export * from './formaPago';
+export * from './formaPagoVenta';
 export * from './healthStatus';
 export * from './listEquiposParams';
 export * from './movimientoCaja';
