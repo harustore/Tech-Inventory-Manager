@@ -1,4 +1,4 @@
-import { useGetEquipo, useDeleteEquipo, useRegistrarVentaEquipo, useReactivarEquipo, useActualizarCuotasPagadas, getGetEquipoQueryKey } from "@workspace/api-client-react";
+import { useGetEquipo, useDeleteEquipo, useRegistrarVentaEquipo, useReactivarEquipo, useListPagosCuotas, useRegistrarPagoCuota, useEliminarPagoCuota, getGetEquipoQueryKey, getListPagosCuotasQueryKey } from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation, useParams } from "wouter";
@@ -37,14 +37,21 @@ export default function InventarioDetail() {
   const deleteEquipo = useDeleteEquipo();
   const registrarVenta = useRegistrarVentaEquipo();
   const reactivar = useReactivarEquipo();
-  const actualizarCuotasPagadas = useActualizarCuotasPagadas();
-  const [cuotasPagadasInput, setCuotasPagadasInput] = useState("");
+  const registrarPagoCuota = useRegistrarPagoCuota();
+  const eliminarPagoCuota = useEliminarPagoCuota();
 
-  useEffect(() => {
-    if (equipo?.ventaFormaPago === "Cuotas") {
-      setCuotasPagadasInput(String(equipo.ventaCuotasPagadas ?? 0));
+  const esVentaEnCuotas = equipo?.estado === "vendido" && equipo?.ventaFormaPago === "Cuotas";
+  const { data: pagosCuotas } = useListPagosCuotas(equipoId, {
+    query: {
+      enabled: !!equipoId && !isNaN(equipoId) && esVentaEnCuotas,
+      queryKey: getListPagosCuotasQueryKey(equipoId)
     }
-  }, [equipo?.id, equipo?.ventaFormaPago, equipo?.ventaCuotasPagadas]);
+  });
+
+  const [nuevoPago, setNuevoPago] = useState({
+    monto: "",
+    fecha: new Date().toISOString().split('T')[0]
+  });
 
   const [ventaData, setVentaData] = useState({
     fechaVenta: new Date().toISOString().split('T')[0],
@@ -104,20 +111,44 @@ export default function InventarioDetail() {
     });
   };
 
-  const handleGuardarCuotasPagadas = () => {
-    actualizarCuotasPagadas.mutate({
+  const handleRegistrarPago = (e: React.FormEvent) => {
+    e.preventDefault();
+    registrarPagoCuota.mutate({
       id: equipoId,
-      data: { ventaCuotasPagadas: Number(cuotasPagadasInput) }
+      data: { monto: Number(nuevoPago.monto), fecha: nuevoPago.fecha }
     }, {
       onSuccess: (data) => {
-        toast({ title: "Cuotas pagadas actualizadas" });
+        toast({ title: "Pago de cuota registrado" });
+        setNuevoPago({ monto: "", fecha: new Date().toISOString().split('T')[0] });
         queryClient.setQueryData(getGetEquipoQueryKey(equipoId), data);
+        queryClient.invalidateQueries({ queryKey: getListPagosCuotasQueryKey(equipoId) });
       },
       onError: () => {
-        toast({ variant: "destructive", title: "Error al actualizar las cuotas pagadas" });
+        toast({ variant: "destructive", title: "Error al registrar el pago" });
       }
     });
   };
+
+  const handleEliminarPago = (pagoId: number) => {
+    if (!confirm("¿Eliminar este pago?")) return;
+    eliminarPagoCuota.mutate({ id: pagoId }, {
+      onSuccess: (data) => {
+        toast({ title: "Pago eliminado" });
+        queryClient.setQueryData(getGetEquipoQueryKey(equipoId), data);
+        queryClient.invalidateQueries({ queryKey: getListPagosCuotasQueryKey(equipoId) });
+      },
+      onError: () => {
+        toast({ variant: "destructive", title: "Error al eliminar el pago" });
+      }
+    });
+  };
+
+  /** Interpolates a red-to-green color for a 0-100 progress percentage. */
+  function progressColor(pct: number) {
+    const clamped = Math.max(0, Math.min(100, pct));
+    const hue = (clamped / 100) * 120; // 0 = red, 120 = green
+    return `hsl(${hue}, 75%, 45%)`;
+  }
 
   if (isLoading) {
     return (
@@ -361,66 +392,89 @@ export default function InventarioDetail() {
                     <span className="font-bold text-emerald-700">{formatCurrency(equipo.precioVenta)}</span>
                   </div>
                   {equipo.ventaFormaPago === "Cuotas" && equipo.ventaNumeroCuotas ? (
-                    <div className="space-y-3">
-                      <div className="flex justify-between items-center text-sm">
-                        <span className="text-slate-500">Pago en cuotas</span>
-                        <span className="font-medium text-slate-900">
-                          {equipo.ventaNumeroCuotas} cuotas de {formatCurrency(equipo.precioVenta / equipo.ventaNumeroCuotas)}
-                        </span>
-                      </div>
-                      <div className="rounded-lg bg-slate-50 border border-slate-200 p-3 space-y-2">
-                        <div className="flex justify-between items-center text-sm">
-                          <span className="text-slate-500">Cuotas pagadas</span>
-                          <span className={cn(
-                            "font-semibold",
-                            (equipo.ventaCuotasPagadas ?? 0) >= equipo.ventaNumeroCuotas ? "text-emerald-600" : "text-slate-900"
-                          )}>
-                            {equipo.ventaCuotasPagadas ?? 0} de {equipo.ventaNumeroCuotas}
-                            {(equipo.ventaCuotasPagadas ?? 0) >= equipo.ventaNumeroCuotas && " · Pagado"}
-                          </span>
+                    (() => {
+                      const montoPagado = (pagosCuotas ?? []).reduce((sum, p) => sum + p.monto, 0);
+                      const pct = equipo.precioVenta > 0 ? (montoPagado / equipo.precioVenta) * 100 : 0;
+                      const cuotasPagadas = pagosCuotas?.length ?? 0;
+                      const completo = cuotasPagadas >= equipo.ventaNumeroCuotas!;
+                      return (
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-center text-sm">
+                            <span className="text-slate-500">Pago en cuotas</span>
+                            <span className="font-medium text-slate-900">
+                              {equipo.ventaNumeroCuotas} cuotas de {formatCurrency(equipo.precioVenta / equipo.ventaNumeroCuotas)}
+                            </span>
+                          </div>
+                          <div className="rounded-lg bg-slate-50 border border-slate-200 p-3 space-y-3">
+                            <div className="flex justify-between items-center text-sm">
+                              <span className="text-slate-500">Pagado</span>
+                              <span className="font-semibold text-slate-900">
+                                {formatCurrency(montoPagado)} de {formatCurrency(equipo.precioVenta)}
+                                {completo && <span className="text-emerald-600"> · Completo</span>}
+                              </span>
+                            </div>
+                            <div className="w-full h-2.5 rounded-full bg-slate-200 overflow-hidden">
+                              <div
+                                className="h-full rounded-full transition-all"
+                                style={{ width: `${Math.min(100, pct)}%`, backgroundColor: progressColor(pct) }}
+                              />
+                            </div>
+                            <div className="flex justify-between items-center text-xs text-slate-500">
+                              <span>{cuotasPagadas} de {equipo.ventaNumeroCuotas} cuotas registradas</span>
+                              <span>{Math.round(pct)}%</span>
+                            </div>
+
+                            {(pagosCuotas?.length ?? 0) > 0 && (
+                              <div className="space-y-1 pt-1 border-t border-slate-200/70">
+                                {pagosCuotas!.map((pago, idx) => (
+                                  <div key={pago.id} className="flex justify-between items-center text-sm py-1">
+                                    <span className="text-slate-500">Cuota {idx + 1} · {formatDate(pago.fecha)}</span>
+                                    <div className="flex items-center gap-2">
+                                      <span className="font-medium text-slate-900">{formatCurrency(pago.monto)}</span>
+                                      <Button
+                                        type="button" variant="ghost" size="icon" className="h-6 w-6 text-slate-400 hover:text-red-600"
+                                        onClick={() => handleEliminarPago(pago.id)}
+                                      >
+                                        <Trash2 className="h-3.5 w-3.5" />
+                                      </Button>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+
+                            {!completo && (
+                              <form onSubmit={handleRegistrarPago} className="flex items-end gap-2 pt-2 border-t border-slate-200/70">
+                                <div className="space-y-1 flex-1">
+                                  <Label htmlFor="montoPago" className="text-xs">Monto pagado</Label>
+                                  <Input
+                                    id="montoPago" type="number" min="0" required
+                                    className="h-8 bg-white"
+                                    value={nuevoPago.monto}
+                                    onChange={e => setNuevoPago({ ...nuevoPago, monto: e.target.value })}
+                                  />
+                                </div>
+                                <div className="space-y-1">
+                                  <Label htmlFor="fechaPago" className="text-xs">Fecha</Label>
+                                  <Input
+                                    id="fechaPago" type="date" required
+                                    className="h-8 bg-white"
+                                    value={nuevoPago.fecha}
+                                    onChange={e => setNuevoPago({ ...nuevoPago, fecha: e.target.value })}
+                                  />
+                                </div>
+                                <Button
+                                  type="submit" size="sm" className="h-8 bg-emerald-500 hover:bg-emerald-600"
+                                  disabled={registrarPagoCuota.isPending}
+                                >
+                                  {registrarPagoCuota.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Registrar"}
+                                </Button>
+                              </form>
+                            )}
+                          </div>
                         </div>
-                        <div className="w-full h-2 rounded-full bg-slate-200 overflow-hidden">
-                          <div
-                            className="h-full bg-emerald-500 rounded-full transition-all"
-                            style={{ width: `${Math.min(100, ((equipo.ventaCuotasPagadas ?? 0) / equipo.ventaNumeroCuotas) * 100)}%` }}
-                          />
-                        </div>
-                        <div className="flex items-center gap-2 pt-1">
-                          <Input
-                            type="number" min="0" max={equipo.ventaNumeroCuotas} step="1"
-                            className="h-8 w-20 bg-white"
-                            value={cuotasPagadasInput}
-                            onChange={e => setCuotasPagadasInput(e.target.value)}
-                          />
-                          <Button
-                            type="button" size="sm" variant="outline" className="h-8"
-                            disabled={actualizarCuotasPagadas.isPending || cuotasPagadasInput === ""}
-                            onClick={handleGuardarCuotasPagadas}
-                          >
-                            {actualizarCuotasPagadas.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Guardar"}
-                          </Button>
-                          {(equipo.ventaCuotasPagadas ?? 0) < equipo.ventaNumeroCuotas && (
-                            <Button
-                              type="button" size="sm" variant="ghost" className="h-8 text-emerald-700 hover:text-emerald-800"
-                              disabled={actualizarCuotasPagadas.isPending}
-                              onClick={() => {
-                                const next = (equipo.ventaCuotasPagadas ?? 0) + 1;
-                                setCuotasPagadasInput(String(next));
-                                actualizarCuotasPagadas.mutate({ id: equipoId, data: { ventaCuotasPagadas: next } }, {
-                                  onSuccess: (data) => {
-                                    toast({ title: "Cuota registrada" });
-                                    queryClient.setQueryData(getGetEquipoQueryKey(equipoId), data);
-                                  },
-                                  onError: () => toast({ variant: "destructive", title: "Error al actualizar las cuotas pagadas" })
-                                });
-                              }}
-                            >
-                              + Registrar cuota pagada
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
+                      );
+                    })()
                   ) : (
                     <div className="flex justify-between items-center text-sm">
                       <span className="text-slate-500">Forma de pago</span>

@@ -445,36 +445,58 @@ export const RegistrarVentaEquipoResponse = zod.object({
 
 
 /**
- * @summary Update how many installments a client has paid for a sale made in cuotas
+ * @summary List installment payments made by the client for a sale made in cuotas
  */
-export const ActualizarCuotasPagadasParams = zod.object({
+export const ListPagosCuotasParams = zod.object({
   "id": zod.coerce.number()
 })
 
-export const actualizarCuotasPagadasBodyVentaCuotasPagadasMin = 0;
+export const listPagosCuotasResponseMontoMin = 0;
 
 
 
-export const ActualizarCuotasPagadasBody = zod.object({
-  "ventaCuotasPagadas": zod.number().min(actualizarCuotasPagadasBodyVentaCuotasPagadasMin).describe('Cantidad de cuotas que el cliente ya pagó.')
+export const ListPagosCuotasResponseItem = zod.object({
+  "id": zod.number(),
+  "equipoId": zod.number(),
+  "monto": zod.number().min(listPagosCuotasResponseMontoMin),
+  "fecha": zod.coerce.date(),
+  "createdAt": zod.coerce.date()
+})
+export const ListPagosCuotasResponse = zod.array(ListPagosCuotasResponseItem)
+
+
+/**
+ * @summary Register a new installment payment for a sale made in cuotas
+ */
+export const RegistrarPagoCuotaParams = zod.object({
+  "id": zod.coerce.number()
 })
 
-export const actualizarCuotasPagadasResponseBateriaPctMin = 0;
-export const actualizarCuotasPagadasResponseBateriaPctMax = 100;
-
-export const actualizarCuotasPagadasResponseVentaNumeroCuotasMin = 2;
-
-export const actualizarCuotasPagadasResponseVentaCuotasPagadasMin = 0;
+export const registrarPagoCuotaBodyMontoMin = 0;
 
 
 
-export const ActualizarCuotasPagadasResponse = zod.object({
+export const RegistrarPagoCuotaBody = zod.object({
+  "monto": zod.number().min(registrarPagoCuotaBodyMontoMin).describe('Monto pagado en esta cuota.'),
+  "fecha": zod.coerce.date()
+})
+
+export const registrarPagoCuotaResponseBateriaPctMin = 0;
+export const registrarPagoCuotaResponseBateriaPctMax = 100;
+
+export const registrarPagoCuotaResponseVentaNumeroCuotasMin = 2;
+
+export const registrarPagoCuotaResponseVentaCuotasPagadasMin = 0;
+
+
+
+export const RegistrarPagoCuotaResponse = zod.object({
   "id": zod.number(),
   "categoria": zod.enum(['Celular', 'Notebook', 'PC Escritorio', 'Consola', 'TV', 'Audifonos', 'Carcasa', 'TV Box', 'Smartwatch', 'Camara', 'Lentes', 'Otro']),
   "equipo": zod.string().describe('Nombre \/ descripción del equipo'),
   "marca": zod.string(),
   "modelo": zod.string(),
-  "bateriaPct": zod.number().min(actualizarCuotasPagadasResponseBateriaPctMin).max(actualizarCuotasPagadasResponseBateriaPctMax).nullish(),
+  "bateriaPct": zod.number().min(registrarPagoCuotaResponseBateriaPctMin).max(registrarPagoCuotaResponseBateriaPctMax).nullish(),
   "imeiSerial": zod.string().nullish(),
   "estadoEquipoCondicion": zod.enum(['Nuevo', 'Usado - Excelente', 'Usado - Bueno', 'Usado - Regular', 'Para repuestos']),
   "estado": zod.enum(['en_stock', 'reservado', 'vendido']).describe('Lifecycle status within inventory'),
@@ -489,8 +511,54 @@ export const ActualizarCuotasPagadasResponse = zod.object({
   "plataformaVenta": zod.string().nullish(),
   "precioVenta": zod.number().nullish(),
   "ventaFormaPago": zod.union([zod.enum(['Contado', 'Cuotas']),zod.null()]).optional(),
-  "ventaNumeroCuotas": zod.number().min(actualizarCuotasPagadasResponseVentaNumeroCuotasMin).nullish(),
-  "ventaCuotasPagadas": zod.number().min(actualizarCuotasPagadasResponseVentaCuotasPagadasMin).nullish(),
+  "ventaNumeroCuotas": zod.number().min(registrarPagoCuotaResponseVentaNumeroCuotasMin).nullish(),
+  "ventaCuotasPagadas": zod.number().min(registrarPagoCuotaResponseVentaCuotasPagadasMin).nullish(),
+  "gananciaNeta": zod.number().nullish(),
+  "comentarios": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Delete an installment payment (e.g. to correct a mistake)
+ */
+export const EliminarPagoCuotaParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const eliminarPagoCuotaResponseBateriaPctMin = 0;
+export const eliminarPagoCuotaResponseBateriaPctMax = 100;
+
+export const eliminarPagoCuotaResponseVentaNumeroCuotasMin = 2;
+
+export const eliminarPagoCuotaResponseVentaCuotasPagadasMin = 0;
+
+
+
+export const EliminarPagoCuotaResponse = zod.object({
+  "id": zod.number(),
+  "categoria": zod.enum(['Celular', 'Notebook', 'PC Escritorio', 'Consola', 'TV', 'Audifonos', 'Carcasa', 'TV Box', 'Smartwatch', 'Camara', 'Lentes', 'Otro']),
+  "equipo": zod.string().describe('Nombre \/ descripción del equipo'),
+  "marca": zod.string(),
+  "modelo": zod.string(),
+  "bateriaPct": zod.number().min(eliminarPagoCuotaResponseBateriaPctMin).max(eliminarPagoCuotaResponseBateriaPctMax).nullish(),
+  "imeiSerial": zod.string().nullish(),
+  "estadoEquipoCondicion": zod.enum(['Nuevo', 'Usado - Excelente', 'Usado - Bueno', 'Usado - Regular', 'Para repuestos']),
+  "estado": zod.enum(['en_stock', 'reservado', 'vendido']).describe('Lifecycle status within inventory'),
+  "fechaCompra": zod.coerce.date(),
+  "proveedorId": zod.number().nullish(),
+  "proveedorNombre": zod.string().nullish(),
+  "formaPagoCompra": zod.enum(['Efectivo', 'Transferencia', 'Tarjeta', 'Otro']),
+  "precioCompra": zod.number(),
+  "gastosExtra": zod.number(),
+  "costoTotal": zod.number(),
+  "fechaVenta": zod.coerce.date().nullish(),
+  "plataformaVenta": zod.string().nullish(),
+  "precioVenta": zod.number().nullish(),
+  "ventaFormaPago": zod.union([zod.enum(['Contado', 'Cuotas']),zod.null()]).optional(),
+  "ventaNumeroCuotas": zod.number().min(eliminarPagoCuotaResponseVentaNumeroCuotasMin).nullish(),
+  "ventaCuotasPagadas": zod.number().min(eliminarPagoCuotaResponseVentaCuotasPagadasMin).nullish(),
   "gananciaNeta": zod.number().nullish(),
   "comentarios": zod.string().nullish(),
   "createdAt": zod.coerce.date(),

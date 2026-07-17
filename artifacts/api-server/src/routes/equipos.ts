@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { and, desc, eq, ilike, or } from "drizzle-orm";
-import { db, equiposTable, movimientosCajaTable, proveedoresTable } from "@workspace/db";
+import { db, equiposTable, movimientosCajaTable, proveedoresTable, pagosCuotasTable } from "@workspace/db";
 import {
   ListEquiposQueryParams,
   ListEquiposResponse,
@@ -16,9 +16,13 @@ import {
   RegistrarVentaEquipoResponse,
   ReactivarEquipoParams,
   ReactivarEquipoResponse,
-  ActualizarCuotasPagadasParams,
-  ActualizarCuotasPagadasBody,
-  ActualizarCuotasPagadasResponse,
+  ListPagosCuotasParams,
+  ListPagosCuotasResponse,
+  RegistrarPagoCuotaParams,
+  RegistrarPagoCuotaBody,
+  RegistrarPagoCuotaResponse,
+  EliminarPagoCuotaParams,
+  EliminarPagoCuotaResponse,
 } from "@workspace/api-zod";
 import { requireAuth } from "../middlewares/requireAuth";
 import { toDateOnlyString } from "../lib/dates";
@@ -349,14 +353,44 @@ router.patch("/equipos/:id/venta", async (req, res): Promise<void> => {
   );
 });
 
-router.patch("/equipos/:id/cuotas-pagadas", async (req, res): Promise<void> => {
-  const params = ActualizarCuotasPagadasParams.safeParse(req.params);
+router.get("/equipos/:id/pagos-cuotas", async (req, res): Promise<void> => {
+  const params = ListPagosCuotasParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
     return;
   }
 
-  const parsed = ActualizarCuotasPagadasBody.safeParse(req.body);
+  const [existing] = await db
+    .select()
+    .from(equiposTable)
+    .where(eq(equiposTable.id, params.data.id));
+
+  if (!existing) {
+    res.status(404).json({ error: "Equipo not found" });
+    return;
+  }
+
+  const pagos = await db
+    .select()
+    .from(pagosCuotasTable)
+    .where(eq(pagosCuotasTable.equipoId, params.data.id))
+    .orderBy(pagosCuotasTable.fecha, pagosCuotasTable.id);
+
+  res.json(
+    ListPagosCuotasResponse.parse(
+      pagos.map((pago) => ({ ...pago, monto: Number(pago.monto) })),
+    ),
+  );
+});
+
+router.post("/equipos/:id/pagos-cuotas", async (req, res): Promise<void> => {
+  const params = RegistrarPagoCuotaParams.safeParse(req.params);
+  if (!params.success) {
+    res.status(400).json({ error: params.error.message });
+    return;
+  }
+
+  const parsed = RegistrarPagoCuotaBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
     return;
@@ -379,18 +413,76 @@ router.patch("/equipos/:id/cuotas-pagadas", async (req, res): Promise<void> => {
 
   if (
     existing.ventaNumeroCuotas !== null &&
-    parsed.data.ventaCuotasPagadas > existing.ventaNumeroCuotas
+    (existing.ventaCuotasPagadas ?? 0) >= existing.ventaNumeroCuotas
   ) {
-    res.status(400).json({
-      error: `ventaCuotasPagadas no puede ser mayor a ventaNumeroCuotas (${existing.ventaNumeroCuotas})`,
+    res.status(400).json({ error: "Ya se registraron todas las cuotas" });
+    return;
+  }
+
+  const fecha = toDateOnlyString(parsed.data.fecha);
+
+  const [equipo] = await db.transaction(async (tx) => {
+    await tx.insert(pagosCuotasTable).values({
+      equipoId: params.data.id,
+      monto: String(parsed.data.monto),
+      fecha,
     });
+
+    const updated = await tx
+      .update(equiposTable)
+      .set({ ventaCuotasPagadas: (existing.ventaCuotasPagadas ?? 0) + 1 })
+      .where(eq(equiposTable.id, params.data.id))
+      .returning();
+
+    return updated;
+  });
+
+  const [proveedorNombre] = equipo.proveedorId
+    ? await db
+        .select({ nombre: proveedoresTable.nombre })
+        .from(proveedoresTable)
+        .where(eq(proveedoresTable.id, equipo.proveedorId))
+    : [];
+
+  res.status(201).json(
+    RegistrarPagoCuotaResponse.parse({
+      ...normalizeEquipo(equipo),
+      proveedorNombre: proveedorNombre?.nombre ?? null,
+    }),
+  );
+});
+
+router.delete("/pagos-cuotas/:id", async (req, res): Promise<void> => {
+  const params = EliminarPagoCuotaParams.safeParse(req.params);
+  if (!params.success) {
+    res.status(400).json({ error: params.error.message });
+    return;
+  }
+
+  const [pago] = await db
+    .delete(pagosCuotasTable)
+    .where(eq(pagosCuotasTable.id, params.data.id))
+    .returning();
+
+  if (!pago) {
+    res.status(404).json({ error: "Pago not found" });
+    return;
+  }
+
+  const [existing] = await db
+    .select()
+    .from(equiposTable)
+    .where(eq(equiposTable.id, pago.equipoId));
+
+  if (!existing) {
+    res.status(404).json({ error: "Equipo not found" });
     return;
   }
 
   const [equipo] = await db
     .update(equiposTable)
-    .set({ ventaCuotasPagadas: parsed.data.ventaCuotasPagadas })
-    .where(eq(equiposTable.id, params.data.id))
+    .set({ ventaCuotasPagadas: Math.max(0, (existing.ventaCuotasPagadas ?? 0) - 1) })
+    .where(eq(equiposTable.id, pago.equipoId))
     .returning();
 
   const [proveedorNombre] = equipo.proveedorId
@@ -401,7 +493,7 @@ router.patch("/equipos/:id/cuotas-pagadas", async (req, res): Promise<void> => {
     : [];
 
   res.json(
-    ActualizarCuotasPagadasResponse.parse({
+    EliminarPagoCuotaResponse.parse({
       ...normalizeEquipo(equipo),
       proveedorNombre: proveedorNombre?.nombre ?? null,
     }),
@@ -455,6 +547,11 @@ router.patch("/equipos/:id/reactivar", async (req, res): Promise<void> => {
           eq(movimientosCajaTable.tipo, "ingreso"),
         ),
       );
+
+    // Remove any installment payments recorded for the sale being undone.
+    await tx
+      .delete(pagosCuotasTable)
+      .where(eq(pagosCuotasTable.equipoId, params.data.id));
 
     return updated;
   });

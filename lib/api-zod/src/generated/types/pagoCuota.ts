@@ -6,10 +6,11 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface CuotasPagadasInput {
-  /**
-     * Cantidad de cuotas que el cliente ya pagó.
-     * @minimum 0
-     */
-  ventaCuotasPagadas: number;
+export interface PagoCuota {
+  id: number;
+  equipoId: number;
+  /** @minimum 0 */
+  monto: number;
+  fecha: Date;
+  createdAt: Date;
 }

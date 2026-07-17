@@ -7,7 +7,6 @@
  */
 
 export * from './categoria';
-export * from './cuotasPagadasInput';
 export * from './equipo';
 export * from './equipoInput';
 export * from './equipoUpdate';
@@ -19,6 +18,8 @@ export * from './healthStatus';
 export * from './listEquiposParams';
 export * from './movimientoCaja';
 export * from './movimientoCajaInput';
+export * from './pagoCuota';
+export * from './pagoCuotaInput';
 export * from './proveedor';
 export * from './proveedorInput';
 export * from './proveedorUpdate';

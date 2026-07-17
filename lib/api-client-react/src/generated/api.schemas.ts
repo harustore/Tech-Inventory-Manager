@@ -224,12 +224,22 @@ export interface EquipoUpdate {
   comentarios?: string | null;
 }
 
-export interface CuotasPagadasInput {
+export interface PagoCuota {
+  id: number;
+  equipoId: number;
+  /** @minimum 0 */
+  monto: number;
+  fecha: string;
+  createdAt: string;
+}
+
+export interface PagoCuotaInput {
   /**
-     * Cantidad de cuotas que el cliente ya pagó.
+     * Monto pagado en esta cuota.
      * @minimum 0
      */
-  ventaCuotasPagadas: number;
+  monto: number;
+  fecha: string;
 }
 
 export interface VentaInput {

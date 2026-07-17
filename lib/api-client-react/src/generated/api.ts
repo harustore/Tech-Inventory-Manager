@@ -20,7 +20,6 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  CuotasPagadasInput,
   Equipo,
   EquipoInput,
   EquipoUpdate,
@@ -28,6 +27,8 @@ import type {
   ListEquiposParams,
   MovimientoCaja,
   MovimientoCajaInput,
+  PagoCuota,
+  PagoCuotaInput,
   Proveedor,
   ProveedorInput,
   ProveedorUpdate,
@@ -956,26 +957,25 @@ export const useRegistrarVentaEquipo = <TError = ErrorType<void>,
       return useMutation(getRegistrarVentaEquipoMutationOptions(options));
     }
 
-export const getActualizarCuotasPagadasUrl = (id: number,) => {
+export const getListPagosCuotasUrl = (id: number,) => {
 
 
 
 
-  return `/api/equipos/${id}/cuotas-pagadas`
+  return `/api/equipos/${id}/pagos-cuotas`
 }
 
 /**
- * @summary Update how many installments a client has paid for a sale made in cuotas
+ * @summary List installment payments made by the client for a sale made in cuotas
  */
-export const actualizarCuotasPagadas = async (id: number,
-    cuotasPagadasInput: CuotasPagadasInput, options?: RequestInit): Promise<Equipo> => {
+export const listPagosCuotas = async (id: number, options?: RequestInit): Promise<PagoCuota[]> => {
 
-  return customFetch<Equipo>(getActualizarCuotasPagadasUrl(id),
+  return customFetch<PagoCuota[]>(getListPagosCuotasUrl(id),
   {
     ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(cuotasPagadasInput)
+    method: 'GET'
+
+
   }
 );}
 
@@ -983,11 +983,89 @@ export const actualizarCuotasPagadas = async (id: number,
 
 
 
-export const getActualizarCuotasPagadasMutationOptions = <TError = ErrorType<void>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof actualizarCuotasPagadas>>, TError,{id: number;data: BodyType<CuotasPagadasInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof actualizarCuotasPagadas>>, TError,{id: number;data: BodyType<CuotasPagadasInput>}, TContext> => {
+export const getListPagosCuotasQueryKey = (id: number,) => {
+    return [
+    `/api/equipos/${id}/pagos-cuotas`
+    ] as const;
+    }
 
-const mutationKey = ['actualizarCuotasPagadas'];
+
+export const getListPagosCuotasQueryOptions = <TData = Awaited<ReturnType<typeof listPagosCuotas>>, TError = ErrorType<void>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listPagosCuotas>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListPagosCuotasQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listPagosCuotas>>> = ({ signal }) => listPagosCuotas(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listPagosCuotas>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListPagosCuotasQueryResult = NonNullable<Awaited<ReturnType<typeof listPagosCuotas>>>
+export type ListPagosCuotasQueryError = ErrorType<void>
+
+
+/**
+ * @summary List installment payments made by the client for a sale made in cuotas
+ */
+
+export function useListPagosCuotas<TData = Awaited<ReturnType<typeof listPagosCuotas>>, TError = ErrorType<void>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listPagosCuotas>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListPagosCuotasQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getRegistrarPagoCuotaUrl = (id: number,) => {
+
+
+
+
+  return `/api/equipos/${id}/pagos-cuotas`
+}
+
+/**
+ * @summary Register a new installment payment for a sale made in cuotas
+ */
+export const registrarPagoCuota = async (id: number,
+    pagoCuotaInput: PagoCuotaInput, options?: RequestInit): Promise<Equipo> => {
+
+  return customFetch<Equipo>(getRegistrarPagoCuotaUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(pagoCuotaInput)
+  }
+);}
+
+
+
+
+
+export const getRegistrarPagoCuotaMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registrarPagoCuota>>, TError,{id: number;data: BodyType<PagoCuotaInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof registrarPagoCuota>>, TError,{id: number;data: BodyType<PagoCuotaInput>}, TContext> => {
+
+const mutationKey = ['registrarPagoCuota'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -997,10 +1075,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof actualizarCuotasPagadas>>, {id: number;data: BodyType<CuotasPagadasInput>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof registrarPagoCuota>>, {id: number;data: BodyType<PagoCuotaInput>}> = (props) => {
           const {id,data} = props ?? {};
 
-          return  actualizarCuotasPagadas(id,data,requestOptions)
+          return  registrarPagoCuota(id,data,requestOptions)
         }
 
 
@@ -1010,22 +1088,93 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type ActualizarCuotasPagadasMutationResult = NonNullable<Awaited<ReturnType<typeof actualizarCuotasPagadas>>>
-    export type ActualizarCuotasPagadasMutationBody = BodyType<CuotasPagadasInput>
-    export type ActualizarCuotasPagadasMutationError = ErrorType<void>
+    export type RegistrarPagoCuotaMutationResult = NonNullable<Awaited<ReturnType<typeof registrarPagoCuota>>>
+    export type RegistrarPagoCuotaMutationBody = BodyType<PagoCuotaInput>
+    export type RegistrarPagoCuotaMutationError = ErrorType<void>
 
     /**
- * @summary Update how many installments a client has paid for a sale made in cuotas
+ * @summary Register a new installment payment for a sale made in cuotas
  */
-export const useActualizarCuotasPagadas = <TError = ErrorType<void>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof actualizarCuotasPagadas>>, TError,{id: number;data: BodyType<CuotasPagadasInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+export const useRegistrarPagoCuota = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registrarPagoCuota>>, TError,{id: number;data: BodyType<PagoCuotaInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
  ): UseMutationResult<
-        Awaited<ReturnType<typeof actualizarCuotasPagadas>>,
+        Awaited<ReturnType<typeof registrarPagoCuota>>,
         TError,
-        {id: number;data: BodyType<CuotasPagadasInput>},
+        {id: number;data: BodyType<PagoCuotaInput>},
         TContext
       > => {
-      return useMutation(getActualizarCuotasPagadasMutationOptions(options));
+      return useMutation(getRegistrarPagoCuotaMutationOptions(options));
+    }
+
+export const getEliminarPagoCuotaUrl = (id: number,) => {
+
+
+
+
+  return `/api/pagos-cuotas/${id}`
+}
+
+/**
+ * @summary Delete an installment payment (e.g. to correct a mistake)
+ */
+export const eliminarPagoCuota = async (id: number, options?: RequestInit): Promise<Equipo> => {
+
+  return customFetch<Equipo>(getEliminarPagoCuotaUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getEliminarPagoCuotaMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof eliminarPagoCuota>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof eliminarPagoCuota>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['eliminarPagoCuota'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof eliminarPagoCuota>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  eliminarPagoCuota(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type EliminarPagoCuotaMutationResult = NonNullable<Awaited<ReturnType<typeof eliminarPagoCuota>>>
+
+    export type EliminarPagoCuotaMutationError = ErrorType<void>
+
+    /**
+ * @summary Delete an installment payment (e.g. to correct a mistake)
+ */
+export const useEliminarPagoCuota = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof eliminarPagoCuota>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof eliminarPagoCuota>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getEliminarPagoCuotaMutationOptions(options));
     }
 
 export const getReactivarEquipoUrl = (id: number,) => {

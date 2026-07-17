@@ -234,11 +234,28 @@ paths:
         "404":
           description: Not found
 
-  /equipos/{id}/cuotas-pagadas:
-    patch:
-      operationId: actualizarCuotasPagadas
+  /equipos/{id}/pagos-cuotas:
+    get:
+      operationId: listPagosCuotas
       tags: [equipos]
-      summary: Update how many installments a client has paid for a sale made in cuotas
+      summary: List installment payments made by the client for a sale made in cuotas
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "200":
+          description: List of installment payments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PagoCuota"
+        "404":
+          description: Not found
+    post:
+      operationId: registrarPagoCuota
+      tags: [equipos]
+      summary: Register a new installment payment for a sale made in cuotas
       parameters:
         - $ref: "#/components/parameters/IdParam"
       requestBody:
@@ -246,16 +263,33 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CuotasPagadasInput"
+              $ref: "#/components/schemas/PagoCuotaInput"
       responses:
-        "200":
-          description: Cuotas pagadas updated
+        "201":
+          description: Installment payment registered
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Equipo"
         "400":
           description: Invalid request
+        "404":
+          description: Not found
+
+  /pagos-cuotas/{id}:
+    delete:
+      operationId: eliminarPagoCuota
+      tags: [equipos]
+      summary: Delete an installment payment (e.g. to correct a mistake)
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      responses:
+        "200":
+          description: Installment payment deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Equipo"
         "404":
           description: Not found
 
@@ -545,14 +579,25 @@ components:
         - Contado
         - Cuotas
 
-    CuotasPagadasInput:
+    PagoCuota:
       type: object
-      required: [ventaCuotasPagadas]
+      required: [id, equipoId, monto, fecha, createdAt]
       properties:
-        ventaCuotasPagadas:
-          type: integer
+        id: { type: integer }
+        equipoId: { type: integer }
+        monto: { type: number, minimum: 0 }
+        fecha: { type: string, format: date }
+        createdAt: { type: string, format: date-time }
+
+    PagoCuotaInput:
+      type: object
+      required: [monto, fecha]
+      properties:
+        monto:
+          type: number
           minimum: 0
-          description: Cantidad de cuotas que el cliente ya pagó.
+          description: Monto pagado en esta cuota.
+        fecha: { type: string, format: date }
 
     VentaInput:
       type: object
