@@ -1,6 +1,6 @@
 {
   "installCommand": "corepack enable && pnpm install",
-  "buildCommand": "pnpm --filter @workspace/techstock run build",
+  "buildCommand": "node artifacts/api-server/build-vercel.mjs && pnpm --filter @workspace/techstock run build",
   "outputDirectory": "artifacts/techstock/dist",
   "framework": null,
   "rewrites": [
