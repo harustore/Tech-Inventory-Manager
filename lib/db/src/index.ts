@@ -15,5 +15,4 @@ export const db = drizzle(pool, { schema });
 
 export * from "./schema";
 
-
-
+export { eq, and, or, desc, asc, ilike, gte, lte, sql, inArray, notInArray } from "drizzle-orm";

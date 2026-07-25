@@ -1,6 +1,5 @@
 import { Router } from "express";
-import { and, desc, eq, ilike, or } from "drizzle-orm";
-import { db, equiposTable, movimientosCajaTable, proveedoresTable, pagosCuotasTable } from "@workspace/db";
+import { db, equiposTable, movimientosCajaTable, proveedoresTable, pagosCuotasTable, and, desc, eq, ilike, or } from "@workspace/db";
 import {
   ListEquiposQueryParams,
   ListEquiposResponse,

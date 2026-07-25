@@ -1,6 +1,5 @@
 import { Router } from "express";
-import { eq } from "drizzle-orm";
-import { db, proveedoresTable } from "@workspace/db";
+import { db, proveedoresTable, eq } from "@workspace/db";
 import {
   CreateProveedorBody,
   ListProveedoresResponse,

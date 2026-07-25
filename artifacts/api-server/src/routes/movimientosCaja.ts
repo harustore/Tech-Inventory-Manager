@@ -1,6 +1,5 @@
 import { Router } from "express";
-import { desc, eq } from "drizzle-orm";
-import { db, movimientosCajaTable } from "@workspace/db";
+import { db, movimientosCajaTable, desc, eq } from "@workspace/db";
 import {
   CreateMovimientoCajaBody,
   ListMovimientosCajaResponse,

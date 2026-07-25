@@ -1,6 +1,5 @@
 import { Router } from "express";
-import { and, eq, gte, sql } from "drizzle-orm";
-import { db, equiposTable, movimientosCajaTable } from "@workspace/db";
+import { db, equiposTable, movimientosCajaTable, and, eq, gte, sql } from "@workspace/db";
 import { GetResumenCapitalResponse, GetRecomendacionesResponse } from "@workspace/api-zod";
 import { requireAuth } from "../middlewares/requireAuth";
 
