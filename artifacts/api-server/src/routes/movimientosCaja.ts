@@ -1,4 +1,4 @@
-import { Router, type IRouter } from "express";
+import { Router } from "express";
 import { desc, eq } from "drizzle-orm";
 import { db, movimientosCajaTable } from "@workspace/db";
 import {
@@ -9,7 +9,7 @@ import {
 import { requireAuth } from "../middlewares/requireAuth";
 import { toDateOnlyString } from "../lib/dates";
 
-const router: IRouter = Router();
+const router = Router();
 
 router.use(requireAuth);
 

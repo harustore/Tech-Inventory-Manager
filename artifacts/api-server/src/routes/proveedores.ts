@@ -1,4 +1,4 @@
-import { Router, type IRouter } from "express";
+import { Router } from "express";
 import { eq } from "drizzle-orm";
 import { db, proveedoresTable } from "@workspace/db";
 import {
@@ -13,7 +13,7 @@ import {
 } from "@workspace/api-zod";
 import { requireAuth } from "../middlewares/requireAuth";
 
-const router: IRouter = Router();
+const router = Router();
 
 router.use(requireAuth);
 
@@ -34,7 +34,7 @@ router.post("/proveedores", async (req, res): Promise<void> => {
 
   const [proveedor] = await db
     .insert(proveedoresTable)
-    .values(parsed.data)
+    .values(parsed.data as Required<typeof parsed.data>)
     .returning();
 
   res.status(201).json(GetProveedorResponse.parse(proveedor));

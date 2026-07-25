@@ -1,11 +1,11 @@
-import { Router, type IRouter } from "express";
+import { Router } from "express";
 import healthRouter from "./health";
 import proveedoresRouter from "./proveedores";
 import equiposRouter from "./equipos";
 import movimientosCajaRouter from "./movimientosCaja";
 import analyticsRouter from "./analytics";
 
-const router: IRouter = Router();
+const router = Router();
 
 router.use(healthRouter);
 router.use(proveedoresRouter);
