@@ -5,6 +5,10 @@ import App from './App';
 
 import './index.css';
 
-setBaseUrl('http://localhost:3000');
+// In production (Vercel), API is served from the same domain at /api
+// In development, point to the local API server
+if (import.meta.env.DEV) {
+  setBaseUrl('http://localhost:3000');
+}
 
 createRoot(document.getElementById('root')!).render(<App />);

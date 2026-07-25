@@ -1,2 +1,0 @@
-- [Clerk on Tailwind v4](clerk-tailwind-v4-layer.md) — index.css must declare `@layer theme, base, clerk, components, utilities;` before `@import 'tailwindcss'` or Clerk's `cssLayerName` appearance option has no effect.
-- [Orval list-query hooks](orval-list-query-params.md) — generated `useList*` hooks take filter params as the first positional arg, not nested under `{ query: { params } }`.
