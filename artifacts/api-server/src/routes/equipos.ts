@@ -23,8 +23,8 @@ import {
   EliminarPagoCuotaParams,
   EliminarPagoCuotaResponse,
 } from "@workspace/api-zod";
-import { requireAuth } from "../middlewares/requireAuth";
-import { toDateOnlyString } from "../lib/dates";
+import { requireAuth } from "../middlewares/requireAuth.js";
+import { toDateOnlyString } from "../lib/dates.js";
 
 const router = Router();
 

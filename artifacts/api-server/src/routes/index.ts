@@ -1,9 +1,9 @@
 import { Router } from "express";
-import healthRouter from "./health";
-import proveedoresRouter from "./proveedores";
-import equiposRouter from "./equipos";
-import movimientosCajaRouter from "./movimientosCaja";
-import analyticsRouter from "./analytics";
+import healthRouter from "./health.js";
+import proveedoresRouter from "./proveedores.js";
+import equiposRouter from "./equipos.js";
+import movimientosCajaRouter from "./movimientosCaja.js";
+import analyticsRouter from "./analytics.js";
 
 const router = Router();
 
