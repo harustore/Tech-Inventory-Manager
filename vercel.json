@@ -3,6 +3,9 @@
   "buildCommand": "node artifacts/api-server/build-vercel.mjs && pnpm --filter @workspace/techstock run build",
   "outputDirectory": "artifacts/techstock/dist",
   "framework": null,
+  "functions": {
+    "api/index.mjs": {}
+  },
   "rewrites": [
     {
       "source": "/api/(.*)",
