@@ -15,6 +15,7 @@ await esbuild({
   outfile: path.resolve(apiDir, "index.mjs"),
   logLevel: "info",
   sourcemap: false,
+  banner: {
+    js: "import { createRequire } from 'module'; const require = createRequire(import.meta.url);",
+  },
 });
-
-console.log("Bundle written to api/index.mjs");
