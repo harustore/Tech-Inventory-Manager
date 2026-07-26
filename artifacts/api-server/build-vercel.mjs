@@ -12,7 +12,7 @@ await esbuild({
   platform: "node",
   bundle: true,
   format: "cjs",
-  outfile: path.resolve(apiDir, "index.cjs"),
+  outfile: path.resolve(apiDir, "index.js"),
   logLevel: "info",
   sourcemap: false,
 });
