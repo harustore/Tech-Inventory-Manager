@@ -11,11 +11,8 @@ await esbuild({
   entryPoints: [path.resolve(artifactDir, "src/vercel.ts")],
   platform: "node",
   bundle: true,
-  format: "esm",
-  outfile: path.resolve(apiDir, "index.mjs"),
+  format: "cjs",
+  outfile: path.resolve(apiDir, "index.cjs"),
   logLevel: "info",
   sourcemap: false,
-  banner: {
-    js: "import { createRequire } from 'module'; const require = createRequire(import.meta.url);",
-  },
 });
