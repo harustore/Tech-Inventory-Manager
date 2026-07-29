@@ -8,6 +8,7 @@
 import type { Categoria } from './categoria';
 import type { EstadoEquipoCondicion } from './estadoEquipoCondicion';
 import type { FormaPago } from './formaPago';
+import type { FormaPagoVenta } from './formaPagoVenta';
 
 export interface EquipoUpdate {
   categoria?: Categoria;
@@ -36,4 +37,34 @@ export interface EquipoUpdate {
   gastosExtra?: number;
   /** @nullable */
   comentarios?: string | null;
+  /** @nullable */
+  fechaVenta?: Date | null;
+  /** @nullable */
+  plataformaVenta?: string | null;
+  /** @nullable */
+  precioVenta?: number | null;
+  ventaFormaPago?: FormaPagoVenta | null;
+  /**
+     * @minimum 2
+     * @nullable
+     */
+  ventaNumeroCuotas?: number | null;
+  /** @nullable */
+  buyerName?: string | null;
+  /** @nullable */
+  buyerRut?: string | null;
+  /** @nullable */
+  buyerContact?: string | null;
+  /** @nullable */
+  meetingPlace?: string | null;
+  /** @nullable */
+  buyerPaymentMethod?: string | null;
+  /** @nullable */
+  sellerName?: string | null;
+  /** @nullable */
+  sellerRut?: string | null;
+  /** @nullable */
+  sellerContact?: string | null;
+  /** @nullable */
+  purchaseMeetingPlace?: string | null;
 }

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { db, equiposTable, movimientosCajaTable, proveedoresTable, pagosCuotasTable, and, desc, eq, ilike, or } from "@workspace/db";
+import { db, equiposTable, movimientosCajaTable, proveedoresTable, pagosCuotasTable, and, desc, eq, like, or } from "@workspace/db";
 import {
   ListEquiposQueryParams,
   ListEquiposResponse,
@@ -30,24 +30,9 @@ const router = Router();
 
 router.use(requireAuth);
 
-/** Drizzle returns `numeric` columns as strings; coerce them back to numbers for the API response. */
-function normalizeEquipo<
-  T extends {
-    precioCompra: string;
-    gastosExtra: string;
-    costoTotal: string;
-    precioVenta: string | null;
-    gananciaNeta: string | null;
-  },
->(equipo: T) {
-  return {
-    ...equipo,
-    precioCompra: Number(equipo.precioCompra),
-    gastosExtra: Number(equipo.gastosExtra),
-    costoTotal: Number(equipo.costoTotal),
-    precioVenta: equipo.precioVenta === null ? null : Number(equipo.precioVenta),
-    gananciaNeta: equipo.gananciaNeta === null ? null : Number(equipo.gananciaNeta),
-  };
+/** SQLite REAL columns return numbers directly; identity transform for API response. */
+function normalizeEquipo<T>(equipo: T) {
+  return equipo;
 }
 
 function equipoWithProveedorSelection() {
@@ -71,9 +56,15 @@ function equipoWithProveedorSelection() {
     fechaVenta: equiposTable.fechaVenta,
     plataformaVenta: equiposTable.plataformaVenta,
     precioVenta: equiposTable.precioVenta,
+    ventaFormaPago: equiposTable.ventaFormaPago,
+    ventaNumeroCuotas: equiposTable.ventaNumeroCuotas,
     ventaCuotasPagadas: equiposTable.ventaCuotasPagadas,
     gananciaNeta: equiposTable.gananciaNeta,
     comentarios: equiposTable.comentarios,
+    sellerName: equiposTable.sellerName,
+    sellerRut: equiposTable.sellerRut,
+    sellerContact: equiposTable.sellerContact,
+    purchaseMeetingPlace: equiposTable.purchaseMeetingPlace,
     createdAt: equiposTable.createdAt,
     updatedAt: equiposTable.updatedAt,
   };
@@ -95,14 +86,14 @@ router.get("/equipos", async (req, res): Promise<void> => {
   }
   if (query.data.search) {
     const term = `%${query.data.search}%`;
-    conditions.push(
-      or(
-        ilike(equiposTable.equipo, term),
-        ilike(equiposTable.marca, term),
-        ilike(equiposTable.modelo, term),
-        ilike(equiposTable.imeiSerial, term),
-      ),
-    );
+      conditions.push(
+        or(
+          like(equiposTable.equipo, term),
+          like(equiposTable.marca, term),
+          like(equiposTable.modelo, term),
+          like(equiposTable.imeiSerial, term),
+        ),
+      );
   }
 
   const equipos = await db
@@ -142,16 +133,20 @@ router.post("/equipos", async (req, res): Promise<void> => {
         fechaCompra,
         proveedorId: parsed.data.proveedorId,
         formaPagoCompra: parsed.data.formaPagoCompra,
-        precioCompra: String(precioCompra),
-        gastosExtra: String(gastosExtra),
-        costoTotal: String(costoTotal),
+        precioCompra,
+        gastosExtra,
+        costoTotal,
         comentarios: parsed.data.comentarios,
+        sellerName: parsed.data.sellerName,
+        sellerRut: parsed.data.sellerRut,
+        sellerContact: parsed.data.sellerContact,
+        purchaseMeetingPlace: parsed.data.purchaseMeetingPlace,
       })
       .returning();
 
     await tx.insert(movimientosCajaTable).values({
       tipo: "egreso",
-      monto: String(costoTotal),
+      monto: costoTotal,
       motivo: `Compra: ${parsed.data.marca} ${parsed.data.modelo}`,
       fecha: fechaCompra,
       equipoId: inserted[0].id,
@@ -223,19 +218,106 @@ router.patch("/equipos/:id", async (req, res): Promise<void> => {
   const gastosExtra = parsed.data.gastosExtra ?? Number(existing.gastosExtra);
   const costoTotal = precioCompra + gastosExtra;
 
-  const [equipo] = await db
-    .update(equiposTable)
-    .set({
-      ...parsed.data,
-      fechaCompra: parsed.data.fechaCompra
-        ? toDateOnlyString(parsed.data.fechaCompra)
-        : undefined,
-      precioCompra: parsed.data.precioCompra !== undefined ? String(precioCompra) : undefined,
-      gastosExtra: parsed.data.gastosExtra !== undefined ? String(gastosExtra) : undefined,
-      costoTotal: String(costoTotal),
-    })
-    .where(eq(equiposTable.id, params.data.id))
-    .returning();
+  const saleFields: Record<string, unknown> = {};
+  const hasSaleFields =
+    parsed.data.fechaVenta !== undefined ||
+    parsed.data.plataformaVenta !== undefined ||
+    parsed.data.precioVenta !== undefined ||
+    parsed.data.ventaFormaPago !== undefined ||
+    parsed.data.ventaNumeroCuotas !== undefined;
+
+  if (hasSaleFields && existing.estado !== "vendido") {
+    res.status(400).json({ error: "El equipo no está vendido, no se pueden editar datos de venta" });
+    return;
+  }
+
+  const oldPrecioVenta = Number(existing.precioVenta);
+  const oldFechaVenta = existing.fechaVenta;
+
+  if (hasSaleFields) {
+    const newPrecioVenta =
+      parsed.data.precioVenta !== undefined ? parsed.data.precioVenta : oldPrecioVenta;
+    const newVentaFormaPago =
+      parsed.data.ventaFormaPago !== undefined ? parsed.data.ventaFormaPago : existing.ventaFormaPago;
+    const newVentaNumeroCuotas =
+      parsed.data.ventaNumeroCuotas !== undefined ? parsed.data.ventaNumeroCuotas : existing.ventaNumeroCuotas;
+    const newFechaVenta = parsed.data.fechaVenta !== undefined
+      ? (parsed.data.fechaVenta ? toDateOnlyString(parsed.data.fechaVenta) : null)
+      : oldFechaVenta;
+    const gananciaNeta = newPrecioVenta !== null ? newPrecioVenta - costoTotal : null;
+
+    saleFields.fechaVenta = newFechaVenta;
+    saleFields.plataformaVenta = parsed.data.plataformaVenta !== undefined
+      ? parsed.data.plataformaVenta
+      : undefined;
+    saleFields.precioVenta = newPrecioVenta;
+    saleFields.ventaFormaPago = newVentaFormaPago;
+    saleFields.ventaNumeroCuotas = newVentaNumeroCuotas;
+    saleFields.gananciaNeta = gananciaNeta;
+
+    if (newVentaFormaPago === "Contado" || newVentaFormaPago === null) {
+      saleFields.ventaCuotasPagadas = null;
+      if (parsed.data.ventaNumeroCuotas === undefined) {
+        saleFields.ventaNumeroCuotas = null;
+      }
+    } else if (newVentaFormaPago === "Cuotas" && existing.ventaFormaPago !== "Cuotas") {
+      saleFields.ventaCuotasPagadas = 0;
+    }
+  }
+
+  const [equipo] = await db.transaction(async (tx) => {
+    const updated = await tx
+      .update(equiposTable)
+      .set({
+        ...parsed.data,
+        fechaCompra: parsed.data.fechaCompra
+          ? toDateOnlyString(parsed.data.fechaCompra)
+          : undefined,
+        precioCompra: parsed.data.precioCompra !== undefined ? precioCompra : undefined,
+        gastosExtra: parsed.data.gastosExtra !== undefined ? gastosExtra : undefined,
+        costoTotal,
+        ...saleFields,
+      })
+      .where(eq(equiposTable.id, params.data.id))
+      .returning();
+
+    if (hasSaleFields) {
+      const newPrecioVenta =
+        parsed.data.precioVenta !== undefined ? parsed.data.precioVenta : oldPrecioVenta;
+      const newFechaVenta = parsed.data.fechaVenta !== undefined
+        ? (parsed.data.fechaVenta ? toDateOnlyString(parsed.data.fechaVenta) : null)
+        : oldFechaVenta;
+
+      const cashChanged = newPrecioVenta !== oldPrecioVenta || newFechaVenta !== oldFechaVenta;
+      if (cashChanged && newPrecioVenta !== null && newFechaVenta !== null) {
+        await tx
+          .update(movimientosCajaTable)
+          .set({
+            monto: newPrecioVenta,
+            fecha: newFechaVenta,
+            motivo: `Venta: ${existing.marca} ${existing.modelo}`,
+          })
+          .where(
+            and(
+              eq(movimientosCajaTable.equipoId, params.data.id),
+              eq(movimientosCajaTable.tipo, "ingreso"),
+            ),
+          );
+      }
+
+      const newFormaPago =
+        parsed.data.ventaFormaPago !== undefined ? parsed.data.ventaFormaPago : existing.ventaFormaPago;
+      const oldFormaPago = existing.ventaFormaPago;
+
+      if (oldFormaPago !== newFormaPago && oldFormaPago === "Cuotas") {
+        await tx
+          .delete(pagosCuotasTable)
+          .where(eq(pagosCuotasTable.equipoId, params.data.id));
+      }
+    }
+
+    return updated;
+  });
 
   const [proveedorNombre] = equipo.proveedorId
     ? await db
@@ -317,18 +399,23 @@ router.patch("/equipos/:id/venta", async (req, res): Promise<void> => {
         estado: "vendido",
         fechaVenta,
         plataformaVenta: parsed.data.plataformaVenta,
-        precioVenta: String(parsed.data.precioVenta),
+        precioVenta: parsed.data.precioVenta,
         ventaFormaPago,
         ventaNumeroCuotas: ventaFormaPago === "Cuotas" ? parsed.data.ventaNumeroCuotas : null,
         ventaCuotasPagadas: ventaFormaPago === "Cuotas" ? 0 : null,
-        gananciaNeta: String(gananciaNeta),
+        gananciaNeta,
+        buyerName: parsed.data.buyerName ?? null,
+        buyerRut: parsed.data.buyerRut ?? null,
+        buyerContact: parsed.data.buyerContact ?? null,
+        meetingPlace: parsed.data.meetingPlace ?? null,
+        buyerPaymentMethod: parsed.data.buyerPaymentMethod ?? null,
       })
       .where(eq(equiposTable.id, params.data.id))
       .returning();
 
     await tx.insert(movimientosCajaTable).values({
       tipo: "ingreso",
-      monto: String(parsed.data.precioVenta),
+      monto: parsed.data.precioVenta,
       motivo: `Venta: ${existing.marca} ${existing.modelo}`,
       fecha: fechaVenta,
       equipoId: updated[0].id,
@@ -423,7 +510,7 @@ router.post("/equipos/:id/pagos-cuotas", async (req, res): Promise<void> => {
   const [equipo] = await db.transaction(async (tx) => {
     await tx.insert(pagosCuotasTable).values({
       equipoId: params.data.id,
-      monto: String(parsed.data.monto),
+      monto: parsed.data.monto,
       fecha,
     });
 

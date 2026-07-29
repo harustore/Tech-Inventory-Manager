@@ -8,10 +8,13 @@ import {
   Lightbulb,
   LogOut,
   Menu,
+  Moon,
+  Sun,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useTheme } from "@/components/theme-provider";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -31,8 +34,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     signOut({ redirectUrl: "/" });
   };
 
+  const { theme, toggleTheme } = useTheme();
+
   return (
-    <div className="min-h-screen bg-slate-50 flex w-full">
+    <div className="min-h-screen bg-background flex w-full">
       {/* Mobile Sidebar overlay */}
       {isMobileOpen && (
         <div 
@@ -74,6 +79,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </Link>
             );
           })}
+          <button
+            onClick={toggleTheme}
+            className="flex items-center gap-3 px-3 py-2.5 w-full rounded-md text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-100 transition-colors"
+          >
+            {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            {theme === "dark" ? "Modo claro" : "Modo oscuro"}
+          </button>
         </div>
 
         <div className="p-4 bg-slate-950 shrink-0">
@@ -85,7 +97,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <p className="text-sm font-medium text-slate-200 truncate">
                 {user?.fullName || "Usuario"}
               </p>
-              <p className="text-xs text-slate-500 truncate">
+              <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
                 {user?.emailAddresses[0]?.emailAddress}
               </p>
             </div>
@@ -102,11 +114,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 bg-white border-b border-slate-200 flex items-center px-4 md:hidden shrink-0">
+        <header className="h-16 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-700 flex items-center px-4 md:hidden shrink-0">
           <Button variant="ghost" size="icon" onClick={() => setIsMobileOpen(true)} className="mr-2">
             <Menu className="w-5 h-5" />
           </Button>
-          <span className="font-bold text-slate-900 text-lg">TechStock</span>
+          <span className="font-bold text-slate-900 dark:text-slate-100 text-lg">TechStock</span>
         </header>
 
         <main className="flex-1 overflow-auto p-4 md:p-8">

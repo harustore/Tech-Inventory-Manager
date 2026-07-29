@@ -27,6 +27,7 @@ import type {
   ListEquiposParams,
   MovimientoCaja,
   MovimientoCajaInput,
+  MovimientoCajaUpdate,
   PagoCuota,
   PagoCuotaInput,
   Proveedor,
@@ -1394,6 +1395,78 @@ export const useCreateMovimientoCaja = <TError = ErrorType<unknown>,
         TContext
       > => {
       return useMutation(getCreateMovimientoCajaMutationOptions(options));
+    }
+
+export const getUpdateMovimientoCajaUrl = (id: number,) => {
+
+
+
+
+  return `/api/movimientos-caja/${id}`
+}
+
+/**
+ * @summary Update a manual cash movement
+ */
+export const updateMovimientoCaja = async (id: number,
+    movimientoCajaUpdate: MovimientoCajaUpdate, options?: RequestInit): Promise<MovimientoCaja> => {
+
+  return customFetch<MovimientoCaja>(getUpdateMovimientoCajaUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(movimientoCajaUpdate)
+  }
+);}
+
+
+
+
+
+export const getUpdateMovimientoCajaMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateMovimientoCaja>>, TError,{id: number;data: BodyType<MovimientoCajaUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateMovimientoCaja>>, TError,{id: number;data: BodyType<MovimientoCajaUpdate>}, TContext> => {
+
+const mutationKey = ['updateMovimientoCaja'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateMovimientoCaja>>, {id: number;data: BodyType<MovimientoCajaUpdate>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateMovimientoCaja(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateMovimientoCajaMutationResult = NonNullable<Awaited<ReturnType<typeof updateMovimientoCaja>>>
+    export type UpdateMovimientoCajaMutationBody = BodyType<MovimientoCajaUpdate>
+    export type UpdateMovimientoCajaMutationError = ErrorType<void>
+
+    /**
+ * @summary Update a manual cash movement
+ */
+export const useUpdateMovimientoCaja = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateMovimientoCaja>>, TError,{id: number;data: BodyType<MovimientoCajaUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateMovimientoCaja>>,
+        TError,
+        {id: number;data: BodyType<MovimientoCajaUpdate>},
+        TContext
+      > => {
+      return useMutation(getUpdateMovimientoCajaMutationOptions(options));
     }
 
 export const getDeleteMovimientoCajaUrl = (id: number,) => {

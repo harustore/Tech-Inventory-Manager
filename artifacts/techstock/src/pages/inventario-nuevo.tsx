@@ -30,6 +30,10 @@ export default function InventarioNuevo() {
     formaPagoCompra: FormaPago.Efectivo,
     precioCompra: "",
     gastosExtra: "0",
+    sellerName: "",
+    sellerRut: "",
+    sellerContact: "",
+    purchaseMeetingPlace: "",
     comentarios: ""
   });
 
@@ -69,14 +73,14 @@ export default function InventarioNuevo() {
           <ArrowLeft className="w-4 h-4" />
         </Button>
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Registrar Compra</h1>
-          <p className="text-slate-500 text-sm">Ingresa un nuevo equipo al inventario</p>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Registrar Compra</h1>
+          <p className="text-slate-500 dark:text-slate-400 text-sm">Ingresa un nuevo equipo al inventario</p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit}>
-        <Card className="border-slate-200 shadow-sm">
-          <CardHeader className="border-b border-slate-100 bg-slate-50/50 pb-4">
+        <Card className="border-slate-200 dark:border-slate-700 shadow-sm">
+          <CardHeader className="border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 pb-4">
             <CardTitle className="text-lg">Detalles del Equipo</CardTitle>
             <CardDescription>Información general y técnica</CardDescription>
           </CardHeader>
@@ -167,11 +171,11 @@ export default function InventarioNuevo() {
               </div>
             </div>
 
-            <div className="my-8 border-t border-slate-100"></div>
+            <div className="my-8 border-t border-slate-100 dark:border-slate-800"></div>
             
             <div className="space-y-2 mb-6">
-              <h3 className="text-lg font-semibold text-slate-900">Datos de Compra</h3>
-              <p className="text-sm text-slate-500">Información financiera y proveedor</p>
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Datos de Compra</h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Información financiera y proveedor</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -199,7 +203,47 @@ export default function InventarioNuevo() {
                     ))}
                   </SelectContent>
                 </Select>
-                <p className="text-xs text-slate-500">Sirve para poder ubicarlo si el equipo presenta fallas.</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Sirve para poder ubicarlo si el equipo presenta fallas.</p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="sellerName">Nombre del vendedor</Label>
+                <Input 
+                  id="sellerName"
+                  placeholder="¿A quién le compraste el equipo?"
+                  value={formData.sellerName}
+                  onChange={e => setFormData({...formData, sellerName: e.target.value})}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="sellerRut">RUT del vendedor</Label>
+                <Input 
+                  id="sellerRut"
+                  placeholder="Ej: 12.345.678-9"
+                  value={formData.sellerRut}
+                  onChange={e => setFormData({...formData, sellerRut: e.target.value})}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="sellerContact">Contacto del vendedor</Label>
+                <Input 
+                  id="sellerContact"
+                  placeholder="Teléfono o email"
+                  value={formData.sellerContact}
+                  onChange={e => setFormData({...formData, sellerContact: e.target.value})}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="purchaseMeetingPlace">Lugar de encuentro</Label>
+                <Input 
+                  id="purchaseMeetingPlace"
+                  placeholder="¿Dónde se realizó la compra?"
+                  value={formData.purchaseMeetingPlace}
+                  onChange={e => setFormData({...formData, purchaseMeetingPlace: e.target.value})}
+                />
               </div>
 
               <div className="space-y-2">
@@ -239,7 +283,7 @@ export default function InventarioNuevo() {
                   value={formData.gastosExtra}
                   onChange={e => setFormData({...formData, gastosExtra: e.target.value})}
                 />
-                <p className="text-xs text-slate-500 mt-1">Costo total: {formatCurrency((Number(formData.precioCompra) || 0) + (Number(formData.gastosExtra) || 0))}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Costo total: {formatCurrency((Number(formData.precioCompra) || 0) + (Number(formData.gastosExtra) || 0))}</p>
               </div>
               
               <div className="space-y-2 md:col-span-2">
@@ -256,7 +300,7 @@ export default function InventarioNuevo() {
             </div>
 
           </CardContent>
-          <div className="p-6 bg-slate-50/80 border-t border-slate-100 flex justify-end gap-3 rounded-b-xl">
+          <div className="p-6 bg-slate-50/80 dark:bg-slate-900/80 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-3 rounded-b-xl">
             <Button type="button" variant="outline" onClick={() => setLocation("/inventario")}>
               Cancelar
             </Button>

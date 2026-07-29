@@ -4,6 +4,7 @@ import { shadcn } from '@clerk/themes';
 import { Switch, Route, useLocation, Router as WouterRouter, Redirect } from 'wouter';
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
+import { ThemeProvider } from "@/components/theme-provider";
 
 import PublicLanding from "./pages/public-landing";
 import Dashboard from "./pages/dashboard";
@@ -172,6 +173,7 @@ function ClerkProviderWithRoutes() {
       routerPush={(to) => setLocation(stripBase(to))}
       routerReplace={(to) => setLocation(stripBase(to), { replace: true })}
     >
+      <ThemeProvider>
       <QueryClientProvider client={queryClient}>
         <ClerkQueryClientCacheInvalidator />
         <Switch>
@@ -193,6 +195,7 @@ function ClerkProviderWithRoutes() {
         </Switch>
         <Toaster />
       </QueryClientProvider>
+      </ThemeProvider>
     </ClerkProvider>
   );
 }

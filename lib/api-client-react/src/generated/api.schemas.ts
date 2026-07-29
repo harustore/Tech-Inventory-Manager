@@ -164,6 +164,51 @@ export interface Equipo {
   ventaCuotasPagadas?: number | null;
   /** @nullable */
   gananciaNeta?: number | null;
+  /**
+     * Nombre del comprador
+     * @nullable
+     */
+  buyerName?: string | null;
+  /**
+     * RUT del comprador
+     * @nullable
+     */
+  buyerRut?: string | null;
+  /**
+     * Medio de contacto del comprador (teléfono, email)
+     * @nullable
+     */
+  buyerContact?: string | null;
+  /**
+     * Lugar de encuentro para la venta
+     * @nullable
+     */
+  meetingPlace?: string | null;
+  /**
+     * Medio de pago usado por el comprador (Efectivo, Transferencia, Tarjeta)
+     * @nullable
+     */
+  buyerPaymentMethod?: string | null;
+  /**
+     * Nombre del vendedor (a quién se le compró)
+     * @nullable
+     */
+  sellerName?: string | null;
+  /**
+     * RUT del vendedor
+     * @nullable
+     */
+  sellerRut?: string | null;
+  /**
+     * Contacto del vendedor
+     * @nullable
+     */
+  sellerContact?: string | null;
+  /**
+     * Lugar de encuentro para la compra
+     * @nullable
+     */
+  purchaseMeetingPlace?: string | null;
   /** @nullable */
   comentarios?: string | null;
   createdAt: string;
@@ -193,6 +238,14 @@ export interface EquipoInput {
   /** @minimum 0 */
   gastosExtra?: number;
   comentarios?: string;
+  /** Nombre del vendedor */
+  sellerName?: string;
+  /** RUT del vendedor */
+  sellerRut?: string;
+  /** Contacto del vendedor */
+  sellerContact?: string;
+  /** Lugar de encuentro para la compra */
+  purchaseMeetingPlace?: string;
 }
 
 export interface EquipoUpdate {
@@ -222,6 +275,36 @@ export interface EquipoUpdate {
   gastosExtra?: number;
   /** @nullable */
   comentarios?: string | null;
+  /** @nullable */
+  fechaVenta?: string | null;
+  /** @nullable */
+  plataformaVenta?: string | null;
+  /** @nullable */
+  precioVenta?: number | null;
+  ventaFormaPago?: FormaPagoVenta | null;
+  /**
+     * @minimum 2
+     * @nullable
+     */
+  ventaNumeroCuotas?: number | null;
+  /** @nullable */
+  buyerName?: string | null;
+  /** @nullable */
+  buyerRut?: string | null;
+  /** @nullable */
+  buyerContact?: string | null;
+  /** @nullable */
+  meetingPlace?: string | null;
+  /** @nullable */
+  buyerPaymentMethod?: string | null;
+  /** @nullable */
+  sellerName?: string | null;
+  /** @nullable */
+  sellerRut?: string | null;
+  /** @nullable */
+  sellerContact?: string | null;
+  /** @nullable */
+  purchaseMeetingPlace?: string | null;
 }
 
 export interface PagoCuota {
@@ -257,6 +340,16 @@ export interface VentaInput {
      * @minimum 2
      */
   ventaNumeroCuotas?: number;
+  /** Nombre del comprador */
+  buyerName?: string;
+  /** RUT del comprador */
+  buyerRut?: string;
+  /** Medio de contacto del comprador */
+  buyerContact?: string;
+  /** Lugar de encuentro para la venta */
+  meetingPlace?: string;
+  /** Medio de pago usado por el comprador */
+  buyerPaymentMethod?: string;
 }
 
 export type TipoMovimiento = typeof TipoMovimiento[keyof typeof TipoMovimiento];
@@ -285,6 +378,14 @@ export interface MovimientoCajaInput {
   /** @minLength 1 */
   motivo: string;
   fecha: string;
+}
+
+export interface MovimientoCajaUpdate {
+  tipo?: TipoMovimiento;
+  monto?: number;
+  /** @minLength 1 */
+  motivo?: string;
+  fecha?: string;
 }
 
 export interface ResumenCapital {

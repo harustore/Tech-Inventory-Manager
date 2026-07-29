@@ -56,6 +56,51 @@ export interface Equipo {
   ventaCuotasPagadas?: number | null;
   /** @nullable */
   gananciaNeta?: number | null;
+  /**
+     * Nombre del comprador
+     * @nullable
+     */
+  buyerName?: string | null;
+  /**
+     * RUT del comprador
+     * @nullable
+     */
+  buyerRut?: string | null;
+  /**
+     * Medio de contacto del comprador (teléfono, email)
+     * @nullable
+     */
+  buyerContact?: string | null;
+  /**
+     * Lugar de encuentro para la venta
+     * @nullable
+     */
+  meetingPlace?: string | null;
+  /**
+     * Medio de pago usado por el comprador (Efectivo, Transferencia, Tarjeta)
+     * @nullable
+     */
+  buyerPaymentMethod?: string | null;
+  /**
+     * Nombre del vendedor (a quién se le compró)
+     * @nullable
+     */
+  sellerName?: string | null;
+  /**
+     * RUT del vendedor
+     * @nullable
+     */
+  sellerRut?: string | null;
+  /**
+     * Contacto del vendedor
+     * @nullable
+     */
+  sellerContact?: string | null;
+  /**
+     * Lugar de encuentro para la compra
+     * @nullable
+     */
+  purchaseMeetingPlace?: string | null;
   /** @nullable */
   comentarios?: string | null;
   createdAt: Date;

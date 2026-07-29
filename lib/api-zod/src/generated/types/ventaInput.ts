@@ -22,4 +22,14 @@ export interface VentaInput {
      * @minimum 2
      */
   ventaNumeroCuotas?: number;
+  /** Nombre del comprador */
+  buyerName?: string;
+  /** RUT del comprador */
+  buyerRut?: string;
+  /** Medio de contacto del comprador */
+  buyerContact?: string;
+  /** Lugar de encuentro para la venta */
+  meetingPlace?: string;
+  /** Medio de pago usado por el comprador */
+  buyerPaymentMethod?: string;
 }

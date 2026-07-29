@@ -75,8 +75,8 @@ export default function Proveedores() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Contactos de Compra</h1>
-          <p className="text-slate-500 mt-1">Registro de a quién le compraste cada equipo, útil si hay que reclamar por una falla</p>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Contactos de Compra</h1>
+          <p className="text-slate-500 dark:text-slate-400 mt-1">Registro de a quién le compraste cada equipo, útil si hay que reclamar por una falla</p>
         </div>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
@@ -168,7 +168,7 @@ export default function Proveedores() {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
         <Input
           placeholder="Buscar por nombre, teléfono o RUT..."
-          className="pl-9 bg-white"
+          className="pl-9 bg-white dark:bg-slate-900"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -181,15 +181,15 @@ export default function Proveedores() {
           ))}
         </div>
       ) : filteredProveedores?.length === 0 ? (
-        <div className="text-center py-20 bg-white rounded-xl border border-slate-200 border-dashed">
+        <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 border-dashed">
           <Building2 className="mx-auto h-12 w-12 text-slate-300" />
-          <h3 className="mt-4 text-lg font-semibold text-slate-900">No hay contactos registrados</h3>
-          <p className="mt-1 text-sm text-slate-500">Añade tu primer contacto de compra para empezar.</p>
+          <h3 className="mt-4 text-lg font-semibold text-slate-900 dark:text-slate-100">No hay contactos registrados</h3>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Añade tu primer contacto de compra para empezar.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredProveedores?.map((proveedor) => (
-            <Card key={proveedor.id} className="border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+            <Card key={proveedor.id} className="border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow">
               <CardHeader className="pb-3 flex flex-row items-start justify-between space-y-0">
                 <CardTitle className="text-base font-semibold leading-tight">{proveedor.nombre}</CardTitle>
                 <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-red-600 -mt-2 -mr-2" onClick={() => handleDelete(proveedor.id)}>
@@ -198,6 +198,7 @@ export default function Proveedores() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-2 text-sm text-slate-600">
+
                   {proveedor.telefono && (
                     <div className="flex items-center gap-2">
                       <Phone className="w-4 h-4 text-slate-400 shrink-0" />
@@ -239,8 +240,8 @@ export default function Proveedores() {
                   )}
                 </div>
                 {proveedor.comentarios && (
-                  <div className="mt-4 pt-3 border-t border-slate-100">
-                    <p className="text-xs text-slate-500 line-clamp-2">{proveedor.comentarios}</p>
+                  <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">{proveedor.comentarios}</p>
                   </div>
                 )}
               </CardContent>

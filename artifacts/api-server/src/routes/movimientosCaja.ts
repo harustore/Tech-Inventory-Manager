@@ -3,6 +3,8 @@ import { db, movimientosCajaTable, desc, eq } from "@workspace/db";
 import {
   CreateMovimientoCajaBody,
   ListMovimientosCajaResponse,
+  UpdateMovimientoCajaBody,
+  UpdateMovimientoCajaParams,
   DeleteMovimientoCajaParams,
 } from "@workspace/api-zod";
 import { requireAuth } from "../middlewares/requireAuth.js";
@@ -18,9 +20,7 @@ router.get("/movimientos-caja", async (_req, res): Promise<void> => {
     .from(movimientosCajaTable)
     .orderBy(desc(movimientosCajaTable.fecha), desc(movimientosCajaTable.id));
   res.json(
-    ListMovimientosCajaResponse.parse(
-      movimientos.map((m) => ({ ...m, monto: Number(m.monto) })),
-    ),
+    ListMovimientosCajaResponse.parse(movimientos),
   );
 });
 
@@ -35,13 +35,43 @@ router.post("/movimientos-caja", async (req, res): Promise<void> => {
     .insert(movimientosCajaTable)
     .values({
       tipo: parsed.data.tipo,
-      monto: String(parsed.data.monto),
+      monto: parsed.data.monto,
       motivo: parsed.data.motivo,
       fecha: toDateOnlyString(parsed.data.fecha),
     })
     .returning();
 
-  res.status(201).json({ ...movimiento, monto: Number(movimiento.monto) });
+  res.status(201).json(movimiento);
+});
+
+router.patch("/movimientos-caja/:id", async (req, res): Promise<void> => {
+  const params = UpdateMovimientoCajaParams.safeParse(req.params);
+  if (!params.success) {
+    res.status(400).json({ error: params.error.message });
+    return;
+  }
+
+  const parsed = UpdateMovimientoCajaBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.message });
+    return;
+  }
+
+  const [movimiento] = await db
+    .update(movimientosCajaTable)
+    .set({
+      ...parsed.data,
+      fecha: parsed.data.fecha ? toDateOnlyString(parsed.data.fecha) : undefined,
+    })
+    .where(eq(movimientosCajaTable.id, params.data.id))
+    .returning();
+
+  if (!movimiento) {
+    res.status(404).json({ error: "Movimiento not found" });
+    return;
+  }
+
+  res.json(movimiento);
 });
 
 router.delete("/movimientos-caja/:id", async (req, res): Promise<void> => {

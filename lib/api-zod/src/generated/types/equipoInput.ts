@@ -32,4 +32,12 @@ export interface EquipoInput {
   /** @minimum 0 */
   gastosExtra?: number;
   comentarios?: string;
+  /** Nombre del vendedor */
+  sellerName?: string;
+  /** RUT del vendedor */
+  sellerRut?: string;
+  /** Contacto del vendedor */
+  sellerContact?: string;
+  /** Lugar de encuentro para la compra */
+  purchaseMeetingPlace?: string;
 }

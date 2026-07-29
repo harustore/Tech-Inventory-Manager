@@ -18,6 +18,7 @@ export * from './healthStatus';
 export * from './listEquiposParams';
 export * from './movimientoCaja';
 export * from './movimientoCajaInput';
+export * from './movimientoCajaUpdate';
 export * from './pagoCuota';
 export * from './pagoCuotaInput';
 export * from './proveedor';

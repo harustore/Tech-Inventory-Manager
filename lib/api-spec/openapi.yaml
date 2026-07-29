@@ -343,6 +343,27 @@ paths:
                 $ref: "#/components/schemas/MovimientoCaja"
 
   /movimientos-caja/{id}:
+    patch:
+      operationId: updateMovimientoCaja
+      tags: [caja]
+      summary: Update a manual cash movement
+      parameters:
+        - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MovimientoCajaUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MovimientoCaja"
+        "404":
+          description: Not found
     delete:
       operationId: deleteMovimientoCaja
       tags: [caja]
@@ -526,6 +547,15 @@ components:
         ventaNumeroCuotas: { type: ["integer", "null"], minimum: 2 }
         ventaCuotasPagadas: { type: ["integer", "null"], minimum: 0 }
         gananciaNeta: { type: ["number", "null"] }
+        buyerName: { type: ["string", "null"], description: "Nombre del comprador" }
+        buyerRut: { type: ["string", "null"], description: "RUT del comprador" }
+        buyerContact: { type: ["string", "null"], description: "Medio de contacto del comprador (teléfono, email)" }
+        meetingPlace: { type: ["string", "null"], description: "Lugar de encuentro para la venta" }
+        buyerPaymentMethod: { type: ["string", "null"], description: "Medio de pago usado por el comprador (Efectivo, Transferencia, Tarjeta)" }
+        sellerName: { type: ["string", "null"], description: "Nombre del vendedor (a quién se le compró)" }
+        sellerRut: { type: ["string", "null"], description: "RUT del vendedor" }
+        sellerContact: { type: ["string", "null"], description: "Contacto del vendedor" }
+        purchaseMeetingPlace: { type: ["string", "null"], description: "Lugar de encuentro para la compra" }
         comentarios: { type: ["string", "null"] }
         createdAt: { type: string, format: date-time }
         updatedAt: { type: string, format: date-time }
@@ -555,6 +585,10 @@ components:
         precioCompra: { type: number, minimum: 0 }
         gastosExtra: { type: number, minimum: 0, default: 0 }
         comentarios: { type: string }
+        sellerName: { type: string, description: "Nombre del vendedor" }
+        sellerRut: { type: string, description: "RUT del vendedor" }
+        sellerContact: { type: string, description: "Contacto del vendedor" }
+        purchaseMeetingPlace: { type: string, description: "Lugar de encuentro para la compra" }
 
     EquipoUpdate:
       type: object
@@ -572,6 +606,23 @@ components:
         precioCompra: { type: number, minimum: 0 }
         gastosExtra: { type: number, minimum: 0 }
         comentarios: { type: ["string", "null"] }
+        fechaVenta: { type: ["string", "null"], format: date }
+        plataformaVenta: { type: ["string", "null"] }
+        precioVenta: { type: ["number", "null"] }
+        ventaFormaPago:
+          anyOf:
+            - $ref: "#/components/schemas/FormaPagoVenta"
+            - type: "null"
+        ventaNumeroCuotas: { type: ["integer", "null"], minimum: 2 }
+        buyerName: { type: ["string", "null"] }
+        buyerRut: { type: ["string", "null"] }
+        buyerContact: { type: ["string", "null"] }
+        meetingPlace: { type: ["string", "null"] }
+        buyerPaymentMethod: { type: ["string", "null"] }
+        sellerName: { type: ["string", "null"] }
+        sellerRut: { type: ["string", "null"] }
+        sellerContact: { type: ["string", "null"] }
+        purchaseMeetingPlace: { type: ["string", "null"] }
 
     FormaPagoVenta:
       type: string
@@ -616,6 +667,11 @@ components:
           type: integer
           minimum: 2
           description: Cantidad de cuotas, requerido solo si ventaFormaPago es Cuotas.
+        buyerName: { type: string, description: "Nombre del comprador" }
+        buyerRut: { type: string, description: "RUT del comprador" }
+        buyerContact: { type: string, description: "Medio de contacto del comprador" }
+        meetingPlace: { type: string, description: "Lugar de encuentro para la venta" }
+        buyerPaymentMethod: { type: string, description: "Medio de pago usado por el comprador" }
 
     TipoMovimiento:
       type: string
@@ -639,6 +695,14 @@ components:
     MovimientoCajaInput:
       type: object
       required: [tipo, monto, motivo, fecha]
+      properties:
+        tipo: { $ref: "#/components/schemas/TipoMovimiento" }
+        monto: { type: number }
+        motivo: { type: string, minLength: 1 }
+        fecha: { type: string, format: date }
+
+    MovimientoCajaUpdate:
+      type: object
       properties:
         tipo: { $ref: "#/components/schemas/TipoMovimiento" }
         monto: { type: number }

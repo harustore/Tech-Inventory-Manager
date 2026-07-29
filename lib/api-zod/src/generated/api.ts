@@ -174,6 +174,15 @@ export const ListEquiposResponseItem = zod.object({
   "ventaNumeroCuotas": zod.number().min(listEquiposResponseVentaNumeroCuotasMin).nullish(),
   "ventaCuotasPagadas": zod.number().min(listEquiposResponseVentaCuotasPagadasMin).nullish(),
   "gananciaNeta": zod.number().nullish(),
+  "buyerName": zod.string().nullish().describe('Nombre del comprador'),
+  "buyerRut": zod.string().nullish().describe('RUT del comprador'),
+  "buyerContact": zod.string().nullish().describe('Medio de contacto del comprador (teléfono, email)'),
+  "meetingPlace": zod.string().nullish().describe('Lugar de encuentro para la venta'),
+  "buyerPaymentMethod": zod.string().nullish().describe('Medio de pago usado por el comprador (Efectivo, Transferencia, Tarjeta)'),
+  "sellerName": zod.string().nullish().describe('Nombre del vendedor (a quién se le compró)'),
+  "sellerRut": zod.string().nullish().describe('RUT del vendedor'),
+  "sellerContact": zod.string().nullish().describe('Contacto del vendedor'),
+  "purchaseMeetingPlace": zod.string().nullish().describe('Lugar de encuentro para la compra'),
   "comentarios": zod.string().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
@@ -210,7 +219,11 @@ export const CreateEquipoBody = zod.object({
   "formaPagoCompra": zod.enum(['Efectivo', 'Transferencia', 'Tarjeta', 'Otro']),
   "precioCompra": zod.number().min(createEquipoBodyPrecioCompraMin),
   "gastosExtra": zod.number().min(createEquipoBodyGastosExtraMin).default(createEquipoBodyGastosExtraDefault),
-  "comentarios": zod.string().optional()
+  "comentarios": zod.string().optional(),
+  "sellerName": zod.string().optional().describe('Nombre del vendedor'),
+  "sellerRut": zod.string().optional().describe('RUT del vendedor'),
+  "sellerContact": zod.string().optional().describe('Contacto del vendedor'),
+  "purchaseMeetingPlace": zod.string().optional().describe('Lugar de encuentro para la compra')
 })
 
 export const createEquipoResponseBateriaPctMin = 0;
@@ -246,6 +259,15 @@ export const CreateEquipoResponse = zod.object({
   "ventaNumeroCuotas": zod.number().min(createEquipoResponseVentaNumeroCuotasMin).nullish(),
   "ventaCuotasPagadas": zod.number().min(createEquipoResponseVentaCuotasPagadasMin).nullish(),
   "gananciaNeta": zod.number().nullish(),
+  "buyerName": zod.string().nullish().describe('Nombre del comprador'),
+  "buyerRut": zod.string().nullish().describe('RUT del comprador'),
+  "buyerContact": zod.string().nullish().describe('Medio de contacto del comprador (teléfono, email)'),
+  "meetingPlace": zod.string().nullish().describe('Lugar de encuentro para la venta'),
+  "buyerPaymentMethod": zod.string().nullish().describe('Medio de pago usado por el comprador (Efectivo, Transferencia, Tarjeta)'),
+  "sellerName": zod.string().nullish().describe('Nombre del vendedor (a quién se le compró)'),
+  "sellerRut": zod.string().nullish().describe('RUT del vendedor'),
+  "sellerContact": zod.string().nullish().describe('Contacto del vendedor'),
+  "purchaseMeetingPlace": zod.string().nullish().describe('Lugar de encuentro para la compra'),
   "comentarios": zod.string().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
@@ -292,6 +314,15 @@ export const GetEquipoResponse = zod.object({
   "ventaNumeroCuotas": zod.number().min(getEquipoResponseVentaNumeroCuotasMin).nullish(),
   "ventaCuotasPagadas": zod.number().min(getEquipoResponseVentaCuotasPagadasMin).nullish(),
   "gananciaNeta": zod.number().nullish(),
+  "buyerName": zod.string().nullish().describe('Nombre del comprador'),
+  "buyerRut": zod.string().nullish().describe('RUT del comprador'),
+  "buyerContact": zod.string().nullish().describe('Medio de contacto del comprador (teléfono, email)'),
+  "meetingPlace": zod.string().nullish().describe('Lugar de encuentro para la venta'),
+  "buyerPaymentMethod": zod.string().nullish().describe('Medio de pago usado por el comprador (Efectivo, Transferencia, Tarjeta)'),
+  "sellerName": zod.string().nullish().describe('Nombre del vendedor (a quién se le compró)'),
+  "sellerRut": zod.string().nullish().describe('RUT del vendedor'),
+  "sellerContact": zod.string().nullish().describe('Contacto del vendedor'),
+  "purchaseMeetingPlace": zod.string().nullish().describe('Lugar de encuentro para la compra'),
   "comentarios": zod.string().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
@@ -315,6 +346,8 @@ export const updateEquipoBodyPrecioCompraMin = 0;
 
 export const updateEquipoBodyGastosExtraMin = 0;
 
+export const updateEquipoBodyVentaNumeroCuotasMin = 2;
+
 
 
 export const UpdateEquipoBody = zod.object({
@@ -330,7 +363,21 @@ export const UpdateEquipoBody = zod.object({
   "formaPagoCompra": zod.enum(['Efectivo', 'Transferencia', 'Tarjeta', 'Otro']).optional(),
   "precioCompra": zod.number().min(updateEquipoBodyPrecioCompraMin).optional(),
   "gastosExtra": zod.number().min(updateEquipoBodyGastosExtraMin).optional(),
-  "comentarios": zod.string().nullish()
+  "comentarios": zod.string().nullish(),
+  "fechaVenta": zod.coerce.date().nullish(),
+  "plataformaVenta": zod.string().nullish(),
+  "precioVenta": zod.number().nullish(),
+  "ventaFormaPago": zod.union([zod.enum(['Contado', 'Cuotas']),zod.null()]).optional(),
+  "ventaNumeroCuotas": zod.number().min(updateEquipoBodyVentaNumeroCuotasMin).nullish(),
+  "buyerName": zod.string().nullish(),
+  "buyerRut": zod.string().nullish(),
+  "buyerContact": zod.string().nullish(),
+  "meetingPlace": zod.string().nullish(),
+  "buyerPaymentMethod": zod.string().nullish(),
+  "sellerName": zod.string().nullish(),
+  "sellerRut": zod.string().nullish(),
+  "sellerContact": zod.string().nullish(),
+  "purchaseMeetingPlace": zod.string().nullish()
 })
 
 export const updateEquipoResponseBateriaPctMin = 0;
@@ -366,6 +413,15 @@ export const UpdateEquipoResponse = zod.object({
   "ventaNumeroCuotas": zod.number().min(updateEquipoResponseVentaNumeroCuotasMin).nullish(),
   "ventaCuotasPagadas": zod.number().min(updateEquipoResponseVentaCuotasPagadasMin).nullish(),
   "gananciaNeta": zod.number().nullish(),
+  "buyerName": zod.string().nullish().describe('Nombre del comprador'),
+  "buyerRut": zod.string().nullish().describe('RUT del comprador'),
+  "buyerContact": zod.string().nullish().describe('Medio de contacto del comprador (teléfono, email)'),
+  "meetingPlace": zod.string().nullish().describe('Lugar de encuentro para la venta'),
+  "buyerPaymentMethod": zod.string().nullish().describe('Medio de pago usado por el comprador (Efectivo, Transferencia, Tarjeta)'),
+  "sellerName": zod.string().nullish().describe('Nombre del vendedor (a quién se le compró)'),
+  "sellerRut": zod.string().nullish().describe('RUT del vendedor'),
+  "sellerContact": zod.string().nullish().describe('Contacto del vendedor'),
+  "purchaseMeetingPlace": zod.string().nullish().describe('Lugar de encuentro para la compra'),
   "comentarios": zod.string().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
@@ -402,7 +458,12 @@ export const RegistrarVentaEquipoBody = zod.object({
   "plataformaVenta": zod.string().min(1),
   "precioVenta": zod.number().min(registrarVentaEquipoBodyPrecioVentaMin).describe('Valor final total de la venta (si es en cuotas, es el total de todas las cuotas).'),
   "ventaFormaPago": zod.enum(['Contado', 'Cuotas']).default(registrarVentaEquipoBodyVentaFormaPagoDefault),
-  "ventaNumeroCuotas": zod.number().min(registrarVentaEquipoBodyVentaNumeroCuotasMin).optional().describe('Cantidad de cuotas, requerido solo si ventaFormaPago es Cuotas.')
+  "ventaNumeroCuotas": zod.number().min(registrarVentaEquipoBodyVentaNumeroCuotasMin).optional().describe('Cantidad de cuotas, requerido solo si ventaFormaPago es Cuotas.'),
+  "buyerName": zod.string().optional().describe('Nombre del comprador'),
+  "buyerRut": zod.string().optional().describe('RUT del comprador'),
+  "buyerContact": zod.string().optional().describe('Medio de contacto del comprador'),
+  "meetingPlace": zod.string().optional().describe('Lugar de encuentro para la venta'),
+  "buyerPaymentMethod": zod.string().optional().describe('Medio de pago usado por el comprador')
 })
 
 export const registrarVentaEquipoResponseBateriaPctMin = 0;
@@ -438,6 +499,15 @@ export const RegistrarVentaEquipoResponse = zod.object({
   "ventaNumeroCuotas": zod.number().min(registrarVentaEquipoResponseVentaNumeroCuotasMin).nullish(),
   "ventaCuotasPagadas": zod.number().min(registrarVentaEquipoResponseVentaCuotasPagadasMin).nullish(),
   "gananciaNeta": zod.number().nullish(),
+  "buyerName": zod.string().nullish().describe('Nombre del comprador'),
+  "buyerRut": zod.string().nullish().describe('RUT del comprador'),
+  "buyerContact": zod.string().nullish().describe('Medio de contacto del comprador (teléfono, email)'),
+  "meetingPlace": zod.string().nullish().describe('Lugar de encuentro para la venta'),
+  "buyerPaymentMethod": zod.string().nullish().describe('Medio de pago usado por el comprador (Efectivo, Transferencia, Tarjeta)'),
+  "sellerName": zod.string().nullish().describe('Nombre del vendedor (a quién se le compró)'),
+  "sellerRut": zod.string().nullish().describe('RUT del vendedor'),
+  "sellerContact": zod.string().nullish().describe('Contacto del vendedor'),
+  "purchaseMeetingPlace": zod.string().nullish().describe('Lugar de encuentro para la compra'),
   "comentarios": zod.string().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
@@ -514,6 +584,15 @@ export const RegistrarPagoCuotaResponse = zod.object({
   "ventaNumeroCuotas": zod.number().min(registrarPagoCuotaResponseVentaNumeroCuotasMin).nullish(),
   "ventaCuotasPagadas": zod.number().min(registrarPagoCuotaResponseVentaCuotasPagadasMin).nullish(),
   "gananciaNeta": zod.number().nullish(),
+  "buyerName": zod.string().nullish().describe('Nombre del comprador'),
+  "buyerRut": zod.string().nullish().describe('RUT del comprador'),
+  "buyerContact": zod.string().nullish().describe('Medio de contacto del comprador (teléfono, email)'),
+  "meetingPlace": zod.string().nullish().describe('Lugar de encuentro para la venta'),
+  "buyerPaymentMethod": zod.string().nullish().describe('Medio de pago usado por el comprador (Efectivo, Transferencia, Tarjeta)'),
+  "sellerName": zod.string().nullish().describe('Nombre del vendedor (a quién se le compró)'),
+  "sellerRut": zod.string().nullish().describe('RUT del vendedor'),
+  "sellerContact": zod.string().nullish().describe('Contacto del vendedor'),
+  "purchaseMeetingPlace": zod.string().nullish().describe('Lugar de encuentro para la compra'),
   "comentarios": zod.string().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
@@ -560,6 +639,15 @@ export const EliminarPagoCuotaResponse = zod.object({
   "ventaNumeroCuotas": zod.number().min(eliminarPagoCuotaResponseVentaNumeroCuotasMin).nullish(),
   "ventaCuotasPagadas": zod.number().min(eliminarPagoCuotaResponseVentaCuotasPagadasMin).nullish(),
   "gananciaNeta": zod.number().nullish(),
+  "buyerName": zod.string().nullish().describe('Nombre del comprador'),
+  "buyerRut": zod.string().nullish().describe('RUT del comprador'),
+  "buyerContact": zod.string().nullish().describe('Medio de contacto del comprador (teléfono, email)'),
+  "meetingPlace": zod.string().nullish().describe('Lugar de encuentro para la venta'),
+  "buyerPaymentMethod": zod.string().nullish().describe('Medio de pago usado por el comprador (Efectivo, Transferencia, Tarjeta)'),
+  "sellerName": zod.string().nullish().describe('Nombre del vendedor (a quién se le compró)'),
+  "sellerRut": zod.string().nullish().describe('RUT del vendedor'),
+  "sellerContact": zod.string().nullish().describe('Contacto del vendedor'),
+  "purchaseMeetingPlace": zod.string().nullish().describe('Lugar de encuentro para la compra'),
   "comentarios": zod.string().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
@@ -606,6 +694,15 @@ export const ReactivarEquipoResponse = zod.object({
   "ventaNumeroCuotas": zod.number().min(reactivarEquipoResponseVentaNumeroCuotasMin).nullish(),
   "ventaCuotasPagadas": zod.number().min(reactivarEquipoResponseVentaCuotasPagadasMin).nullish(),
   "gananciaNeta": zod.number().nullish(),
+  "buyerName": zod.string().nullish().describe('Nombre del comprador'),
+  "buyerRut": zod.string().nullish().describe('RUT del comprador'),
+  "buyerContact": zod.string().nullish().describe('Medio de contacto del comprador (teléfono, email)'),
+  "meetingPlace": zod.string().nullish().describe('Lugar de encuentro para la venta'),
+  "buyerPaymentMethod": zod.string().nullish().describe('Medio de pago usado por el comprador (Efectivo, Transferencia, Tarjeta)'),
+  "sellerName": zod.string().nullish().describe('Nombre del vendedor (a quién se le compró)'),
+  "sellerRut": zod.string().nullish().describe('RUT del vendedor'),
+  "sellerContact": zod.string().nullish().describe('Contacto del vendedor'),
+  "purchaseMeetingPlace": zod.string().nullish().describe('Lugar de encuentro para la compra'),
   "comentarios": zod.string().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
@@ -641,6 +738,34 @@ export const CreateMovimientoCajaBody = zod.object({
 })
 
 export const CreateMovimientoCajaResponse = zod.object({
+  "id": zod.number(),
+  "tipo": zod.enum(['ingreso', 'egreso', 'ajuste']),
+  "monto": zod.number(),
+  "motivo": zod.string(),
+  "fecha": zod.coerce.date(),
+  "equipoId": zod.number().nullish(),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Update a manual cash movement
+ */
+export const UpdateMovimientoCajaParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+
+
+export const UpdateMovimientoCajaBody = zod.object({
+  "tipo": zod.enum(['ingreso', 'egreso', 'ajuste']).optional(),
+  "monto": zod.number().optional(),
+  "motivo": zod.string().min(1).optional(),
+  "fecha": zod.coerce.date().optional()
+})
+
+export const UpdateMovimientoCajaResponse = zod.object({
   "id": zod.number(),
   "tipo": zod.enum(['ingreso', 'egreso', 'ajuste']),
   "monto": zod.number(),
