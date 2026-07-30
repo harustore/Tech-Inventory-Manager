@@ -24,3 +24,9 @@ export function formatDate(dateStr: string) {
     day: "numeric",
   }).format(new Date(dateStr));
 }
+
+export function daysBetween(from: string, to: string = new Date().toISOString()): number {
+  const a = new Date(from);
+  const b = new Date(to);
+  return Math.round((b.getTime() - a.getTime()) / 86400000);
+}

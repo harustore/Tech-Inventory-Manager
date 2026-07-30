@@ -71,6 +71,9 @@ importers:
 
   .:
     dependencies:
+      pg:
+        specifier: ^8.22.0
+        version: 8.22.0
       sql.js:
         specifier: ^1.14.1
         version: 1.14.1

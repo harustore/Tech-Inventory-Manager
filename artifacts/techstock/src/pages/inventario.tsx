@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "wouter";
-import { formatCurrency, formatDate, cn } from "@/lib/utils";
+import { formatCurrency, formatDate, daysBetween, cn } from "@/lib/utils";
 import { Search, Plus, Smartphone, Laptop, Tv, Headphones, Watch, Camera, PackageSearch, Battery, ArrowUpDown } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -217,7 +217,12 @@ export default function Inventario() {
                     )}
                     {equipo.estado !== 'vendido' && (
                       <span className="text-xs text-slate-400 mt-1 hidden sm:block">
-                        Comprado: {formatDate(equipo.fechaCompra)}
+                        {daysBetween(equipo.fechaCompra)} días en stock
+                      </span>
+                    )}
+                    {equipo.estado === 'vendido' && equipo.fechaVenta && (
+                      <span className="text-xs text-slate-400 mt-1 hidden sm:block">
+                        Vendido en {daysBetween(equipo.fechaCompra, equipo.fechaVenta)} días
                       </span>
                     )}
                   </div>
