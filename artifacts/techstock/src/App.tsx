@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
-import { ClerkProvider, SignIn, Show, useClerk } from '@clerk/react';
+import { ClerkProvider, SignIn, Show, useClerk, useAuth } from '@clerk/react';
+import { setAuthTokenGetter } from '@workspace/api-client-react';
 import { shadcn } from '@clerk/themes';
 import { Switch, Route, useLocation, Router as WouterRouter, Redirect } from 'wouter';
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
@@ -111,6 +112,17 @@ function ClerkQueryClientCacheInvalidator() {
   return null;
 }
 
+function ClerkAuthBridge() {
+  const { getToken } = useAuth();
+
+  useEffect(() => {
+    setAuthTokenGetter(getToken);
+    return () => setAuthTokenGetter(null);
+  }, [getToken]);
+
+  return null;
+}
+
 function HomeRedirect() {
   return (
     <>
@@ -168,6 +180,7 @@ function ClerkProviderWithRoutes() {
       <ThemeProvider>
       <QueryClientProvider client={queryClient}>
         <ClerkQueryClientCacheInvalidator />
+        <ClerkAuthBridge />
         <Switch>
           <Route path="/" component={HomeRedirect} />
           <Route path="/sign-in/*?" component={SignInPage} />
