@@ -1,1 +1,1 @@
-module.exports = function handler(req, res) { res.status(200).send('placeholder'); };
+export default function handler(req, res) { res.status(200).send('placeholder'); };

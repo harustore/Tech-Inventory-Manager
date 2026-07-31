@@ -11,7 +11,7 @@ await esbuild({
   platform: "node",
   bundle: true,
   format: "esm",
-  outfile: path.resolve(apiDir, "index.mjs"),
+  outfile: path.resolve(apiDir, "index.js"),
   logLevel: "info",
   sourcemap: false,
   // sql.js must stay external so initSqlJs() can load sql-wasm.wasm from node_modules at runtime.

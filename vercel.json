@@ -4,14 +4,14 @@
   "outputDirectory": "artifacts/techstock/dist",
   "framework": null,
   "functions": {
-    "api/index.mjs": {
+    "api/index.js": {
       "maxDuration": 30
     }
   },
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "/api/index.mjs"
+      "destination": "/api/index.js"
     }
   ]
 }
