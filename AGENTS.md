@@ -13,7 +13,7 @@ Private inventory, sales, and cash-flow tracker for a small tech resale business
 | Regenerate API hooks + Zod schemas | `pnpm --filter @workspace/api-spec run codegen` |
 | Push DB schema to Neon | `pnpm --filter @workspace/db run push` (needs reachable `DATABASE_URL`) |
 | Seed local SQLite | `node ../../scripts/seed-local.mjs` **from `artifacts/api-server` cwd** (see gotcha below) |
-| Migrate Neon → local SQLite | `node scripts/migrate-neon.mjs` (run from repo root) |
+| Migrate Neon → local SQLite | `tsx ../../scripts/migrate-neon.mjs` **from `artifacts/api-server` cwd** (needs reachable `DATABASE_URL`; replaces local data — a `.bak` backup is created first; stop the API server before running) |
 
 Build order: libs first (`pnpm run typecheck:libs` runs `tsc --build` on `lib/db`, `lib/api-client-react`, `lib/api-zod`), then artifacts.
 
@@ -59,6 +59,7 @@ Cash ledger side effects: create = egreso, venta = ingreso, reactivar = removes 
 
 - **DB path is cwd-relative**: `lib/db/src/index.ts` opens `join(process.cwd(), "data", "techstock.db")`. The API runs from `artifacts/api-server`, so its DB is `artifacts/api-server/data/techstock.db` — a **different file** than the root `data/techstock.db`. Run the server and the seed script from `artifacts/api-server`, or you will read/write the wrong database.
 - **Runtime DB is SQLite via `sql.js` only** — everywhere, including production. `DATABASE_URL`/Neon is read only by `lib/db/drizzle.config.ts` (`db run push`) and `scripts/migrate-neon.mjs`. On Vercel serverless, sql.js filesystem writes are **ephemeral** — deployed data does not persist. The local `artifacts/api-server/data/techstock.db` is the single source of truth and has no automated backup.
+- **Migrate script needs `tsx` and hits Neon over HTTPS**: `scripts/migrate-neon.mjs` imports `@workspace/db` (a `.ts` package that Node can't load directly — directory import `./schema`), so it must run with `tsx`. It reads Neon through the SQL-over-HTTP endpoint (`POST https://<host>/sql` + `neon-connection-string` header), which works even on networks that block Postgres TCP 5432. The script **replaces** local data (FK-safe wipe, explicit IDs preserved) and writes a `.bak` of the previous DB file.
 - **`.env` files are NOT gitignored** and are untracked: `artifacts/api-server/.env` (holds `CLERK_SECRET_KEY`) and `artifacts/techstock/.env.local` (`VITE_CLERK_PUBLISHABLE_KEY`). Never `git add .` them; never commit secrets. `data/` dirs are also untracked.
 - **Date columns** (`equipos.fechaCompra`/`fechaVenta`, `movimientos_caja.fecha`, `pagos_cuotas.fecha`) are Drizzle `date` with `mode: "string"`. Convert zod-coerced `Date` inputs with `toDateOnlyString()` from `artifacts/api-server/src/lib/dates.ts` — never pass raw `Date` objects to DB.
 - **Numeric/money columns** are Postgres `numeric`, returned as **strings** by Drizzle. Use `String(...)` on write and `Number(...)` on read/aggregation. See `normalizeEquipo()` in `artifacts/api-server/src/routes/equipos.ts` for the pattern.
