@@ -50,3 +50,15 @@ Thumbs.db
 
 # Vercel build output
 api/index.js
+
+# secrets
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# local databases and logs
+data/
+*.db
+*.db.bak
+*.log
