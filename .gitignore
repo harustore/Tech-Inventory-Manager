@@ -50,6 +50,7 @@ Thumbs.db
 
 # Vercel build output
 api/index.js
+api/index.mjs
 
 # secrets
 .env
