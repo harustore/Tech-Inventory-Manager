@@ -33,14 +33,23 @@ app.use(cors({ credentials: true, origin: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Clerk middleware — skip if no secret key (local dev)
-if (process.env.CLERK_SECRET_KEY) {
-  app.use(
-    clerkMiddleware(() => ({
-      publishableKey: process.env.CLERK_PUBLISHABLE_KEY,
-    })),
-  );
+// Fail closed: without a Clerk secret key the API must not start exposed.
+if (!process.env.CLERK_SECRET_KEY) {
+  throw new Error("CLERK_SECRET_KEY is required to start the API server");
 }
+
+app.use((req, res, next) => {
+  const clerkMw = clerkMiddleware(() => ({
+    publishableKey: process.env.CLERK_PUBLISHABLE_KEY,
+  }));
+  clerkMw(req, res, (err) => {
+    if (err) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+    next();
+  });
+});
 
 // Persist SQLite DB to disk after every API response
 app.use((_req, res, next) => {
