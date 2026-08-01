@@ -1,16 +1,26 @@
-import { sqliteTable, text, integer, real } from "drizzle-orm/sqlite-core";
+import {
+  pgTable,
+  serial,
+  integer,
+  text,
+  numeric,
+  date,
+  timestamp,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 import { equiposTable } from "./equipos";
 
-export const pagosCuotasTable = sqliteTable("pagos_cuotas", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const pagosCuotasTable = pgTable("pagos_cuotas", {
+  id: serial("id").primaryKey(),
   equipoId: integer("equipo_id")
     .notNull()
     .references(() => equiposTable.id, { onDelete: "cascade" }),
-  monto: real("monto").notNull(),
-  fecha: text("fecha").notNull(),
-  createdAt: text("created_at").notNull().$defaultFn(() => new Date().toISOString()),
+  monto: numeric("monto", { precision: 12, scale: 2, mode: "number" }).notNull(),
+  fecha: date("fecha", { mode: "string" }).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+    .notNull()
+    .defaultNow(),
 });
 
 export const insertPagoCuotaSchema = createInsertSchema(pagosCuotasTable).omit(

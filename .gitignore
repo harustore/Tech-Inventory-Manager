@@ -63,3 +63,5 @@ data/
 *.db
 *.db.bak
 *.log
+.vercel
+.env*

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { db, equiposTable, movimientosCajaTable, proveedoresTable, pagosCuotasTable, and, desc, eq, like, or } from "@workspace/db";
+import { db, equiposTable, movimientosCajaTable, proveedoresTable, pagosCuotasTable, and, desc, eq, or, sql } from "@workspace/db";
 import {
   ListEquiposQueryParams,
   ListEquiposResponse,
@@ -30,7 +30,7 @@ const router = Router();
 
 router.use(requireAuth);
 
-/** SQLite REAL columns return numbers directly; identity transform for API response. */
+/** pg columns (numeric/date) are mapped by @workspace/db to numbers/strings; identity transform for API response. */
 function normalizeEquipo<T>(equipo: T) {
   return equipo;
 }
@@ -88,10 +88,10 @@ router.get("/equipos", async (req, res): Promise<void> => {
     const term = `%${query.data.search}%`;
       conditions.push(
         or(
-          like(equiposTable.equipo, term),
-          like(equiposTable.marca, term),
-          like(equiposTable.modelo, term),
-          like(equiposTable.imeiSerial, term),
+          sql`${equiposTable.equipo} ILIKE ${term}`,
+          sql`${equiposTable.marca} ILIKE ${term}`,
+          sql`${equiposTable.modelo} ILIKE ${term}`,
+          sql`${equiposTable.imeiSerial} ILIKE ${term}`,
         ),
       );
   }

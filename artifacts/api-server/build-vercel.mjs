@@ -14,7 +14,7 @@ await esbuild({
   outfile: path.resolve(apiDir, "index.js"),
   logLevel: "info",
   sourcemap: false,
-  // sql.js must stay external so initSqlJs() can load sql-wasm.wasm from node_modules at runtime.
+  // pg-native/pg-cloudflare must stay external so pg can load native bindings at runtime.
   // Other native/unbundleable packages are externalized as a safety net.
   external: [
     "*.node",
@@ -29,8 +29,8 @@ await esbuild({
     "bufferutil",
     "utf-8-validate",
     "pg-native",
+    "pg-cloudflare",
     "@prisma/client",
-    "sql.js",
   ],
   // Make sure packages that are cjs only (e.g. express) but are bundled continue to work in our esm output file
   banner: {

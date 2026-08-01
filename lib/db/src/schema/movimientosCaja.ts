@@ -1,18 +1,28 @@
-import { sqliteTable, text, integer, real } from "drizzle-orm/sqlite-core";
+import {
+  pgTable,
+  serial,
+  integer,
+  text,
+  numeric,
+  date,
+  timestamp,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 import { equiposTable } from "./equipos";
 
-export const movimientosCajaTable = sqliteTable("movimientos_caja", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const movimientosCajaTable = pgTable("movimientos_caja", {
+  id: serial("id").primaryKey(),
   tipo: text("tipo").notNull(),
-  monto: real("monto").notNull(),
+  monto: numeric("monto", { precision: 12, scale: 2, mode: "number" }).notNull(),
   motivo: text("motivo").notNull(),
-  fecha: text("fecha").notNull(),
+  fecha: date("fecha", { mode: "string" }).notNull(),
   equipoId: integer("equipo_id").references(() => equiposTable.id, {
     onDelete: "set null",
   }),
-  createdAt: text("created_at").notNull().$defaultFn(() => new Date().toISOString()),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+    .notNull()
+    .defaultNow(),
 });
 
 export const insertMovimientoCajaSchema = createInsertSchema(

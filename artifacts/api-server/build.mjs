@@ -47,7 +47,7 @@ async function buildAll() {
       "isolated-vm",
       "lightningcss",
       "pg-native",
-      "sql.js",
+      "pg-cloudflare",
       "oracledb",
       "mongodb-client-encryption",
       "nodemailer",

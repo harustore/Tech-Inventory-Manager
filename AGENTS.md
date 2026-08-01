@@ -12,8 +12,6 @@ Private inventory, sales, and cash-flow tracker for a small tech resale business
 | Build all | `pnpm run build` |
 | Regenerate API hooks + Zod schemas | `pnpm --filter @workspace/api-spec run codegen` |
 | Push DB schema to Neon | `pnpm --filter @workspace/db run push` (needs reachable `DATABASE_URL`) |
-| Seed local SQLite | `node ../../scripts/seed-local.mjs` **from `artifacts/api-server` cwd** (see gotcha below) |
-| Migrate Neon → local SQLite | `tsx ../../scripts/migrate-neon.mjs` **from `artifacts/api-server` cwd** (needs reachable `DATABASE_URL`; replaces local data — a `.bak` backup is created first; stop the API server before running) |
 
 Build order: libs first (`pnpm run typecheck:libs` runs `tsc --build` on `lib/db`, `lib/api-client-react`, `lib/api-zod`), then artifacts.
 
@@ -57,13 +55,12 @@ Cash ledger side effects: create = egreso, venta = ingreso, reactivar = removes 
 
 ## Critical gotchas
 
-- **DB path is cwd-relative**: `lib/db/src/index.ts` opens `join(process.cwd(), "data", "techstock.db")`. The API runs from `artifacts/api-server`, so its DB is `artifacts/api-server/data/techstock.db` — a **different file** than the root `data/techstock.db`. Run the server and the seed script from `artifacts/api-server`, or you will read/write the wrong database.
-- **Runtime DB is SQLite via `sql.js` only** — everywhere, including production. `DATABASE_URL`/Neon is read only by `lib/db/drizzle.config.ts` (`db run push`) and `scripts/migrate-neon.mjs`. On Vercel serverless, sql.js filesystem writes are **ephemeral** — deployed data does not persist. The local `artifacts/api-server/data/techstock.db` is the single source of truth and has no automated backup.
-- **Migrate script needs `tsx` and hits Neon over HTTPS**: `scripts/migrate-neon.mjs` imports `@workspace/db` (a `.ts` package that Node can't load directly — directory import `./schema`), so it must run with `tsx`. It reads Neon through the SQL-over-HTTP endpoint (`POST https://<host>/sql` + `neon-connection-string` header), which works even on networks that block Postgres TCP 5432. The script **replaces** local data (FK-safe wipe, explicit IDs preserved) and writes a `.bak` of the previous DB file.
-- **`.env` files are NOT gitignored** and are untracked: `artifacts/api-server/.env` (holds `CLERK_SECRET_KEY`) and `artifacts/techstock/.env.local` (`VITE_CLERK_PUBLISHABLE_KEY`). Never `git add .` them; never commit secrets. `data/` dirs are also untracked.
+- **Runtime DB is PostgreSQL on Neon** (`DATABASE_URL` in `artifacts/api-server/.env`). Both local dev and Vercel talk to the same Neon database — data is shared and persistent. Schema is defined in `lib/db/src/schema/*.ts`; push it with `pnpm --filter @workspace/db run push`.
+- **The pg driver returns NUMERIC/BIGINT as strings.** `lib/db/src/index.ts` registers `pg.types.setTypeParser` for OID 20 (int8) and 1700 (numeric) so money counts come back as numbers. Drizzle columns also use `numeric(..., { mode: "number" })` for money and `date(..., { mode: "string" })` for dates so the API contract stays number/string.
 - **Date columns** (`equipos.fechaCompra`/`fechaVenta`, `movimientos_caja.fecha`, `pagos_cuotas.fecha`) are Drizzle `date` with `mode: "string"`. Convert zod-coerced `Date` inputs with `toDateOnlyString()` from `artifacts/api-server/src/lib/dates.ts` — never pass raw `Date` objects to DB.
-- **Numeric/money columns** are Postgres `numeric`, returned as **strings** by Drizzle. Use `String(...)` on write and `Number(...)` on read/aggregation. See `normalizeEquipo()` in `artifacts/api-server/src/routes/equipos.ts` for the pattern.
+- **`.env` files are NOT gitignored** and are untracked: `artifacts/api-server/.env` (holds `CLERK_SECRET_KEY` and `DATABASE_URL`) and `artifacts/techstock/.env.local` (`VITE_CLERK_PUBLISHABLE_KEY`). Never `git add .` them; never commit secrets.
 - Cash `egreso` is only created at purchase time; later cost edits do **not** retroactively adjust the ledger (accepted MVP simplification).
+- The corporate network at some locations blocks Postgres TCP 5432 (ETIMEDOUT). If `db run push` fails that way, retry from a network that allows it.
 
 ## Codegen flow
 
@@ -75,7 +72,7 @@ After editing `openapi.yaml`, always run `pnpm --filter @workspace/api-spec run 
 
 ## Vercel deployment
 
-`vercel.json` runs `node artifacts/api-server/build-vercel.mjs` (esbuild `src/vercel.ts` → `api/index.js`) then builds the frontend. API routes are rewritten to `/api/index.js`. Env vars needed: `DATABASE_URL`, `CLERK_SECRET_KEY`, `CLERK_PUBLISHABLE_KEY`, `VITE_CLERK_PUBLISHABLE_KEY`. Because the runtime DB is sql.js SQLite (ephemeral on serverless), treat Vercel as a demo/CI surface, not the source of truth for data.
+`vercel.json` runs `node artifacts/api-server/build-vercel.mjs` (esbuild `src/vercel.ts` → `api/index.js`) then builds the frontend. API routes are rewritten to `/api/index.js`. Env vars needed: `DATABASE_URL`, `CLERK_SECRET_KEY`, `CLERK_PUBLISHABLE_KEY`, `VITE_CLERK_PUBLISHABLE_KEY`. The API and frontend share the Neon database, so data persists across deployments and is shared with local dev.
 
 ## Auth (Clerk)
 

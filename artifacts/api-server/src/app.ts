@@ -4,7 +4,6 @@ import pinoHttp from "pino-http";
 import { clerkMiddleware } from "@clerk/express";
 import router from "./routes/index.js";
 import { logger } from "./lib/logger.js";
-import { persist } from "@workspace/db";
 
 const app = express();
 
@@ -49,16 +48,6 @@ app.use((req, res, next) => {
     }
     next();
   });
-});
-
-// Persist SQLite DB to disk after every API response
-app.use((_req, res, next) => {
-  const originalEnd = res.end.bind(res);
-  res.end = ((...args: unknown[]) => {
-    persist();
-    return originalEnd(...(args as Parameters<typeof res.end>));
-  }) as typeof res.end;
-  next();
 });
 
 app.use("/api", router);

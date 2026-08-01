@@ -1,9 +1,9 @@
-import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+import { pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
-export const proveedoresTable = sqliteTable("proveedores", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const proveedoresTable = pgTable("proveedores", {
+  id: serial("id").primaryKey(),
   nombre: text("nombre").notNull(),
   telefono: text("telefono"),
   facebook: text("facebook"),
@@ -12,7 +12,9 @@ export const proveedoresTable = sqliteTable("proveedores", {
   email: text("email"),
   direccion: text("direccion"),
   comentarios: text("comentarios"),
-  createdAt: text("created_at").notNull().$defaultFn(() => new Date().toISOString()),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+    .notNull()
+    .defaultNow(),
 });
 
 export const insertProveedorSchema = createInsertSchema(proveedoresTable).omit({
