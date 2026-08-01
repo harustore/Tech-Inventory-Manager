@@ -54,10 +54,10 @@ app.use((req, res, next) => {
 // Persist SQLite DB to disk after every API response
 app.use((_req, res, next) => {
   const originalEnd = res.end.bind(res);
-  res.end = (...args: Parameters<typeof res.end>) => {
+  res.end = ((...args: unknown[]) => {
     persist();
-    return originalEnd(...args);
-  };
+    return originalEnd(...(args as Parameters<typeof res.end>));
+  }) as typeof res.end;
   next();
 });
 

@@ -265,11 +265,13 @@ router.patch("/equipos/:id", async (req, res): Promise<void> => {
     }
   }
 
+  const { fechaVenta: _fechaVenta, ...restData } = parsed.data;
+
   const [equipo] = await db.transaction(async (tx) => {
     const updated = await tx
       .update(equiposTable)
       .set({
-        ...parsed.data,
+        ...restData,
         fechaCompra: parsed.data.fechaCompra
           ? toDateOnlyString(parsed.data.fechaCompra)
           : undefined,

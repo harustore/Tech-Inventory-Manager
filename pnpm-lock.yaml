@@ -470,9 +470,6 @@ importers:
       lucide-react:
         specifier: 'catalog:'
         version: 0.545.0(react@19.1.0)
-      next-themes:
-        specifier: ^0.4.6
-        version: 0.4.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react:
         specifier: 'catalog:'
         version: 19.1.0
@@ -541,10 +538,10 @@ importers:
     dependencies:
       drizzle-orm:
         specifier: ^0.45.2
-        version: 0.45.2(@types/pg@8.20.0)(pg@8.22.0)(sql.js@1.14.1)
+        version: 0.45.2(@types/pg@8.20.0)(@types/sql.js@1.4.11)(pg@8.22.0)(sql.js@1.14.1)
       drizzle-zod:
         specifier: ^0.8.3
-        version: 0.8.3(drizzle-orm@0.45.2(@types/pg@8.20.0)(pg@8.22.0)(sql.js@1.14.1))(zod@3.25.76)
+        version: 0.8.3(drizzle-orm@0.45.2(@types/pg@8.20.0)(@types/sql.js@1.4.11)(pg@8.22.0)(sql.js@1.14.1))(zod@3.25.76)
       pg:
         specifier: ^8.22.0
         version: 8.22.0
@@ -558,6 +555,9 @@ importers:
       '@types/pg':
         specifier: ^8.20.0
         version: 8.20.0
+      '@types/sql.js':
+        specifier: ^1.4.9
+        version: 1.4.11
       drizzle-kit:
         specifier: ^0.31.10
         version: 0.31.10
@@ -2383,6 +2383,9 @@ packages:
   '@types/d3-timer@3.0.2':
     resolution: {integrity: sha512-Ps3T8E8dZDam6fUyNiMkekK3XUsaUEik+idO9/YjPtfj2qruF8tFBXS7XhtE4iIXBLxhmLjP3SXpLhVf21I9Lw==}
 
+  '@types/emscripten@1.41.5':
+    resolution: {integrity: sha512-cMQm7pxu6BxtHyqJ7mQZ2kXWV5SLmugybFdHCBbJ5eHzOo6VhBckEgAT3//rP5FwPHNPeEiq4SmQ5ucBwsOo4Q==}
+
   '@types/estree@1.0.9':
     resolution: {integrity: sha512-GhdPgy1el4/ImP05X05Uw4cw2/M93BCUmnEvWZNStlCzEKME4Fkk+YpoA5OiHNQmoS7Cafb8Xa3Pya8m1Qrzeg==}
 
@@ -2423,6 +2426,9 @@ packages:
 
   '@types/serve-static@2.2.0':
     resolution: {integrity: sha512-8mam4H1NHLtu7nmtalF7eyBH14QyOASmcxHhSfEoRyr0nP/YdoesEtU+uSRvMe96TW/HPTtkoKqQLl53N7UXMQ==}
+
+  '@types/sql.js@1.4.11':
+    resolution: {integrity: sha512-QXIx38p2ZThJaK9vP5ZdqdlRe1FG9I8SmCZOS7FHfB/2qPAjZwkL7/vlfPg6N/oWHuuOaGg/P/IRwfP2W0kWVQ==}
 
   '@types/unist@3.0.3':
     resolution: {integrity: sha512-ko/gIFJRv177XgZsZcBwnqJN5x/Gien8qNOn0D5bQU/zAzVf9Zt3BlcUiLqhV9y4ARk0GbT3tnUiPNgnTXzc/Q==}
@@ -5590,6 +5596,8 @@ snapshots:
 
   '@types/d3-timer@3.0.2': {}
 
+  '@types/emscripten@1.41.5': {}
+
   '@types/estree@1.0.9': {}
 
   '@types/express-serve-static-core@5.1.1':
@@ -5640,6 +5648,11 @@ snapshots:
   '@types/serve-static@2.2.0':
     dependencies:
       '@types/http-errors': 2.0.5
+      '@types/node': 25.9.4
+
+  '@types/sql.js@1.4.11':
+    dependencies:
+      '@types/emscripten': 1.41.5
       '@types/node': 25.9.4
 
   '@types/unist@3.0.3': {}
@@ -5878,15 +5891,16 @@ snapshots:
       esbuild: 0.25.12
       tsx: 4.23.0
 
-  drizzle-orm@0.45.2(@types/pg@8.20.0)(pg@8.22.0)(sql.js@1.14.1):
+  drizzle-orm@0.45.2(@types/pg@8.20.0)(@types/sql.js@1.4.11)(pg@8.22.0)(sql.js@1.14.1):
     optionalDependencies:
       '@types/pg': 8.20.0
+      '@types/sql.js': 1.4.11
       pg: 8.22.0
       sql.js: 1.14.1
 
-  drizzle-zod@0.8.3(drizzle-orm@0.45.2(@types/pg@8.20.0)(pg@8.22.0)(sql.js@1.14.1))(zod@3.25.76):
+  drizzle-zod@0.8.3(drizzle-orm@0.45.2(@types/pg@8.20.0)(@types/sql.js@1.4.11)(pg@8.22.0)(sql.js@1.14.1))(zod@3.25.76):
     dependencies:
-      drizzle-orm: 0.45.2(@types/pg@8.20.0)(pg@8.22.0)(sql.js@1.14.1)
+      drizzle-orm: 0.45.2(@types/pg@8.20.0)(@types/sql.js@1.4.11)(pg@8.22.0)(sql.js@1.14.1)
       zod: 3.25.76
 
   dunder-proto@1.0.1:
