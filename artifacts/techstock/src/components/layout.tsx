@@ -1,4 +1,4 @@
-import { Link, useLocation } from "wouter";
+﻿import { Link, useLocation } from "wouter";
 import { useClerk, useUser } from "@clerk/react";
 import {
   LayoutDashboard,
@@ -31,104 +31,109 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const { signOut } = useClerk();
   const { user } = useUser();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   const handleLogout = () => {
     signOut({ redirectUrl: "/" });
   };
 
-  const { theme, toggleTheme } = useTheme();
-
   return (
     <div className="min-h-screen bg-background flex w-full">
-      {/* Mobile Sidebar overlay */}
       {isMobileOpen && (
-        <div 
-          className="fixed inset-0 bg-slate-900/50 z-40 md:hidden"
+        <div
+          className="fixed inset-0 z-40 bg-slate-900/50 md:hidden"
           onClick={() => setIsMobileOpen(false)}
         />
       )}
 
-      {/* Sidebar */}
-      <aside 
+      <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-slate-300 transform transition-transform duration-200 ease-in-out md:translate-x-0 md:static md:flex md:flex-col",
-          isMobileOpen ? "translate-x-0" : "-translate-x-full"
+          "fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-cyan-500/10 bg-slate-950 text-slate-300 shadow-2xl shadow-slate-950/30 transition-transform duration-200 ease-in-out md:static md:translate-x-0",
+          isMobileOpen ? "translate-x-0" : "-translate-x-full",
         )}
       >
-        <div className="flex items-center h-16 px-6 bg-slate-950 text-white gap-3 shrink-0">
-          <img src={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/logo.svg`} alt="Logo" className="w-8 h-8" />
-          <span className="font-bold text-lg tracking-tight">TechStock</span>
+        <div className="flex h-18 shrink-0 items-center gap-3 border-b border-white/5 bg-gradient-to-b from-slate-900 to-slate-950 px-6 text-white">
+          <div className="relative">
+            <div className="absolute inset-0 rounded-xl bg-cyan-400/20 blur-md" />
+            <img src={`${import.meta.env.BASE_URL.replace(/\/$/, "")}/logo.svg`} alt="Logo" className="relative h-9 w-9" />
+          </div>
+          <div className="leading-tight">
+            <span className="block text-lg font-semibold tracking-tight">TechStock</span>
+            <span className="text-[11px] uppercase tracking-[0.28em] text-slate-400">Inventory Manager</span>
+          </div>
         </div>
 
-        <div className="flex-1 py-6 px-4 overflow-y-auto space-y-1">
+        <div className="flex-1 space-y-1 overflow-y-auto px-4 py-6">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.startsWith(item.href);
             return (
-              <Link 
-                key={item.href} 
+              <Link
+                key={item.href}
                 href={item.href}
                 onClick={() => setIsMobileOpen(false)}
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors",
-                  isActive 
-                    ? "bg-emerald-500/10 text-emerald-400" 
-                    : "hover:bg-slate-800 hover:text-slate-100"
+                  "flex items-center gap-3 rounded-xl border px-3 py-3 text-sm font-medium transition-all duration-150",
+                  isActive
+                    ? "border-cyan-400/20 bg-cyan-500/10 text-cyan-300 shadow-[0_0_0_1px_rgba(52,211,153,0.08)]"
+                    : "border-transparent hover:border-white/5 hover:bg-white/5 hover:text-slate-50",
                 )}
               >
-                <Icon className="w-5 h-5" />
+                <Icon className="h-5 w-5" />
                 {item.label}
               </Link>
             );
           })}
           <button
             onClick={toggleTheme}
-            className="flex items-center gap-3 px-3 py-2.5 w-full rounded-md text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-100 transition-colors"
+            className="flex w-full items-center gap-3 rounded-xl border border-transparent px-3 py-3 text-sm font-medium text-slate-400 transition-all duration-150 hover:border-white/5 hover:bg-white/5 hover:text-slate-100"
           >
-            {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             {theme === "dark" ? "Modo claro" : "Modo oscuro"}
           </button>
         </div>
 
-        <div className="p-4 bg-slate-950 shrink-0">
-          <div className="flex items-center gap-3 px-3 py-2 mb-4">
-            <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white font-bold shrink-0">
+        <div className="shrink-0 border-t border-white/5 bg-slate-950 p-4">
+          <div className="mb-4 flex items-center gap-3 rounded-2xl bg-white/5 px-3 py-2">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-cyan-400 to-cyan-600 font-bold text-white shadow-lg shadow-cyan-500/20">
               {user?.firstName?.charAt(0) || user?.emailAddresses[0]?.emailAddress?.charAt(0)?.toUpperCase() || "U"}
             </div>
             <div className="overflow-hidden">
-              <p className="text-sm font-medium text-slate-200 truncate">
-                {user?.fullName || "Usuario"}
-              </p>
-              <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                {user?.emailAddresses[0]?.emailAddress}
-              </p>
+              <p className="truncate text-sm font-semibold text-slate-100">{user?.fullName || "Usuario"}</p>
+              <p className="truncate text-xs text-slate-400">{user?.emailAddresses[0]?.emailAddress}</p>
             </div>
           </div>
-          <button 
+          <button
             onClick={handleLogout}
-            className="flex items-center gap-3 px-3 py-2 w-full rounded-md text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"
+            className="flex w-full items-center gap-3 rounded-xl border border-transparent px-3 py-3 text-sm font-medium text-slate-400 transition-all duration-150 hover:border-red-500/20 hover:bg-red-500/10 hover:text-red-200"
           >
-            <LogOut className="w-5 h-5" />
-            Cerrar sesión
+            <LogOut className="h-5 w-5" />
+            Cerrar sesiÃ³n
           </button>
         </div>
       </aside>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-700 flex items-center px-4 md:hidden shrink-0">
-          <Button variant="ghost" size="icon" onClick={() => setIsMobileOpen(true)} className="mr-2">
-            <Menu className="w-5 h-5" />
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="flex h-16 shrink-0 items-center justify-between border-b border-slate-200/80 bg-white/85 px-4 backdrop-blur dark:border-slate-700 dark:bg-slate-950/90 md:hidden">
+          <Button variant="ghost" size="icon" onClick={() => setIsMobileOpen(true)}>
+            <Menu className="h-5 w-5" />
           </Button>
-          <span className="font-bold text-slate-900 dark:text-slate-100 text-lg">TechStock</span>
+          <span className="text-lg font-bold text-slate-900 dark:text-slate-100">TechStock</span>
+          <button
+            onClick={toggleTheme}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+            aria-label={theme === "dark" ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
+          >
+            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </button>
         </header>
 
-        <main className="flex-1 overflow-auto p-4 md:p-8">
-          <div className="max-w-6xl mx-auto w-full">
-            {children}
-          </div>
+        <main className="relative flex-1 overflow-auto p-4 md:p-8">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.12),transparent_35%),radial-gradient(circle_at_top_right,rgba(34,211,238,0.08),transparent_30%)]" />
+          <div className="relative mx-auto w-full max-w-6xl">{children}</div>
         </main>
       </div>
     </div>
   );
 }
+

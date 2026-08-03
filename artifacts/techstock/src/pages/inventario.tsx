@@ -1,13 +1,32 @@
-import { useState, useRef, useEffect } from "react";
-import { useListEquipos, getListEquiposQueryKey, EstadoEquipo, Categoria } from "@workspace/api-client-react";
+﻿import { useState, useRef, useEffect } from "react";
+import {
+  useListEquipos,
+  getListEquiposQueryKey,
+  EstadoEquipo,
+  Categoria,
+} from "@workspace/api-client-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "wouter";
-import { formatCurrency, formatDate, daysBetween, cn } from "@/lib/utils";
-import { Search, Plus, Smartphone, Laptop, Tv, Headphones, Watch, Camera, PackageSearch, Battery, ArrowUpDown } from "lucide-react";
+import { formatCurrency, daysBetween, cn } from "@/lib/utils";
+import {
+  Search,
+  Plus,
+  Smartphone,
+  Laptop,
+  Tv,
+  Headphones,
+  Watch,
+  Camera,
+  PackageSearch,
+  Battery,
+  ArrowUpDown,
+  Filter,
+} from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 
 export default function Inventario() {
   const [, setLocation] = useLocation();
@@ -23,147 +42,249 @@ export default function Inventario() {
     debounceRef.current = setTimeout(() => setSearch(searchInput), 300);
     return () => clearTimeout(debounceRef.current);
   }, [searchInput]);
-  
+
   const equiposParams = {
     search: search || undefined,
     estado: estadoFilter === "todos" ? undefined : estadoFilter,
     categoria: categoriaFilter === "todos" ? undefined : categoriaFilter,
   };
+
   const { data: equipos, isLoading } = useListEquipos(equiposParams, {
     query: {
-      queryKey: getListEquiposQueryKey(equiposParams)
-    }
+      queryKey: getListEquiposQueryKey(equiposParams),
+    },
   });
 
-  const sorted = equipos ? [...equipos].sort((a, b) => {
-    switch (sortBy) {
-      case "fecha-asc": return new Date(a.fechaCompra).getTime() - new Date(b.fechaCompra).getTime();
-      case "fecha-desc": return new Date(b.fechaCompra).getTime() - new Date(a.fechaCompra).getTime();
-      case "precio-asc": return a.costoTotal - b.costoTotal;
-      case "precio-desc": return b.costoTotal - a.costoTotal;
-      default: return 0;
-    }
-  }) : undefined;
+  const sorted = equipos
+    ? [...equipos].sort((a, b) => {
+        switch (sortBy) {
+          case "fecha-asc":
+            return new Date(a.fechaCompra).getTime() - new Date(b.fechaCompra).getTime();
+          case "fecha-desc":
+            return new Date(b.fechaCompra).getTime() - new Date(a.fechaCompra).getTime();
+          case "precio-asc":
+            return a.costoTotal - b.costoTotal;
+          case "precio-desc":
+            return b.costoTotal - a.costoTotal;
+          default:
+            return 0;
+        }
+      })
+    : undefined;
 
   const getCategoryIcon = (categoria: string) => {
-    switch(categoria) {
-      case "Celular": return <Smartphone className="w-5 h-5 text-blue-500" />;
-      case "Notebook": 
-      case "PC Escritorio": return <Laptop className="w-5 h-5 text-indigo-500" />;
-      case "TV": 
-      case "TV Box": return <Tv className="w-5 h-5 text-purple-500" />;
-      case "Audifonos": return <Headphones className="w-5 h-5 text-rose-500" />;
-      case "Smartwatch": return <Watch className="w-5 h-5 text-amber-500" />;
-      case "Camara": 
-      case "Lentes": return <Camera className="w-5 h-5 text-emerald-500" />;
-      default: return <PackageSearch className="w-5 h-5 text-slate-500 dark:text-slate-400" />;
+    switch (categoria) {
+      case "Celular":
+        return <Smartphone className="w-5 h-5 text-blue-500" />;
+      case "Notebook":
+      case "PC Escritorio":
+        return <Laptop className="w-5 h-5 text-indigo-500" />;
+      case "TV":
+      case "TV Box":
+        return <Tv className="w-5 h-5 text-purple-500" />;
+      case "Audifonos":
+        return <Headphones className="w-5 h-5 text-rose-500" />;
+      case "Smartwatch":
+        return <Watch className="w-5 h-5 text-amber-500" />;
+      case "Camara":
+      case "Lentes":
+        return <Camera className="w-5 h-5 text-cyan-500" />;
+      default:
+        return <PackageSearch className="w-5 h-5 text-slate-500 dark:text-slate-400" />;
     }
   };
 
   const getEstadoBadge = (estado: EstadoEquipo) => {
-    switch(estado) {
-      case "en_stock": 
-        return <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">En Stock</span>;
+    switch (estado) {
+      case "en_stock":
+        return <Badge className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-50 dark:bg-blue-500/10 dark:text-blue-300 dark:border-blue-500/20">En stock</Badge>;
       case "reservado":
-        return <span className="inline-flex items-center rounded-full bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-600/20">Reservado</span>;
+        return <Badge className="bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-50 dark:bg-amber-500/10 dark:text-amber-300 dark:border-amber-500/20">Reservado</Badge>;
       case "vendido":
-        return <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20">Vendido</span>;
+        return <Badge className="bg-cyan-50 text-cyan-700 border-cyan-200 hover:bg-cyan-50 dark:bg-cyan-500/10 dark:text-cyan-300 dark:border-cyan-500/20">Vendido</Badge>;
     }
   };
 
+  const hasFilters = search || estadoFilter !== "todos" || categoriaFilter !== "todos";
+
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Inventario</h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">Gestiona tus equipos y registra ventas</p>
-        </div>
-        <Link href="/inventario/nuevo" className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-emerald-500 text-white hover:bg-emerald-600 h-10 px-4 py-2 shadow-sm">
-          <Plus className="w-4 h-4 mr-2" />
-          Registrar Compra
-        </Link>
-      </div>
+      <section className="relative overflow-hidden rounded-3xl border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-cyan-50 shadow-sm dark:border-slate-700 dark:from-slate-950 dark:via-slate-900 dark:to-cyan-950/50">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(52,211,153,0.12),transparent_28%),radial-gradient(circle_at_bottom_left,rgba(59,130,246,0.10),transparent_26%)] dark:bg-[radial-gradient(circle_at_top_right,rgba(52,211,153,0.14),transparent_28%),radial-gradient(circle_at_bottom_left,rgba(59,130,246,0.10),transparent_26%)]" />
+        <div className="absolute inset-x-0 bottom-0 h-px bg-white/60 dark:bg-white/10" />
+        <div className="relative p-6 md:p-8">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-2xl space-y-3">
+              <p className="inline-flex items-center rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.28em] text-cyan-700 dark:border-cyan-500/20 dark:bg-cyan-500/10 dark:text-cyan-300">
+                Inventario activo
+              </p>
+              <div>
+                <h1 className="text-3xl font-semibold tracking-tight text-slate-950 dark:text-slate-50 md:text-4xl">
+                  Inventario más claro, con lectura rápida y mejor foco.
+                </h1>
+                <p className="mt-3 max-w-xl text-sm text-slate-600 dark:text-slate-300 md:text-base">
+                  Busca, filtra y ordena el inventario con una interfaz más limpia para tomar decisiones rápido.
+                </p>
+              </div>
+            </div>
 
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-          <Input 
-            placeholder="Buscar por equipo, marca, modelo o IMEI..." 
-            className="pl-9 bg-white dark:bg-slate-900"
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-          />
-        </div>
-        <div className="flex gap-2 flex-wrap">
-          <div className="w-full sm:w-40">
-            <Select value={estadoFilter} onValueChange={(val) => setEstadoFilter(val as any)}>
-              <SelectTrigger className="bg-white dark:bg-slate-900">
-                <SelectValue placeholder="Estado" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todos">Todos los estados</SelectItem>
-                <SelectItem value="en_stock">En Stock</SelectItem>
-                <SelectItem value="reservado">Reservado</SelectItem>
-                <SelectItem value="vendido">Vendido</SelectItem>
-              </SelectContent>
-            </Select>
+            <Link
+              href="/inventario/nuevo"
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-950/15 transition-transform hover:-translate-y-0.5 hover:bg-slate-900 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-200"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Registrar compra
+            </Link>
           </div>
-          <div className="w-full sm:w-44">
-            <Select value={categoriaFilter} onValueChange={(val) => setCategoriaFilter(val as any)}>
-              <SelectTrigger className="bg-white dark:bg-slate-900">
-                <SelectValue placeholder="Categoría" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todos">Todas las categorías</SelectItem>
-                <SelectItem value="Celular">Celular</SelectItem>
-                <SelectItem value="Notebook">Notebook</SelectItem>
-                <SelectItem value="PC Escritorio">PC Escritorio</SelectItem>
-                <SelectItem value="Consola">Consola</SelectItem>
-                <SelectItem value="TV">TV</SelectItem>
-                <SelectItem value="Audifonos">Audífonos</SelectItem>
-                <SelectItem value="Smartwatch">Smartwatch</SelectItem>
-                <SelectItem value="Camara">Cámara</SelectItem>
-                <SelectItem value="TV Box">TV Box</SelectItem>
-                <SelectItem value="Carcasa">Carcasa</SelectItem>
-                <SelectItem value="Lentes">Lentes</SelectItem>
-                <SelectItem value="Otro">Otro</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="w-full sm:w-44">
-            <Select value={sortBy} onValueChange={(val) => setSortBy(val as any)}>
-              <SelectTrigger className="bg-white dark:bg-slate-900">
-                <ArrowUpDown className="w-3.5 h-3.5 mr-2 text-slate-400" />
-                <SelectValue placeholder="Ordenar" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="fecha-desc">Más recientes</SelectItem>
-                <SelectItem value="fecha-asc">Más antiguos</SelectItem>
-                <SelectItem value="precio-asc">Menor costo</SelectItem>
-                <SelectItem value="precio-desc">Mayor costo</SelectItem>
-              </SelectContent>
-            </Select>
+
+          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+            <div className="rounded-2xl border border-white/70 bg-white/85 p-4 shadow-sm backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/70">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500 dark:text-slate-400">Filtro rápido</p>
+              <p className="mt-2 text-sm text-slate-700 dark:text-slate-300">Usa los filtros para reducir la lista sin perder contexto.</p>
+            </div>
+            <div className="rounded-2xl border border-white/70 bg-white/85 p-4 shadow-sm backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/70">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500 dark:text-slate-400">Orden</p>
+              <p className="mt-2 text-sm text-slate-700 dark:text-slate-300">Prioriza lo más reciente o el costo según tu flujo.</p>
+            </div>
+            <div className="rounded-2xl border border-white/70 bg-white/85 p-4 shadow-sm backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/70">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500 dark:text-slate-400">Detalle</p>
+              <p className="mt-2 text-sm text-slate-700 dark:text-slate-300">Cada tarjeta muestra estado, valor y antigüedad de forma compacta.</p>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
+
+      <Card className="overflow-hidden border-slate-200/80 bg-white/90 shadow-sm backdrop-blur dark:border-slate-700 dark:bg-slate-950/80">
+        <CardContent className="p-4 md:p-5">
+          <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+            <div className="relative flex-1">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Input
+                placeholder="Buscar por equipo, marca, modelo o IMEI..."
+                className="border-slate-200 bg-slate-50/80 pl-9 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+              />
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2 xl:min-w-[760px] xl:grid-cols-3">
+              <Select value={estadoFilter} onValueChange={(val) => setEstadoFilter(val as any)}>
+                <SelectTrigger className="border-slate-200 bg-slate-50/80 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100">
+                  <Filter className="mr-2 h-3.5 w-3.5 text-slate-400" />
+                  <SelectValue placeholder="Estado" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos los estados</SelectItem>
+                  <SelectItem value="en_stock">En stock</SelectItem>
+                  <SelectItem value="reservado">Reservado</SelectItem>
+                  <SelectItem value="vendido">Vendido</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={categoriaFilter} onValueChange={(val) => setCategoriaFilter(val as any)}>
+                <SelectTrigger className="border-slate-200 bg-slate-50/80 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100">
+                  <SelectValue placeholder="Categoría" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todas las categorías</SelectItem>
+                  <SelectItem value="Celular">Celular</SelectItem>
+                  <SelectItem value="Notebook">Notebook</SelectItem>
+                  <SelectItem value="PC Escritorio">PC Escritorio</SelectItem>
+                  <SelectItem value="Consola">Consola</SelectItem>
+                  <SelectItem value="TV">TV</SelectItem>
+                  <SelectItem value="Audifonos">Audífonos</SelectItem>
+                  <SelectItem value="Smartwatch">Smartwatch</SelectItem>
+                  <SelectItem value="Camara">Cámara</SelectItem>
+                  <SelectItem value="TV Box">TV Box</SelectItem>
+                  <SelectItem value="Carcasa">Carcasa</SelectItem>
+                  <SelectItem value="Lentes">Lentes</SelectItem>
+                  <SelectItem value="Otro">Otro</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={sortBy} onValueChange={(val) => setSortBy(val as any)}>
+                <SelectTrigger className="border-slate-200 bg-slate-50/80 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100">
+                  <ArrowUpDown className="mr-2 h-3.5 w-3.5 text-slate-400" />
+                  <SelectValue placeholder="Ordenar" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="fecha-desc">Más recientes</SelectItem>
+                  <SelectItem value="fecha-asc">Más antiguos</SelectItem>
+                  <SelectItem value="precio-asc">Menor costo</SelectItem>
+                  <SelectItem value="precio-desc">Mayor costo</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {hasFilters && (
+            <div className="mt-4 flex flex-wrap gap-2">
+              <span className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                Filtros activos
+              </span>
+              {search && (
+                <span className="inline-flex items-center rounded-full bg-cyan-50 px-3 py-1 text-xs font-medium text-cyan-700 dark:bg-cyan-500/10 dark:text-cyan-300">
+                  "{search}"
+                </span>
+              )}
+              {estadoFilter !== "todos" && (
+                <span className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 dark:bg-blue-500/10 dark:text-blue-300">
+                  {estadoFilter === "en_stock" ? "En stock" : estadoFilter === "reservado" ? "Reservado" : "Vendido"}
+                </span>
+              )}
+              {categoriaFilter !== "todos" && (
+                <span className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                  {categoriaFilter}
+                </span>
+              )}
+              <button
+                type="button"
+                className="inline-flex items-center rounded-full bg-slate-950 px-3 py-1 text-xs font-medium text-white transition hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-200"
+                onClick={() => {
+                  setSearchInput("");
+                  setSearch("");
+                  setEstadoFilter("todos");
+                  setCategoriaFilter("todos");
+                }}
+              >
+                Limpiar filtros
+              </button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {isLoading ? (
-        <div className="space-y-4">
+        <div className="grid gap-4">
           {Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton key={i} className="h-24 w-full rounded-xl" />
+            <Skeleton key={i} className="h-28 w-full rounded-3xl" />
           ))}
         </div>
       ) : equipos?.length === 0 ? (
-        <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 border-dashed">
+        <div className="rounded-3xl border border-dashed border-slate-200 bg-white/85 px-6 py-16 text-center shadow-sm dark:border-slate-700 dark:bg-slate-950/80">
           <PackageSearch className="mx-auto h-12 w-12 text-slate-300" />
           <h3 className="mt-4 text-lg font-semibold text-slate-900 dark:text-slate-100">No hay equipos</h3>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">No se encontraron equipos con los filtros actuales.</p>
-          {search || estadoFilter !== "todos" || categoriaFilter !== "todos" ? (
-            <Button variant="outline" className="mt-4" onClick={() => { setSearchInput(""); setSearch(""); setEstadoFilter("todos"); setCategoriaFilter("todos"); }}>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            No se encontraron equipos con los filtros actuales.
+          </p>
+          {hasFilters ? (
+            <Button
+              variant="outline"
+              className="mt-5 rounded-xl"
+              onClick={() => {
+                setSearchInput("");
+                setSearch("");
+                setEstadoFilter("todos");
+                setCategoriaFilter("todos");
+              }}
+            >
               Limpiar filtros
             </Button>
           ) : (
-            <Button className="mt-4 bg-emerald-500 hover:bg-emerald-600 text-white" onClick={() => setLocation("/inventario/nuevo")}>
+            <Button
+              className="mt-5 rounded-xl bg-cyan-500 text-white hover:bg-cyan-600"
+              onClick={() => setLocation("/inventario/nuevo")}
+            >
               Registrar primer equipo
             </Button>
           )}
@@ -171,60 +292,76 @@ export default function Inventario() {
       ) : (
         <div className="grid grid-cols-1 gap-4">
           {sorted?.map((equipo, index) => (
-            <Card 
-              key={equipo.id} 
+            <Card
+              key={equipo.id}
               className={cn(
-                "hover:border-emerald-200 hover:shadow-md transition-all cursor-pointer overflow-hidden animate-in fade-in slide-in-from-bottom-2",
-                `duration-${Math.min(index * 100 + 300, 700)}`,
-                equipo.estado === 'vendido' && "opacity-75 bg-slate-50/50 dark:bg-slate-900/50"
+                "group overflow-hidden rounded-3xl border-slate-200/80 bg-white/90 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-cyan-200 hover:shadow-lg hover:shadow-cyan-950/5 dark:border-slate-700 dark:bg-slate-950/80 dark:hover:border-cyan-500/30 dark:hover:shadow-cyan-950/20",
+                `animate-in fade-in slide-in-from-bottom-2 duration-${Math.min(index * 100 + 300, 700)}`,
+                equipo.estado === "vendido" && "bg-slate-50/70 opacity-85 dark:bg-slate-950/50",
               )}
               onClick={() => setLocation(`/inventario/${equipo.id}`)}
             >
               <CardContent className="p-0">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center p-4 sm:p-5 gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 border border-slate-200/60 dark:border-slate-700/60">
-                    {getCategoryIcon(equipo.categoria)}
-                  </div>
-                  
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold text-slate-900 dark:text-slate-100 text-base truncate">{equipo.equipo}</h3>
-                      {getEstadoBadge(equipo.estado)}
+                <div className="grid gap-4 p-4 md:grid-cols-[1.15fr_1.7fr_0.95fr] md:items-center md:p-5">
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-slate-200/80 bg-gradient-to-br from-slate-50 to-white dark:border-slate-700 dark:from-slate-900 dark:to-slate-950">
+                      {getCategoryIcon(equipo.categoria)}
                     </div>
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-500 dark:text-slate-400">
-                      <span className="font-medium text-slate-700 dark:text-slate-300">{equipo.marca} {equipo.modelo}</span>
-                      <span className="flex items-center gap-1.5"><span className="w-1 h-1 rounded-full bg-slate-300"></span>{equipo.estadoEquipoCondicion}</span>
-                      {equipo.bateriaPct !== null && equipo.bateriaPct !== undefined && (
-                        <span className="flex items-center gap-1 text-slate-600">
-                          <span className="w-1 h-1 rounded-full bg-slate-300 mr-0.5"></span>
-                          <Battery className="w-3.5 h-3.5" />
-                          {equipo.bateriaPct}%
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="truncate text-base font-semibold text-slate-950 dark:text-slate-100">
+                          {equipo.equipo}
+                        </h3>
+                        {getEstadoBadge(equipo.estado)}
+                      </div>
+                      <p className="mt-1 text-sm font-medium text-slate-600 dark:text-slate-300">
+                        {equipo.marca} {equipo.modelo}
+                      </p>
+                      <div className="mt-2 flex flex-wrap gap-2 text-xs text-slate-500 dark:text-slate-400">
+                        <span className="rounded-full bg-slate-100 px-2.5 py-1 dark:bg-slate-800 dark:text-slate-300">
+                          {equipo.estadoEquipoCondicion}
                         </span>
-                      )}
+                        {equipo.bateriaPct !== null && equipo.bateriaPct !== undefined && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 dark:bg-slate-800 dark:text-slate-300">
+                            <Battery className="h-3.5 w-3.5" />
+                            {equipo.bateriaPct}%
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex flex-col sm:items-end gap-1 w-full sm:w-auto mt-2 sm:mt-0 pt-3 sm:pt-0 border-t border-slate-100 dark:border-slate-800 sm:border-0">
-                    <div className="flex justify-between sm:flex-col w-full sm:w-auto">
-                      <span className="text-xs text-slate-500 dark:text-slate-400 sm:hidden">Costo Total</span>
-                      <span className="font-semibold text-slate-900 dark:text-slate-100">{formatCurrency(equipo.costoTotal)}</span>
+                  <div className="grid gap-3 sm:grid-cols-2 md:justify-self-start">
+                    <div className="rounded-2xl border border-slate-200/80 bg-gradient-to-br from-slate-50 to-white p-3 dark:border-slate-700 dark:from-slate-900 dark:to-slate-950">
+                      <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500 dark:text-slate-400">Costo total</p>
+                      <p className="mt-1 text-lg font-semibold text-slate-950 dark:text-slate-100">{formatCurrency(equipo.costoTotal)}</p>
                     </div>
-                    {equipo.estado === 'vendido' && equipo.precioVenta && (
-                      <div className="flex justify-between sm:flex-col w-full sm:w-auto">
-                        <span className="text-xs text-emerald-600 sm:hidden">Vendido en</span>
-                        <span className="text-sm font-medium text-emerald-600 sm:text-right">{formatCurrency(equipo.precioVenta)}</span>
+                    <div className="rounded-2xl border border-slate-200/80 bg-gradient-to-br from-slate-50 to-white p-3 dark:border-slate-700 dark:from-slate-900 dark:to-slate-950">
+                      <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500 dark:text-slate-400">Antigüedad</p>
+                      <p className="mt-1 text-lg font-semibold text-slate-950 dark:text-slate-100">
+                        {equipo.estado !== "vendido"
+                          ? `${daysBetween(equipo.fechaCompra)} días`
+                          : equipo.fechaVenta
+                          ? `${daysBetween(equipo.fechaCompra, equipo.fechaVenta)} días`
+                            : "—"}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="md:justify-self-end">
+                    <div className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200/80 bg-white p-3 dark:border-slate-700 dark:bg-slate-900 md:w-44">
+                      <div>
+                        <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500 dark:text-slate-400">Venta</p>
+                        <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100">
+                          {equipo.estado === "vendido" && equipo.precioVenta
+                            ? formatCurrency(equipo.precioVenta)
+                            : "Disponible"}
+                        </p>
                       </div>
-                    )}
-                    {equipo.estado !== 'vendido' && (
-                      <span className="text-xs text-slate-400 mt-1 hidden sm:block">
-                        {daysBetween(equipo.fechaCompra)} días en stock
-                      </span>
-                    )}
-                    {equipo.estado === 'vendido' && equipo.fechaVenta && (
-                      <span className="text-xs text-slate-400 mt-1 hidden sm:block">
-                        Vendido en {daysBetween(equipo.fechaCompra, equipo.fechaVenta)} días
-                      </span>
-                    )}
+                      <div className="rounded-2xl bg-cyan-50 p-2 text-cyan-600 dark:bg-cyan-500/10 dark:text-cyan-300">
+                        <Plus className="h-4 w-4 rotate-45" />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -235,3 +372,4 @@ export default function Inventario() {
     </div>
   );
 }
+
