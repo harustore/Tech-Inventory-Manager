@@ -1,10 +1,25 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { execFileSync } from "node:child_process";
 import { build as esbuild } from "esbuild";
 
 const artifactDir = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(artifactDir, "../..");
 const apiDir = path.resolve(rootDir, "api");
+
+function buildPackage(packagePath) {
+  execFileSync(
+    process.platform === "win32" ? "pnpm.cmd" : "pnpm",
+    ["exec", "tsc", "-b", packagePath, "--emitDeclarationOnly", "false"],
+    {
+      cwd: rootDir,
+      stdio: "inherit",
+    },
+  );
+}
+
+buildPackage(path.resolve(rootDir, "lib/db"));
+buildPackage(path.resolve(rootDir, "lib/api-zod"));
 
 await esbuild({
   entryPoints: [path.resolve(artifactDir, "src/vercel.ts")],
