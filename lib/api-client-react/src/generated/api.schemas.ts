@@ -414,6 +414,33 @@ export interface Recomendacion {
   recomendacion: string;
 }
 
+export interface Deudor {
+  equipoId: number;
+  equipo: string;
+  marca: string;
+  modelo: string;
+  /** @nullable */
+  buyerName?: string | null;
+  /** @nullable */
+  buyerRut?: string | null;
+  /** @nullable */
+  buyerContact?: string | null;
+  /** @nullable */
+  fechaVenta: string | null;
+  precioVenta: number;
+  ventaNumeroCuotas: number;
+  ventaCuotasPagadas: number;
+  cuotasPendientes: number;
+  totalPagado: number;
+  saldoPendiente: number;
+}
+
+export interface ListaDeudoresResponse {
+  totalDeuda: number;
+  cantidadDeudores: number;
+  deudores: Deudor[];
+}
+
 export type ListEquiposParams = {
 estado?: EstadoEquipo;
 categoria?: Categoria;

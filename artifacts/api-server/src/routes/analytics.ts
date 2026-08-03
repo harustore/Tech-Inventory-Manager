@@ -1,6 +1,10 @@
 import { Router } from "express";
-import { db, equiposTable, movimientosCajaTable, and, eq, gte, sql } from "@workspace/db";
-import { GetResumenCapitalResponse, GetRecomendacionesResponse } from "@workspace/api-zod";
+import { db, equiposTable, pagosCuotasTable, movimientosCajaTable, and, desc, eq, gte, sql } from "@workspace/db";
+import {
+  GetResumenCapitalResponse,
+  GetRecomendacionesResponse,
+  GetDeudoresResponse,
+} from "@workspace/api-zod";
 import { requireAuth } from "../middlewares/requireAuth.js";
 
 const router = Router();
@@ -118,6 +122,85 @@ router.get("/analytics/recomendaciones", async (_req, res): Promise<void> => {
   });
 
   res.json(GetRecomendacionesResponse.parse(recomendaciones));
+});
+
+router.get("/analytics/deudores", async (_req, res): Promise<void> => {
+  try {
+    const equiposEnCuotas = await db
+      .select({
+        equipoId: equiposTable.id,
+        equipo: equiposTable.equipo,
+        marca: equiposTable.marca,
+        modelo: equiposTable.modelo,
+        buyerName: equiposTable.buyerName,
+        buyerRut: equiposTable.buyerRut,
+        buyerContact: equiposTable.buyerContact,
+        fechaVenta: equiposTable.fechaVenta,
+        precioVenta: equiposTable.precioVenta,
+        ventaNumeroCuotas: equiposTable.ventaNumeroCuotas,
+        ventaCuotasPagadas: equiposTable.ventaCuotasPagadas,
+      })
+      .from(equiposTable)
+      .where(
+        and(
+          eq(equiposTable.estado, "vendido"),
+          eq(equiposTable.ventaFormaPago, "Cuotas"),
+        ),
+      )
+      .orderBy(desc(equiposTable.fechaVenta), desc(equiposTable.id));
+
+    const pagosPorEquipo = await db
+      .select({
+        equipoId: pagosCuotasTable.equipoId,
+        total_pagado: sql<number>`coalesce(sum(${pagosCuotasTable.monto}), 0)`.as("total_pagado"),
+      })
+      .from(pagosCuotasTable)
+      .groupBy(pagosCuotasTable.equipoId);
+
+    const totalPagadoPorEquipo = new Map(
+      pagosPorEquipo.map((row) => [row.equipoId, Number(row.total_pagado)]),
+    );
+
+    const deudores = equiposEnCuotas
+      .map((row) => {
+        const precioVenta = Number(row.precioVenta);
+        const totalPagado = totalPagadoPorEquipo.get(row.equipoId) ?? 0;
+        const cuotasPendientes = Math.max(
+          0,
+          (row.ventaNumeroCuotas ?? 0) - (row.ventaCuotasPagadas ?? 0),
+        );
+        return {
+          equipoId: row.equipoId,
+          equipo: row.equipo,
+          marca: row.marca,
+          modelo: row.modelo,
+          buyerName: row.buyerName,
+          buyerRut: row.buyerRut,
+          buyerContact: row.buyerContact,
+          fechaVenta: row.fechaVenta,
+          precioVenta,
+          ventaNumeroCuotas: row.ventaNumeroCuotas ?? 0,
+          ventaCuotasPagadas: row.ventaCuotasPagadas ?? 0,
+          cuotasPendientes,
+          totalPagado,
+          saldoPendiente: Math.max(0, precioVenta - totalPagado),
+        };
+      })
+      .filter((d) => d.saldoPendiente > 0);
+
+    const totalDeuda = deudores.reduce((sum, d) => sum + d.saldoPendiente, 0);
+
+    res.json(
+      GetDeudoresResponse.parse({
+        totalDeuda,
+        cantidadDeudores: deudores.length,
+        deudores,
+      }),
+    );
+  } catch (error) {
+    console.error("Error in GET /analytics/deudores", error);
+    res.status(500).json({ error: "No se pudieron cargar los deudores" });
+  }
 });
 
 export default router;

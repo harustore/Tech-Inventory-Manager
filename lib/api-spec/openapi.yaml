@@ -404,6 +404,19 @@ paths:
                 items:
                   $ref: "#/components/schemas/Recomendacion"
 
+  /analytics/deudores:
+    get:
+      operationId: getDeudores
+      tags: [analytics]
+      summary: Deudores — ventas en cuotas con saldo pendiente por cobrar
+      responses:
+        "200":
+          description: Resumen de deudores con cuotas pendientes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListaDeudoresResponse"
+
 components:
   parameters:
     IdParam:
@@ -758,3 +771,47 @@ components:
         margenPromedioPct: { type: number }
         precioCompraRecomendado: { type: number }
         recomendacion: { type: string }
+
+    Deudor:
+      type: object
+      required:
+        - equipoId
+        - equipo
+        - marca
+        - modelo
+        - fechaVenta
+        - precioVenta
+        - ventaNumeroCuotas
+        - ventaCuotasPagadas
+        - cuotasPendientes
+        - totalPagado
+        - saldoPendiente
+      properties:
+        equipoId: { type: integer }
+        equipo: { type: string }
+        marca: { type: string }
+        modelo: { type: string }
+        buyerName: { type: ["string", "null"] }
+        buyerRut: { type: ["string", "null"] }
+        buyerContact: { type: ["string", "null"] }
+        fechaVenta: { type: ["string", "null"], format: date }
+        precioVenta: { type: number }
+        ventaNumeroCuotas: { type: integer }
+        ventaCuotasPagadas: { type: integer }
+        cuotasPendientes: { type: integer }
+        totalPagado: { type: number }
+        saldoPendiente: { type: number }
+
+    ListaDeudoresResponse:
+      type: object
+      required:
+        - totalDeuda
+        - cantidadDeudores
+        - deudores
+      properties:
+        totalDeuda: { type: number }
+        cantidadDeudores: { type: integer }
+        deudores:
+          type: array
+          items:
+            $ref: "#/components/schemas/Deudor"

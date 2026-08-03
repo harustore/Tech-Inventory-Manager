@@ -25,6 +25,7 @@ import type {
   EquipoUpdate,
   HealthStatus,
   ListEquiposParams,
+  ListaDeudoresResponse,
   MovimientoCaja,
   MovimientoCajaInput,
   MovimientoCajaUpdate,
@@ -1682,6 +1683,83 @@ export function useGetRecomendaciones<TData = Awaited<ReturnType<typeof getRecom
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getGetRecomendacionesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetDeudoresUrl = () => {
+
+
+
+
+  return `/api/analytics/deudores`
+}
+
+/**
+ * @summary Deudores — ventas en cuotas con saldo pendiente por cobrar
+ */
+export const getDeudores = async ( options?: RequestInit): Promise<ListaDeudoresResponse> => {
+
+  return customFetch<ListaDeudoresResponse>(getGetDeudoresUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetDeudoresQueryKey = () => {
+    return [
+    `/api/analytics/deudores`
+    ] as const;
+    }
+
+
+export const getGetDeudoresQueryOptions = <TData = Awaited<ReturnType<typeof getDeudores>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDeudores>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetDeudoresQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDeudores>>> = ({ signal }) => getDeudores({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getDeudores>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetDeudoresQueryResult = NonNullable<Awaited<ReturnType<typeof getDeudores>>>
+export type GetDeudoresQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Deudores — ventas en cuotas con saldo pendiente por cobrar
+ */
+
+export function useGetDeudores<TData = Awaited<ReturnType<typeof getDeudores>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDeudores>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetDeudoresQueryOptions(options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

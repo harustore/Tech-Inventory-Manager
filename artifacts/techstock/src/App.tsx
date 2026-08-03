@@ -15,6 +15,7 @@ import InventarioNuevo from "./pages/inventario-nuevo";
 import Proveedores from "./pages/proveedores";
 import MovimientosCaja from "./pages/movimientos-caja";
 import Recomendaciones from "./pages/recomendaciones";
+import Deudores from "./pages/deudores";
 import Layout from "./components/layout";
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
@@ -191,6 +192,7 @@ function ClerkProviderWithRoutes() {
           <Route path="/proveedores" component={() => <ProtectedRoute component={Proveedores} />} />
           <Route path="/movimientos-caja" component={() => <ProtectedRoute component={MovimientosCaja} />} />
           <Route path="/recomendaciones" component={() => <ProtectedRoute component={Recomendaciones} />} />
+          <Route path="/deudores" component={() => <ProtectedRoute component={Deudores} />} />
           <Route>
             <div className="flex min-h-screen items-center justify-center">
               <h1 className="text-2xl font-bold">404 - No encontrado</h1>

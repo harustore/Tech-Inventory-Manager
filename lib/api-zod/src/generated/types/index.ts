@@ -7,6 +7,7 @@
  */
 
 export * from './categoria';
+export * from './deudor';
 export * from './equipo';
 export * from './equipoInput';
 export * from './equipoUpdate';
@@ -15,6 +16,7 @@ export * from './estadoEquipoCondicion';
 export * from './formaPago';
 export * from './formaPagoVenta';
 export * from './healthStatus';
+export * from './listaDeudoresResponse';
 export * from './listEquiposParams';
 export * from './movimientoCaja';
 export * from './movimientoCajaInput';

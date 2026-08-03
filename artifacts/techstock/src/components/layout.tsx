@@ -6,6 +6,7 @@ import {
   Users,
   Wallet,
   Lightbulb,
+  HandCoins,
   LogOut,
   Menu,
   Moon,
@@ -22,6 +23,7 @@ const navItems = [
   { href: "/proveedores", label: "Contactos de Compra", icon: Users },
   { href: "/movimientos-caja", label: "Caja", icon: Wallet },
   { href: "/recomendaciones", label: "Recomendaciones", icon: Lightbulb },
+  { href: "/deudores", label: "Deudores", icon: HandCoins },
 ];
 
 export default function Layout({ children }: { children: React.ReactNode }) {

@@ -821,3 +821,28 @@ export const GetRecomendacionesResponseItem = zod.object({
 export const GetRecomendacionesResponse = zod.array(GetRecomendacionesResponseItem)
 
 
+/**
+ * @summary Deudores — ventas en cuotas con saldo pendiente por cobrar
+ */
+export const GetDeudoresResponse = zod.object({
+  "totalDeuda": zod.number(),
+  "cantidadDeudores": zod.number(),
+  "deudores": zod.array(zod.object({
+  "equipoId": zod.number(),
+  "equipo": zod.string(),
+  "marca": zod.string(),
+  "modelo": zod.string(),
+  "buyerName": zod.string().nullish(),
+  "buyerRut": zod.string().nullish(),
+  "buyerContact": zod.string().nullish(),
+  "fechaVenta": zod.coerce.date().nullable(),
+  "precioVenta": zod.number(),
+  "ventaNumeroCuotas": zod.number(),
+  "ventaCuotasPagadas": zod.number(),
+  "cuotasPendientes": zod.number(),
+  "totalPagado": zod.number(),
+  "saldoPendiente": zod.number()
+}))
+})
+
+
