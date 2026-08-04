@@ -507,6 +507,19 @@ router.post("/equipos/:id/pagos-cuotas", async (req, res): Promise<void> => {
     return;
   }
 
+  const [pagosResumen] = await db
+    .select({ total: sql<number>`coalesce(sum(${pagosCuotasTable.monto}), 0)` })
+    .from(pagosCuotasTable)
+    .where(eq(pagosCuotasTable.equipoId, params.data.id));
+  const saldoPendiente = Math.max(
+    0,
+    Number(existing.precioVenta ?? 0) - Number(pagosResumen?.total ?? 0),
+  );
+  if (parsed.data.monto > saldoPendiente) {
+    res.status(400).json({ error: "El pago no puede superar el saldo pendiente" });
+    return;
+  }
+
   const fecha = toDateOnlyString(parsed.data.fecha);
 
   const [equipo] = await db.transaction(async (tx) => {

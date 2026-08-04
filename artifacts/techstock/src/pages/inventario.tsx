@@ -9,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "wouter";
-import { formatCurrency, daysBetween, cn } from "@/lib/utils";
+import { formatCurrency, daysBetween, cn, downloadCsv } from "@/lib/utils";
 import {
   Search,
   Plus,
@@ -23,6 +23,7 @@ import {
   Battery,
   ArrowUpDown,
   Filter,
+  Download,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -215,6 +216,24 @@ export default function Inventario() {
                 </SelectContent>
               </Select>
             </div>
+            <Button
+              type="button"
+              variant="outline"
+              className="shrink-0"
+              disabled={!sorted?.length}
+              onClick={() => downloadCsv("techstock-inventario.csv", (sorted ?? []).map((equipo) => ({
+                Equipo: equipo.equipo,
+                Marca: equipo.marca,
+                Modelo: equipo.modelo,
+                Estado: equipo.estado,
+                Categoría: equipo.categoria,
+                Costo: equipo.costoTotal,
+                Venta: equipo.precioVenta,
+                Compra: equipo.fechaCompra,
+              })))}
+            >
+              <Download className="mr-2 h-4 w-4" /> Exportar CSV
+            </Button>
           </div>
 
           {hasFilters && (

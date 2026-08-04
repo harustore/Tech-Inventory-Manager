@@ -1,6 +1,10 @@
 ﻿import { useGetResumenCapital, getGetResumenCapitalQueryKey } from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatCurrency } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { useListEquipos, useListProveedores, useListMovimientosCaja, useGetDeudores } from "@workspace/api-client-react";
+import { Link } from "wouter";
+import { Bar, BarChart, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { formatCurrency, downloadJson } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Wallet,
@@ -11,14 +15,22 @@ import {
   ShoppingCart,
   Activity,
   Box,
+  Plus,
+  HandCoins,
+  Download,
+  AlertTriangle,
 } from "lucide-react";
 
 export default function Dashboard() {
-  const { data: resumen, isLoading } = useGetResumenCapital({
+  const { data: resumen, isLoading, error, refetch } = useGetResumenCapital({
     query: {
       queryKey: getGetResumenCapitalQueryKey(),
     },
   });
+  const { data: equipos } = useListEquipos({});
+  const { data: proveedores } = useListProveedores();
+  const { data: movimientos } = useListMovimientosCaja();
+  const { data: deudores } = useGetDeudores();
 
   if (isLoading) {
     return (
@@ -40,7 +52,31 @@ export default function Dashboard() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="rounded-3xl border border-red-200 bg-red-50 p-6 text-red-900 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-100">
+        <div className="flex items-start gap-3">
+          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" />
+          <div>
+            <h2 className="font-semibold">No pudimos cargar el resumen</h2>
+            <p className="mt-1 text-sm text-red-800 dark:text-red-200">Revisa tu conexión y vuelve a intentarlo.</p>
+            <Button type="button" variant="outline" className="mt-4 border-red-300 dark:border-red-800" onClick={() => refetch()}>
+              Reintentar
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!resumen) return null;
+  const capitalCalculado = resumen.cajaActual + resumen.valorInventario;
+  const capitalInconsistente = Math.abs(resumen.capitalTotal - capitalCalculado) > 1;
+  const equiposVendidos = (equipos ?? []).filter((equipo) => equipo.estado === "vendido");
+  const ventasTotales = equiposVendidos.reduce((sum, equipo) => sum + Number(equipo.precioVenta ?? 0), 0);
+  const margenHistorico = ventasTotales > 0
+    ? (resumen.gananciaTotalHistorica / ventasTotales) * 100
+    : 0;
 
   const heroMetrics = [
     {
@@ -71,28 +107,40 @@ export default function Dashboard() {
 
   const activity = [
     {
-      label: "Ganancia histÃ³rica",
+      label: "Ganancia histórica",
       value: formatCurrency(resumen.gananciaTotalHistorica),
       icon: TrendingUp,
       accent: "text-cyan-500",
     },
     {
-      label: "Ganancia del mes",
+      label: "Ganancia últimos 30 días",
       value: formatCurrency(resumen.gananciaMes),
       icon: LineChart,
       accent: "text-blue-500",
     },
     {
-      label: "Ventas 30 dÃ­as",
+      label: "Ventas 30 días",
       value: String(resumen.ventasUltimos30Dias),
       icon: ShoppingCart,
       accent: "text-cyan-500",
     },
     {
-      label: "Compras 30 dÃ­as",
+      label: "Compras 30 días",
       value: String(resumen.comprasUltimos30Dias),
       icon: Activity,
       accent: "text-amber-500",
+    },
+    {
+      label: "Cuentas por cobrar",
+      value: formatCurrency(deudores?.totalDeuda ?? 0),
+      icon: HandCoins,
+      accent: "text-red-500",
+    },
+    {
+      label: "Margen histórico",
+      value: `${margenHistorico.toFixed(1)}%`,
+      icon: TrendingUp,
+      accent: "text-emerald-500",
     },
   ];
 
@@ -117,6 +165,25 @@ export default function Dashboard() {
     },
   ];
 
+  const statusChart = [
+    { name: "En stock", value: resumen.itemsEnStock, color: "#2563eb" },
+    { name: "Reservados", value: resumen.itemsReservados, color: "#f59e0b" },
+    { name: "Vendidos", value: resumen.itemsVendidos, color: "#06b6d4" },
+  ];
+  const activityChart = [
+    { name: "Ganancia", value: resumen.gananciaMes },
+    { name: "Caja", value: resumen.cajaActual },
+    { name: "Inventario", value: resumen.valorInventario },
+  ];
+  const descargarRespaldo = () => downloadJson(`techstock-respaldo-${new Date().toISOString().slice(0, 10)}.json`, {
+    exportadoEn: new Date().toISOString(),
+    resumen,
+    equipos: equipos ?? [],
+    proveedores: proveedores ?? [],
+    movimientosCaja: movimientos ?? [],
+    deudores: deudores ?? null,
+  });
+
   return (
     <div className="space-y-8">
       <section className="relative overflow-hidden rounded-3xl border border-white/60 bg-gradient-to-br from-slate-950 via-slate-900 to-cyan-950 text-white shadow-2xl shadow-slate-950/20 dark:border-slate-700/60">
@@ -127,7 +194,7 @@ export default function Dashboard() {
             <p className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.28em] text-cyan-200">
               Resumen operativo
             </p>
-            <h1 className="mt-4 text-3xl font-semibold tracking-tight md:text-4xl">
+            <h1 className="mt-4 text-2xl font-semibold tracking-tight sm:text-3xl md:text-4xl">
               Controla el negocio sin perder de vista caja, stock y ventas.
             </h1>
             <p className="mt-3 max-w-xl text-sm text-slate-300 md:text-base">
@@ -160,8 +227,47 @@ export default function Dashboard() {
               );
             })}
           </div>
+
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Link
+              href="/inventario/nuevo"
+              className="inline-flex items-center rounded-xl bg-cyan-400 px-4 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Registrar compra
+            </Link>
+            <Link
+              href="/deudores"
+              className="inline-flex items-center rounded-xl border border-white/15 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/15"
+            >
+              <HandCoins className="mr-2 h-4 w-4" />
+              Revisar cuotas
+            </Link>
+            <button
+              type="button"
+              onClick={descargarRespaldo}
+              disabled={!equipos || !proveedores || !movimientos}
+              className="inline-flex items-center rounded-xl border border-white/15 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Descargar respaldo
+            </button>
+          </div>
         </div>
       </section>
+
+      {(capitalInconsistente || resumen.cajaActual < 0) && (
+        <div className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-100">
+          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
+          <div className="text-sm">
+            <p className="font-semibold">Revisa los datos financieros</p>
+            <p className="mt-1 text-amber-800 dark:text-amber-200">
+              {capitalInconsistente ? "El capital total no coincide con caja más inventario. " : "La caja actual está en negativo. "}
+              Verifica los movimientos de caja y las compras registradas.
+            </p>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card className="overflow-hidden border-slate-200/80 bg-white/85 shadow-sm backdrop-blur dark:border-slate-700 dark:bg-slate-950/80">
@@ -215,6 +321,40 @@ export default function Dashboard() {
                 </div>
               );
             })}
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <Card className="border-slate-200/80 bg-white/85 shadow-sm backdrop-blur dark:border-slate-700 dark:bg-slate-950/80">
+          <CardHeader>
+            <CardTitle className="text-base text-slate-900 dark:text-slate-100">Distribución del inventario</CardTitle>
+          </CardHeader>
+          <CardContent className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie data={statusChart} dataKey="value" nameKey="name" innerRadius={55} outerRadius={85} paddingAngle={3}>
+                  {statusChart.map((entry) => <Cell key={entry.name} fill={entry.color} />)}
+                </Pie>
+                <Tooltip contentStyle={{ backgroundColor: "hsl(var(--popover))", borderColor: "hsl(var(--border))", color: "hsl(var(--popover-foreground))" }} formatter={(value) => [value, "Equipos"]} />
+              </PieChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card className="border-slate-200/80 bg-white/85 shadow-sm backdrop-blur dark:border-slate-700 dark:bg-slate-950/80">
+          <CardHeader>
+            <CardTitle className="text-base text-slate-900 dark:text-slate-100">Capital por componente</CardTitle>
+          </CardHeader>
+          <CardContent className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={activityChart} layout="vertical" margin={{ left: 12, right: 12 }}>
+                <XAxis type="number" hide />
+                <YAxis type="category" dataKey="name" width={80} tick={{ fontSize: 12 }} />
+                <Tooltip contentStyle={{ backgroundColor: "hsl(var(--popover))", borderColor: "hsl(var(--border))", color: "hsl(var(--popover-foreground))" }} formatter={(value) => [formatCurrency(Number(value)), "Monto"]} />
+                <Bar dataKey="value" fill="#06b6d4" radius={[0, 6, 6, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
           </CardContent>
         </Card>
       </div>

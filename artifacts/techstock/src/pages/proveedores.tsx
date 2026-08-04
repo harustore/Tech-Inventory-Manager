@@ -197,7 +197,7 @@ export default function Proveedores() {
                 </Button>
               </CardHeader>
               <CardContent>
-                <div className="space-y-2 text-sm text-slate-600">
+                <div className="space-y-2 text-sm text-slate-600 dark:text-slate-300">
 
                   {proveedor.telefono && (
                     <div className="flex items-center gap-2">

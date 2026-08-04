@@ -27,7 +27,7 @@ export default function PublicLanding() {
           <h1 className="text-4xl md:text-6xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight text-balance">
             El control total de tu negocio tecnológico.
           </h1>
-          <p className="text-lg md:text-xl text-slate-600 max-w-xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-xl text-slate-600 dark:text-slate-300 max-w-xl mx-auto leading-relaxed">
             Abandona las hojas de Excel. TechStock Inventario está diseñado específicamente para registrar compras, ventas, y ganancias de celulares, PCs, consolas y más, con precisión y confianza.
           </p>
           <div className="pt-8">

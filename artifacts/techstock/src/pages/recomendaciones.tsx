@@ -1,8 +1,25 @@
 import { useGetRecomendaciones, getGetRecomendacionesQueryKey } from "@workspace/api-client-react";
+import { customFetch } from "@workspace/api-client-react";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/utils";
-import { Lightbulb, TrendingUp, AlertCircle, Sparkles } from "lucide-react";
+import { Lightbulb, TrendingUp, AlertCircle, Sparkles, Link2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+
+const fuentesMercado = [
+  ["Celulares usados", "https://listado.mercadolibre.cl/celulares-telefonia/celulares-smartphones/usado/celular_OrderId_PRICE_PublishedToday_YES_NoIndex_True"],
+  ["Celulares 256 GB o más", "https://listado.mercadolibre.cl/celulares-telefonia/celulares-smartphones/usado/celular_OrderId_PRICE_PublishedToday_YES_INTERNAL*MEMORY_256GB-*_NoIndex_True"],
+  ["Tablets usadas", "https://listado.mercadolibre.cl/computacion/tablets-accesorios/tablets/usado/tablets_OrderId_PRICE_PublishedToday_YES_NoIndex_True"],
+  ["Notebooks usadas", "https://listado.mercadolibre.cl/computacion/notebooks-accesorios/notebooks/usado/notebooks_OrderId_PRICE_PublishedToday_YES_NoIndex_True"],
+  ["Consolas usadas", "https://listado.mercadolibre.cl/consolas-videojuegos/consolas/usado/_OrderId_PRICE_PublishedToday_YES_NoIndex_True"],
+  ["Smartwatches usados", "https://listado.mercadolibre.cl/celulares-telefonia/smartwatches-accesoriossmartwatch/usado/_OrderId_PRICE_PublishedToday_YES_NoIndex_True"],
+  ["Audífonos usados", "https://listado.mercadolibre.cl/electronica-audio-video/audio/audifonos/usado/_PublishedToday_YES"],
+  ["RTX y GTX usadas", "https://listado.mercadolibre.cl/rtx_PublishedToday_YES_ITEM*CONDITION_2230581_NoIndex_True"],
+  ["Televisores usados", "https://listado.mercadolibre.cl/electronica-audio-video/televisores/usado/televisores_OrderId_PRICE_PublishedToday_YES_NoIndex_True"],
+  ["TV Box usados", "https://listado.mercadolibre.cl/tv-box_PublishedToday_YES_ITEM*CONDITION_2230581_NoIndex_True"],
+  ["Apple usado", "https://listado.mercadolibre.cl/apple_PublishedToday_YES_ITEM*CONDITION_2230581_NoIndex_True"],
+  ["Paletas y raquetas usadas", "https://listado.mercadolibre.cl/deportes-fitness/tenis-padel-squash/equipamiento/paletas-raquetas/tenis-squash/usado/_OrderId_PRICE_PublishedToday_YES_NoIndex_True"],
+] as const;
 
 export default function Recomendaciones() {
   const { data: recomendaciones, isLoading } = useGetRecomendaciones({
@@ -10,11 +27,18 @@ export default function Recomendaciones() {
       queryKey: getGetRecomendacionesQueryKey()
     }
   });
+  const { data: radar, isLoading: isRadarLoading } = useQuery({
+    queryKey: ["mercadolibre-radar"],
+    queryFn: () => customFetch<{ currency: string; collectedAt: string; sources: Array<{ name: string; status: string; listings: number; averagePrice: number; minPrice: number; maxPrice: number }> }>("/api/analytics/mercadolibre-radar", { responseType: "json" }),
+  });
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Recomendaciones</h1>
+        <a href="http://localhost:3000/api/mercadolibre/connect" className="mt-4 inline-flex items-center rounded-xl bg-cyan-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-cyan-700">
+          <Link2 className="mr-2 h-4 w-4" /> Conectar MercadoLibre
+        </a>
         <p className="text-slate-500 dark:text-slate-400 mt-1">Análisis inteligente basado en tu historial de ventas</p>
       </div>
 
@@ -30,6 +54,46 @@ export default function Recomendaciones() {
           </p>
         </div>
       </div>
+
+      <Card className="border-cyan-200 bg-cyan-50/70 dark:border-cyan-900 dark:bg-cyan-950/20">
+        <CardHeader>
+          <CardTitle className="text-base text-slate-900 dark:text-slate-100">Radar de mercado usado</CardTitle>
+          <CardDescription className="dark:text-slate-400">
+            Fuentes de MercadoLibre Chile que usaremos para comparar publicaciones nuevas y precios en CLP.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {fuentesMercado.map(([nombre, url]) => (
+            <a key={nombre} href={url} target="_blank" rel="noreferrer" className="rounded-lg border border-cyan-100 bg-white px-3 py-2 text-sm font-medium text-cyan-800 transition hover:border-cyan-300 hover:bg-cyan-50 dark:border-cyan-900 dark:bg-slate-900 dark:text-cyan-300 dark:hover:bg-cyan-950/50">
+              {nombre}
+            </a>
+          ))}
+        </CardContent>
+      </Card>
+
+      <Card className="border-slate-200 dark:border-slate-700">
+        <CardHeader>
+          <CardTitle className="text-base text-slate-900 dark:text-slate-100">Precios publicados hoy</CardTitle>
+          <CardDescription className="dark:text-slate-400">Lectura automática de publicaciones usadas en MercadoLibre Chile.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {isRadarLoading ? <Skeleton className="h-32 w-full" /> : (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {radar?.sources.map((source) => (
+                <div key={source.name} className="rounded-xl border border-slate-200 p-3 dark:border-slate-700">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{source.name}</p>
+                    <span className={source.status === "ok" ? "text-xs text-emerald-600" : "text-xs text-amber-600"}>{source.status === "ok" ? "Actualizado" : "No disponible"}</span>
+                  </div>
+                  <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">Publicaciones detectadas: {source.listings}</p>
+                  <p className="mt-1 text-lg font-bold text-cyan-700 dark:text-cyan-300">{source.averagePrice ? formatCurrency(source.averagePrice) : "Sin datos"}</p>
+                  {source.minPrice > 0 && <p className="text-xs text-slate-500 dark:text-slate-400">Rango: {formatCurrency(source.minPrice)} – {formatCurrency(source.maxPrice)}</p>}
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

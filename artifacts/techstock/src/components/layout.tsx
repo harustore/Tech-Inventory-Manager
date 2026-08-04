@@ -59,7 +59,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </div>
           <div className="leading-tight">
             <span className="block text-lg font-semibold tracking-tight">TechStock</span>
-            <span className="text-[11px] uppercase tracking-[0.28em] text-slate-400">Inventory Manager</span>
+            <span className="text-[11px] uppercase tracking-[0.28em] text-slate-400">HARUSTORE INV</span>
           </div>
         </div>
 
@@ -108,7 +108,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             className="flex w-full items-center gap-3 rounded-xl border border-transparent px-3 py-3 text-sm font-medium text-slate-400 transition-all duration-150 hover:border-red-500/20 hover:bg-red-500/10 hover:text-red-200"
           >
             <LogOut className="h-5 w-5" />
-            Cerrar sesiÃ³n
+            Cerrar sesión
           </button>
         </div>
       </aside>
@@ -128,7 +128,32 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </button>
         </header>
 
-        <main className="relative flex-1 overflow-auto p-4 md:p-8">
+        <nav
+          aria-label="Navegación principal móvil"
+          className="fixed inset-x-3 bottom-3 z-30 grid grid-cols-4 rounded-2xl border border-slate-200/80 bg-white/95 p-1.5 shadow-xl shadow-slate-900/10 backdrop-blur dark:border-slate-700 dark:bg-slate-900/95 md:hidden"
+        >
+          {navItems.slice(0, 4).map((item) => {
+            const Icon = item.icon;
+            const isActive = location.startsWith(item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "flex min-h-14 flex-col items-center justify-center gap-1 rounded-xl px-1 text-[10px] font-semibold transition-colors",
+                  isActive
+                    ? "bg-cyan-50 text-cyan-700 dark:bg-cyan-950/70 dark:text-cyan-300"
+                    : "text-slate-500 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800",
+                )}
+              >
+                <Icon className="h-5 w-5" />
+                <span>{item.label === "Contactos de Compra" ? "Contactos" : item.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+
+        <main className="relative flex-1 overflow-auto p-3 pb-24 sm:p-4 md:p-8 md:pb-8">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.12),transparent_35%),radial-gradient(circle_at_top_right,rgba(34,211,238,0.08),transparent_30%)]" />
           <div className="relative mx-auto w-full max-w-6xl">{children}</div>
         </main>

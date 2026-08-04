@@ -310,11 +310,11 @@ export default function InventarioDetail() {
           <div className="flex items-center gap-3">
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">{equipo.equipo}</h1>
             {isVendido ? (
-              <span className="inline-flex items-center rounded-full bg-cyan-100 px-2.5 py-0.5 text-xs font-semibold text-cyan-800">Vendido</span>
+              <span className="inline-flex items-center rounded-full bg-cyan-100 px-2.5 py-0.5 text-xs font-semibold text-cyan-800 dark:bg-cyan-900/50 dark:text-cyan-200">Vendido</span>
             ) : equipo.estado === "reservado" ? (
-               <span className="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-800">Reservado</span>
+               <span className="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-800 dark:bg-amber-900/50 dark:text-amber-200">Reservado</span>
             ) : (
-              <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-semibold text-blue-800">En Stock</span>
+              <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-semibold text-blue-800 dark:bg-blue-900/50 dark:text-blue-200">En Stock</span>
             )}
           </div>
           <p className="text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-2">
@@ -1018,10 +1018,13 @@ export default function InventarioDetail() {
                             <div className="space-y-1">
                               <Label htmlFor="montoPago" className="text-xs">Monto</Label>
                               <Input
-                                id="montoPago" type="number" min="0" required
+                                id="montoPago" type="number" min="1" max={Math.max(0, (equipo.precioVenta ?? 0) - totalPagadoCuotas)} required
                                 value={nuevoPago.monto}
                                 onChange={e => setNuevoPago({ ...nuevoPago, monto: e.target.value })}
                               />
+                              <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                                Saldo disponible: {formatCurrency(Math.max(0, (equipo.precioVenta ?? 0) - totalPagadoCuotas))}
+                              </p>
                             </div>
                             <div className="space-y-1">
                               <Label htmlFor="fechaPago" className="text-xs">Fecha</Label>
@@ -1058,7 +1061,7 @@ export default function InventarioDetail() {
                   </div>
                   {equipo.costoTotal > 0 && (
                     <div className="flex justify-end">
-                      <span className="text-xs font-medium px-2 py-1 bg-cyan-100 text-cyan-800 rounded-full">
+                      <span className="text-xs font-medium px-2 py-1 bg-cyan-100 text-cyan-800 rounded-full dark:bg-cyan-900/50 dark:text-cyan-200">
                         Margen: {Math.round((equipo.gananciaNeta / equipo.costoTotal) * 100)}%
                       </span>
                     </div>

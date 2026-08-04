@@ -1,19 +1,19 @@
 ﻿import { useGetDeudores } from "@workspace/api-client-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLocation } from "wouter";
-import { formatCurrency, formatDate, cn } from "@/lib/utils";
-import { HandCoins, Users, CalendarClock, Phone, IdCard, ChevronRight, PartyPopper } from "lucide-react";
+import { formatCurrency, formatDate, cn, downloadCsv } from "@/lib/utils";
+import { HandCoins, Users, CalendarClock, Phone, IdCard, ChevronRight, PartyPopper, Download } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 function PageShell({ title, subtitle }: { title: string; subtitle: string }) {
   return (
-    <section className="overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-cyan-50 shadow-sm">
+    <section className="overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-cyan-50 shadow-sm dark:border-slate-700 dark:from-slate-950 dark:via-slate-900 dark:to-cyan-950/40">
       <div className="p-6 md:p-8">
         <p className="inline-flex items-center rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.28em] text-cyan-700">
           Deudores
         </p>
-        <h1 className="mt-4 text-3xl font-semibold tracking-tight text-slate-950">{title}</h1>
-        <p className="mt-3 max-w-2xl text-sm text-slate-600">{subtitle}</p>
+        <h1 className="mt-4 text-2xl font-semibold tracking-tight text-slate-950 dark:text-slate-50 sm:text-3xl">{title}</h1>
+        <p className="mt-3 max-w-2xl text-sm text-slate-600 dark:text-slate-300">{subtitle}</p>
       </div>
     </section>
   );
@@ -30,7 +30,7 @@ export default function Deudores() {
       <div className="space-y-6">
         <PageShell
           title="Cuotas pendientes por cobrar"
-          subtitle="Esta vista agrupa todas las ventas que todavÃ­a tienen cuotas por cobrar y te deja entrar directo al detalle de cada equipo."
+          subtitle="Esta vista agrupa todas las ventas que todavía tienen cuotas por cobrar y te deja entrar directo al detalle de cada equipo."
         />
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           {Array.from({ length: 3 }).map((_, i) => (
@@ -47,12 +47,12 @@ export default function Deudores() {
       <div className="space-y-6">
         <PageShell
           title="Cuotas pendientes por cobrar"
-          subtitle="Esta vista agrupa todas las ventas que todavÃ­a tienen cuotas por cobrar y te deja entrar directo al detalle de cada equipo."
+          subtitle="Esta vista agrupa todas las ventas que todavía tienen cuotas por cobrar y te deja entrar directo al detalle de cada equipo."
         />
         <div className="rounded-3xl border border-red-200 bg-gradient-to-br from-red-50 to-white p-6 text-red-900 shadow-sm dark:border-red-900/40 dark:from-red-950/40 dark:to-slate-950 dark:text-red-100">
           <h3 className="text-lg font-semibold">No pudimos cargar los deudores</h3>
           <p className="mt-2 text-sm text-red-800 dark:text-red-200">
-            La API devolviÃ³ un error al consultar las cuotas pendientes. ProbÃ¡ de nuevo en unos segundos.
+            La API devolvió un error al consultar las cuotas pendientes. Probá de nuevo en unos segundos.
           </p>
           <button
             type="button"
@@ -73,7 +73,7 @@ export default function Deudores() {
       <div className="space-y-6">
         <PageShell
           title="Cuotas pendientes por cobrar"
-          subtitle="Esta vista agrupa todas las ventas que todavÃ­a tienen cuotas por cobrar y te deja entrar directo al detalle de cada equipo."
+          subtitle="Esta vista agrupa todas las ventas que todavía tienen cuotas por cobrar y te deja entrar directo al detalle de cada equipo."
         />
         <div className="rounded-3xl border border-dashed border-cyan-200 bg-white p-8 text-center shadow-sm dark:border-cyan-900 dark:bg-slate-950">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-cyan-100 text-cyan-600 dark:bg-cyan-950 dark:text-cyan-300">
@@ -81,7 +81,7 @@ export default function Deudores() {
           </div>
           <h3 className="mt-4 text-lg font-semibold text-slate-900 dark:text-slate-100">Sin deudas pendientes</h3>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            Todas las ventas en cuotas estÃ¡n al dÃ­a. Â¡Buen trabajo!
+            Todas las ventas en cuotas están al día. ¡Buen trabajo!
           </p>
         </div>
       </div>
@@ -92,7 +92,7 @@ export default function Deudores() {
     <div className="space-y-6">
       <PageShell
         title="Cuotas pendientes por cobrar"
-        subtitle="Esta vista agrupa todas las ventas que todavÃ­a tienen cuotas por cobrar y te deja entrar directo al detalle de cada equipo."
+        subtitle="Esta vista agrupa todas las ventas que todavía tienen cuotas por cobrar y te deja entrar directo al detalle de cada equipo."
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -128,6 +128,24 @@ export default function Deudores() {
             <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">en total</p>
           </CardContent>
         </Card>
+      </div>
+
+      <div className="flex flex-wrap items-center justify-end gap-3">
+        <button
+          type="button"
+          className="inline-flex items-center rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+          onClick={() => downloadCsv("techstock-deudores.csv", data.deudores.map((d) => ({
+            Comprador: d.buyerName,
+            Contacto: d.buyerContact,
+            Equipo: `${d.marca} ${d.modelo}`,
+            Cuotas: `${d.ventaCuotasPagadas}/${d.ventaNumeroCuotas}`,
+            Total: d.precioVenta,
+            Pagado: d.totalPagado,
+            Saldo: d.saldoPendiente,
+          })))}
+        >
+          <Download className="mr-2 h-4 w-4" /> Exportar CSV
+        </button>
       </div>
 
       <Card className="overflow-hidden border-slate-200 shadow-sm dark:border-slate-700">
@@ -182,7 +200,7 @@ export default function Deudores() {
                     </div>
 
                     <span className="text-sm text-slate-600 dark:text-slate-300">
-                      {d.fechaVenta ? formatDate(d.fechaVenta) : "â€”"}
+                      {d.fechaVenta ? formatDate(d.fechaVenta) : "—"}
                     </span>
 
                     <div className="flex items-center gap-2">
@@ -191,7 +209,7 @@ export default function Deudores() {
                       </span>
                       {d.cuotasPendientes > 0 && (
                         <span className="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700 ring-1 ring-inset ring-amber-600/20">
-                          {d.cuotasPendientes} pend.
+                          {d.cuotasPendientes} pendientes
                         </span>
                       )}
                     </div>
@@ -210,6 +228,16 @@ export default function Deudores() {
                     )}>
                       {formatCurrency(d.saldoPendiente)}
                       <ChevronRight className="w-4 h-4 text-slate-300 hidden md:inline" />
+                      <button
+                        type="button"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          setLocation(`/inventario/${d.equipoId}`);
+                        }}
+                        className="ml-1 rounded-lg bg-cyan-50 px-2 py-1 text-[11px] font-semibold text-cyan-700 hover:bg-cyan-100 dark:bg-cyan-950/60 dark:text-cyan-300 dark:hover:bg-cyan-900/70"
+                      >
+                        Registrar pago
+                      </button>
                     </span>
                   </div>
                 </div>

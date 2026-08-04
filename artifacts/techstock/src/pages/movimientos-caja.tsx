@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { formatCurrency, formatDate, cn } from "@/lib/utils";
+import { formatCurrency, formatDate, cn, downloadCsv } from "@/lib/utils";
 import {
   Plus,
   ArrowDownRight,
@@ -27,6 +27,7 @@ import {
   Wallet,
   Coins,
   TrendingDown,
+  Download,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
@@ -90,9 +91,18 @@ export default function MovimientosCaja() {
   const [editId, setEditId] = useState<number | null>(null);
   const [editData, setEditData] = useState<MovimientoCajaUpdate>({});
   const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [tipoFilter, setTipoFilter] = useState<TipoMovimiento | "todos">("todos");
+  const [desde, setDesde] = useState("");
+  const [hasta, setHasta] = useState("");
+
+  const filteredMovimientos = useMemo(() => (movimientos ?? []).filter((mov) => (
+    (tipoFilter === "todos" || mov.tipo === tipoFilter) &&
+    (!desde || mov.fecha >= desde) &&
+    (!hasta || mov.fecha <= hasta)
+  )), [movimientos, tipoFilter, desde, hasta]);
 
   const totals = useMemo(() => {
-    const list = movimientos ?? [];
+    const list = filteredMovimientos;
     const ingresos = list.filter((m) => m.tipo === "ingreso").reduce((sum, m) => sum + m.monto, 0);
     const egresos = list.filter((m) => m.tipo === "egreso").reduce((sum, m) => sum + m.monto, 0);
     const ajustes = list.filter((m) => m.tipo === "ajuste").reduce((sum, m) => sum + m.monto, 0);
@@ -103,7 +113,7 @@ export default function MovimientosCaja() {
       neto: ingresos - egresos + ajustes,
       total: list.length,
     };
-  }, [movimientos]);
+  }, [filteredMovimientos]);
 
   const openEdit = (mov: MovimientoCaja) => {
     setEditId(mov.id);
@@ -425,6 +435,38 @@ export default function MovimientosCaja() {
         </DialogContent>
       </Dialog>
 
+      <Card className="border-slate-200/80 bg-white/85 shadow-sm dark:border-slate-700 dark:bg-slate-950/80">
+        <CardContent className="flex flex-col gap-3 p-4 md:flex-row md:items-end">
+          <div className="space-y-1">
+            <Label htmlFor="filtro-tipo">Tipo</Label>
+            <Select value={tipoFilter} onValueChange={(value) => setTipoFilter(value as TipoMovimiento | "todos")}>
+              <SelectTrigger id="filtro-tipo" className="w-full md:w-44"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos</SelectItem>
+                <SelectItem value="ingreso">Ingresos</SelectItem>
+                <SelectItem value="egreso">Egresos</SelectItem>
+                <SelectItem value="ajuste">Ajustes</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1"><Label htmlFor="filtro-desde">Desde</Label><Input id="filtro-desde" type="date" value={desde} onChange={(e) => setDesde(e.target.value)} /></div>
+          <div className="space-y-1"><Label htmlFor="filtro-hasta">Hasta</Label><Input id="filtro-hasta" type="date" value={hasta} onChange={(e) => setHasta(e.target.value)} /></div>
+          <Button
+            type="button"
+            variant="outline"
+            className="md:ml-auto"
+            disabled={!filteredMovimientos.length}
+            onClick={() => downloadCsv("techstock-caja.csv", filteredMovimientos.map((mov) => ({
+              Fecha: mov.fecha,
+              Tipo: mov.tipo,
+              Motivo: mov.motivo,
+              Monto: mov.monto,
+              Equipo: mov.equipoId,
+            })))}
+          ><Download className="mr-2 h-4 w-4" /> Exportar CSV</Button>
+        </CardContent>
+      </Card>
+
       <Card className="overflow-hidden border-slate-200 shadow-sm dark:border-slate-700 dark:bg-slate-950/80">
         <CardHeader className="border-b border-slate-100 bg-gradient-to-r from-slate-50 via-white to-slate-50 dark:border-slate-800 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900">
           <CardTitle className="text-base font-semibold text-slate-900 dark:text-slate-100">Movimientos recientes</CardTitle>
@@ -444,13 +486,13 @@ export default function MovimientosCaja() {
                 </div>
               ))}
             </div>
-          ) : movimientos?.length === 0 ? (
+          ) : filteredMovimientos.length === 0 ? (
             <div className="p-12 text-center text-slate-500 dark:text-slate-400">
               No hay movimientos registrados.
             </div>
           ) : (
             <div className="divide-y divide-slate-100 dark:divide-slate-800">
-              {movimientos?.map((mov) => {
+              {filteredMovimientos.map((mov) => {
                 const meta = typeMeta(mov.tipo);
                 const Icon = meta.icon;
                 return (

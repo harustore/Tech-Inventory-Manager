@@ -4,6 +4,7 @@ import pinoHttp from "pino-http";
 import { clerkMiddleware } from "@clerk/express";
 import router from "./routes/index.js";
 import { logger } from "./lib/logger.js";
+import mercadoLibreRouter from "./routes/mercadolibre.js";
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use(
 app.use(cors({ credentials: true, origin: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use("/api/mercadolibre", mercadoLibreRouter);
 
 // Fail closed: without a Clerk secret key the API must not start exposed.
 if (!process.env.CLERK_SECRET_KEY) {

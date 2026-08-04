@@ -203,4 +203,34 @@ router.get("/analytics/deudores", async (_req, res): Promise<void> => {
   }
 });
 
+const radarSources = [
+  { name: "Celulares usados", url: "https://listado.mercadolibre.cl/celulares-telefonia/celulares-smartphones/usado/celular_OrderId_PRICE_PublishedToday_YES_NoIndex_True" },
+  { name: "Tablets usadas", url: "https://listado.mercadolibre.cl/computacion/tablets-accesorios/tablets/usado/tablets_OrderId_PRICE_PublishedToday_YES_NoIndex_True" },
+  { name: "Notebooks usadas", url: "https://listado.mercadolibre.cl/computacion/notebooks-accesorios/notebooks/usado/notebooks_OrderId_PRICE_PublishedToday_YES_NoIndex_True" },
+  { name: "Consolas usadas", url: "https://listado.mercadolibre.cl/consolas-videojuegos/consolas/usado/_OrderId_PRICE_PublishedToday_YES_NoIndex_True" },
+  { name: "Smartwatches usados", url: "https://listado.mercadolibre.cl/celulares-telefonia/smartwatches-accesoriossmartwatch/usado/_OrderId_PRICE_PublishedToday_YES_NoIndex_True" },
+  { name: "Audífonos usados", url: "https://listado.mercadolibre.cl/electronica-audio-video/audio/audifonos/usado/_PublishedToday_YES" },
+  { name: "RTX y GTX usadas", url: "https://listado.mercadolibre.cl/rtx_PublishedToday_YES_ITEM*CONDITION_2230581_NoIndex_True" },
+  { name: "Televisores usados", url: "https://listado.mercadolibre.cl/electronica-audio-video/televisores/usado/televisores_OrderId_PRICE_PublishedToday_YES_NoIndex_True" },
+  { name: "TV Box usados", url: "https://listado.mercadolibre.cl/tv-box_PublishedToday_YES_ITEM*CONDITION_2230581_NoIndex_True" },
+  { name: "Apple usado", url: "https://listado.mercadolibre.cl/apple_PublishedToday_YES_ITEM*CONDITION_2230581_NoIndex_True" },
+];
+
+router.get("/analytics/mercadolibre-radar", async (_req, res): Promise<void> => {
+  const results = await Promise.all(radarSources.map(async (source) => {
+    try {
+      const response = await fetch(source.url, { headers: { "User-Agent": "Mozilla/5.0" } });
+      const html = await response.text();
+      const prices = [...html.matchAll(/andes-money-amount__fraction[^>]*>([\d.]+)/g)]
+        .map((match) => Number(match[1].replace(/\./g, "")))
+        .filter((price) => price > 0);
+      const averagePrice = prices.length ? prices.reduce((sum, price) => sum + price, 0) / prices.length : 0;
+      return { ...source, status: response.ok ? "ok" : "error", listings: prices.length, averagePrice: Math.round(averagePrice), minPrice: prices.length ? Math.min(...prices) : 0, maxPrice: prices.length ? Math.max(...prices) : 0 };
+    } catch {
+      return { ...source, status: "error", listings: 0, averagePrice: 0, minPrice: 0, maxPrice: 0 };
+    }
+  }));
+  res.json({ currency: "CLP", collectedAt: new Date().toISOString(), sources: results });
+});
+
 export default router;
