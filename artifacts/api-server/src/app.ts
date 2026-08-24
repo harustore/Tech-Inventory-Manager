@@ -8,25 +8,30 @@ import mercadoLibreRouter from "./routes/mercadolibre.js";
 
 const app = express();
 
-app.use(
-  pinoHttp({
-    logger,
-    serializers: {
-      req(req) {
-        return {
-          id: req.id,
-          method: req.method,
-          url: req.url?.split("?")[0],
-        };
+// pino-http relies on Node internals that are not available in the Workers
+// runtime. Keep request logging everywhere else, but skip only this optional
+// middleware when the Cloudflare deployment flag is enabled.
+if (process.env.CLOUDFLARE_WORKERS !== "1") {
+  app.use(
+    pinoHttp({
+      logger,
+      serializers: {
+        req(req) {
+          return {
+            id: req.id,
+            method: req.method,
+            url: req.url?.split("?")[0],
+          };
+        },
+        res(res) {
+          return {
+            statusCode: res.statusCode,
+          };
+        },
       },
-      res(res) {
-        return {
-          statusCode: res.statusCode,
-        };
-      },
-    },
-  }),
-);
+    }),
+  );
+}
 
 // CORS: allow requests from Vercel frontend (same domain in production)
 app.use(cors({ credentials: true, origin: true }));
