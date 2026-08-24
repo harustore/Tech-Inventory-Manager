@@ -3,6 +3,10 @@ main = "cloudflare/worker.ts"
 compatibility_date = "2026-08-24"
 compatibility_flags = ["nodejs_compat"]
 
+[alias]
+"@workspace/db" = "./lib/db/src/index.ts"
+"@workspace/api-zod" = "./lib/api-zod/src/index.ts"
+
 [assets]
 directory = "artifacts/techstock/dist"
 binding = "ASSETS"
