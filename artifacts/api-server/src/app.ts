@@ -1,37 +1,22 @@
 import express from "express";
 import cors from "cors";
-import pinoHttp from "pino-http";
 import { clerkMiddleware } from "@clerk/express";
 import router from "./routes/index.js";
-import { logger } from "./lib/logger.js";
 import mercadoLibreRouter from "./routes/mercadolibre.js";
 
 const app = express();
 
-// pino-http relies on Node internals that are not available in the Workers
-// runtime. Keep request logging everywhere else, but skip only this optional
-// middleware when the Cloudflare deployment flag is enabled.
-if (process.env.CLOUDFLARE_WORKERS !== "1") {
-  app.use(
-    pinoHttp({
-      logger,
-      serializers: {
-        req(req) {
-          return {
-            id: req.id,
-            method: req.method,
-            url: req.url?.split("?")[0],
-          };
-        },
-        res(res) {
-          return {
-            statusCode: res.statusCode,
-          };
-        },
-      },
-    }),
-  );
-}
+// Keep request logging runtime-neutral: pino-http depends on Node internals
+// that are unavailable when this API is bundled into a Cloudflare Worker.
+app.use((req, res, next) => {
+  const startedAt = Date.now();
+  res.on("finish", () => {
+    if (process.env.NODE_ENV !== "test") {
+      console.log(`${req.method} ${req.url?.split("?")[0]} ${res.statusCode} ${Date.now() - startedAt}ms`);
+    }
+  });
+  next();
+});
 
 // CORS: allow requests from Vercel frontend (same domain in production)
 app.use(cors({ credentials: true, origin: true }));
