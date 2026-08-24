@@ -128,3 +128,32 @@ Cada vez que hagas `git push` a GitHub, Vercel desplegará automáticamente los 
 - **Clerk Free:** Gratis (10,000 usuarios)
 
 **Total: $0/mes** para uso personal
+
+---
+
+## Opción alternativa: Cloudflare
+
+Si prefieres salir de Vercel, este repositorio ya quedó preparado para Cloudflare:
+
+- El frontend Vite se construye en `artifacts/techstock/dist`
+- El backend Express corre como Worker con `nodejs_compat`
+- La base de datos sigue siendo Neon
+
+### Build y deploy
+
+```bash
+pnpm run build:cloudflare
+pnpm run deploy:cloudflare
+```
+
+### Variables necesarias en Cloudflare
+
+- `DATABASE_URL`
+- `CLERK_SECRET_KEY`
+- `CLERK_PUBLISHABLE_KEY`
+- `VITE_CLERK_PUBLISHABLE_KEY`
+
+### Configuración principal
+
+- `wrangler.toml` en la raíz
+- `cloudflare/worker.ts` como entrada del Worker
