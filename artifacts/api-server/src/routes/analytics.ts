@@ -19,7 +19,7 @@ router.get("/analytics/resumen", async (_req, res): Promise<void> => {
     })
     .from(movimientosCajaTable);
 
-  const cajaActual = caja.ingresos - caja.egresos;
+  const cajaActual = Number(caja.ingresos) - Number(caja.egresos);
 
   const [inventario] = await db
     .select({
@@ -59,15 +59,15 @@ router.get("/analytics/resumen", async (_req, res): Promise<void> => {
   res.json(
     GetResumenCapitalResponse.parse({
       cajaActual,
-      valorInventario: inventario.valorInventario,
-      capitalTotal: cajaActual + inventario.valorInventario,
-      gananciaTotalHistorica: ventas.gananciaTotalHistorica,
-      gananciaMes: ventasMes.ganancia,
-      itemsEnStock: inventario.itemsEnStock,
-      itemsReservados: inventario.itemsReservados,
-      itemsVendidos: inventario.itemsVendidos,
-      ventasUltimos30Dias: ventasMes.total,
-      comprasUltimos30Dias: comprasMes.total,
+      valorInventario: Number(inventario.valorInventario),
+      capitalTotal: cajaActual + Number(inventario.valorInventario),
+      gananciaTotalHistorica: Number(ventas.gananciaTotalHistorica),
+      gananciaMes: Number(ventasMes.ganancia),
+      itemsEnStock: Number(inventario.itemsEnStock),
+      itemsReservados: Number(inventario.itemsReservados),
+      itemsVendidos: Number(inventario.itemsVendidos),
+      ventasUltimos30Dias: Number(ventasMes.total),
+      comprasUltimos30Dias: Number(comprasMes.total),
     }),
   );
 });
