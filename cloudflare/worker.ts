@@ -35,7 +35,7 @@ export default {
     if (url.pathname.startsWith("/api/")) {
       try {
         const nodeHandler = await getNodeHandler(env);
-        return await nodeHandler(request, env, ctx);
+        return await nodeHandler.fetch(request, env, ctx);
       } catch (error) {
         console.error("Cloudflare API exception", error);
         return Response.json(
