@@ -1,7 +1,8 @@
-name = "harustore-inv"
+name = "haruinv"
 main = "cloudflare/worker.ts"
 compatibility_date = "2026-08-24"
 compatibility_flags = ["nodejs_compat"]
+keep_vars = true
 
 [alias]
 "@workspace/db" = "./lib/db/src/index.ts"
