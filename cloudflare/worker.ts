@@ -33,8 +33,19 @@ export default {
     const url = new URL(request.url);
 
     if (url.pathname.startsWith("/api/")) {
-      const nodeHandler = await getNodeHandler(env);
-      return nodeHandler(request, env, ctx);
+      try {
+        const nodeHandler = await getNodeHandler(env);
+        return await nodeHandler(request, env, ctx);
+      } catch (error) {
+        console.error("Cloudflare API exception", error);
+        return Response.json(
+          {
+            error: "Error interno del Worker",
+            detail: error instanceof Error ? error.message : String(error),
+          },
+          { status: 500 },
+        );
+      }
     }
 
     return env.ASSETS.fetch(request);
