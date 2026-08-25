@@ -44,4 +44,14 @@ app.use((req, res, next) => {
 
 app.use("/api", router);
 
+// Keep API failures as JSON so the client can surface the actual backend
+// problem instead of Cloudflare/Express returning an opaque HTML error page.
+app.use((error: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  console.error("Unhandled API error", error);
+  res.status(500).json({
+    error: "Error interno de la API",
+    detail: error instanceof Error ? error.message : String(error),
+  });
+});
+
 export default app;
