@@ -30,6 +30,29 @@ const router = Router();
 
 router.use(requireAuth);
 
+function normalizarImei(value: unknown) {
+  if (value === undefined || value === null || value === "") return null;
+  return String(value).replace(/\s|-/g, "");
+}
+
+async function validarImeis(imei1: unknown, imei2: unknown, excluirId?: number) {
+  const valores = [normalizarImei(imei1), normalizarImei(imei2)].filter(Boolean) as string[];
+  if (new Set(valores).size !== valores.length) return "El IMEI 1 y el IMEI 2 deben ser distintos";
+  if (valores.some((imei) => !/^\d{15}$/.test(imei))) return "Cada IMEI debe tener exactamente 15 dígitos";
+  if (!valores.length) return null;
+
+  const existentes = await db
+    .select({ id: equiposTable.id })
+    .from(equiposTable)
+    .where(
+      or(
+        ...valores.flatMap((imei) => [eq(equiposTable.imei1, imei), eq(equiposTable.imei2, imei)]),
+      ),
+    );
+  if (existentes.some((equipo) => equipo.id !== excluirId)) return "Uno de los IMEI ya está registrado en otro producto";
+  return null;
+}
+
 /** pg columns (numeric/date) are mapped by @workspace/db to numbers/strings; identity transform for API response. */
 function normalizeEquipo<T>(equipo: T) {
   return equipo;
@@ -125,6 +148,11 @@ router.post("/equipos", async (req, res): Promise<void> => {
   const gastosExtra = parsed.data.gastosExtra;
   const costoTotal = precioCompra + gastosExtra;
   const fechaCompra = toDateOnlyString(parsed.data.fechaCompra);
+  const errorImei = await validarImeis(parsed.data.imei1, parsed.data.imei2);
+  if (errorImei) {
+    res.status(400).json({ error: errorImei });
+    return;
+  }
 
   const [equipo] = await db.transaction(async (tx) => {
     const inserted = await tx
@@ -229,6 +257,11 @@ router.patch("/equipos/:id", async (req, res): Promise<void> => {
   const precioCompra = parsed.data.precioCompra ?? Number(existing.precioCompra);
   const gastosExtra = parsed.data.gastosExtra ?? Number(existing.gastosExtra);
   const costoTotal = precioCompra + gastosExtra;
+  const errorImei = await validarImeis(parsed.data.imei1, parsed.data.imei2, params.data.id);
+  if (errorImei) {
+    res.status(400).json({ error: errorImei });
+    return;
+  }
 
   const saleFields: Record<string, unknown> = {};
   const hasSaleFields =

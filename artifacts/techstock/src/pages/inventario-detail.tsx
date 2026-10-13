@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useRef, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { ALMACENAMIENTOS, RAMS } from "@/lib/marcas";
 
 export default function InventarioDetail() {
   const { id } = useParams();
@@ -96,6 +97,11 @@ export default function InventarioDetail() {
     sellerRut: "",
     sellerContact: "",
     purchaseMeetingPlace: "",
+    almacenamiento: "",
+    ram: "",
+    imei1: "",
+    imei2: "",
+    imeiSerial: "",
   });
 
   const openEditCompra = () => {
@@ -110,6 +116,11 @@ export default function InventarioDetail() {
       sellerRut: equipo.sellerRut ?? "",
       sellerContact: equipo.sellerContact ?? "",
       purchaseMeetingPlace: equipo.purchaseMeetingPlace ?? "",
+      almacenamiento: equipo.almacenamiento ?? "",
+      ram: equipo.ram ?? "",
+      imei1: equipo.imei1 ?? "",
+      imei2: equipo.imei2 ?? "",
+      imeiSerial: equipo.imeiSerial ?? "",
     });
     setIsEditCompraOpen(true);
   };
@@ -128,6 +139,11 @@ export default function InventarioDetail() {
         sellerRut: editCompraData.sellerRut || null,
         sellerContact: editCompraData.sellerContact || null,
         purchaseMeetingPlace: editCompraData.purchaseMeetingPlace || null,
+        almacenamiento: editCompraData.almacenamiento || null,
+        ram: editCompraData.ram || null,
+        imei1: editCompraData.imei1 || null,
+        imei2: editCompraData.imei2 || null,
+        imeiSerial: editCompraData.imeiSerial || null,
       }
     }, {
       onSuccess: (data) => {
@@ -705,6 +721,25 @@ export default function InventarioDetail() {
                         />
                       </div>
                     </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-almacenamiento">Almacenamiento</Label>
+                      <Select value={editCompraData.almacenamiento} onValueChange={(val) => setEditCompraData({...editCompraData, almacenamiento: val})}>
+                        <SelectTrigger id="edit-almacenamiento"><SelectValue placeholder="Selecciona" /></SelectTrigger>
+                        <SelectContent>{ALMACENAMIENTOS.map((valor) => <SelectItem key={valor} value={valor}>{valor}</SelectItem>)}</SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-ram">RAM</Label>
+                      <Select value={editCompraData.ram} onValueChange={(val) => setEditCompraData({...editCompraData, ram: val})}>
+                        <SelectTrigger id="edit-ram"><SelectValue placeholder="Selecciona" /></SelectTrigger>
+                        <SelectContent>{RAMS.map((valor) => <SelectItem key={valor} value={valor}>{valor}</SelectItem>)}</SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2"><Label htmlFor="edit-imei1">IMEI 1</Label><Input id="edit-imei1" inputMode="numeric" pattern="[0-9]{15}" maxLength={15} value={editCompraData.imei1} onChange={e => setEditCompraData({...editCompraData, imei1: e.target.value})} /></div>
+                    <div className="space-y-2"><Label htmlFor="edit-imei2">IMEI 2</Label><Input id="edit-imei2" inputMode="numeric" pattern="[0-9]{15}" maxLength={15} value={editCompraData.imei2} onChange={e => setEditCompraData({...editCompraData, imei2: e.target.value})} /></div>
+                    <div className="space-y-2 col-span-2"><Label htmlFor="edit-imeiSerial">Número de Serie</Label><Input id="edit-imeiSerial" value={editCompraData.imeiSerial} onChange={e => setEditCompraData({...editCompraData, imeiSerial: e.target.value})} /></div>
                   </div>
 
                   <div className="space-y-4">
