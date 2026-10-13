@@ -56,3 +56,41 @@ export const MARCAS_EQUIPOS = [
   "ZTE",
   "Otra",
 ] as const;
+
+export const MODELOS_POR_MARCA: Record<string, string[]> = {
+  Apple: [
+    "iPhone 11", "iPhone 11 Pro", "iPhone 12", "iPhone 12 Pro", "iPhone 13", "iPhone 13 Pro",
+    "iPhone 14", "iPhone 14 Pro", "iPhone 15", "iPhone 15 Pro", "iPhone 16", "iPhone 16 Pro",
+    "iPhone 17", "iPad 10ª generación", "iPad Air", "iPad Pro", "MacBook Air", "MacBook Pro",
+    "Apple Watch Series", "Apple Watch SE", "Apple Watch Ultra", "AirPods", "Otro modelo",
+  ],
+  Samsung: [
+    "Galaxy A14", "Galaxy A15", "Galaxy A24", "Galaxy A25", "Galaxy A34", "Galaxy A54",
+    "Galaxy S21", "Galaxy S22", "Galaxy S23", "Galaxy S24", "Galaxy S25", "Galaxy Note 20",
+    "Galaxy Z Flip", "Galaxy Z Fold", "Galaxy Tab A", "Galaxy Tab S", "Galaxy Watch", "Galaxy Buds", "Otro modelo",
+  ],
+  Xiaomi: [
+    "Redmi Note 10", "Redmi Note 11", "Redmi Note 12", "Redmi Note 13", "Redmi Note 14",
+    "Redmi 12", "Redmi 13", "Poco X3", "Poco X5", "Poco X6", "Poco F5", "Xiaomi 12", "Xiaomi 13", "Xiaomi 14", "Otro modelo",
+  ],
+  Google: ["Pixel 6", "Pixel 6a", "Pixel 7", "Pixel 7a", "Pixel 8", "Pixel 8a", "Pixel 9", "Pixel 9 Pro", "Otro modelo"],
+  Motorola: ["Moto G20", "Moto G30", "Moto G40", "Moto G50", "Moto G60", "Moto G84", "Edge 30", "Edge 40", "Razr", "Otro modelo"],
+  Huawei: ["P30", "P40", "P50", "P60", "Mate 20", "Mate 30", "Mate 50", "Nova 9", "Nova 11", "Watch GT", "Otro modelo"],
+  Oppo: ["A54", "A57", "A78", "Reno 5", "Reno 7", "Reno 10", "Find X5", "Find X6", "Otro modelo"],
+  Vivo: ["Y20", "Y21", "Y33", "Y55", "V21", "V23", "V25", "V27", "X80", "X90", "Otro modelo"],
+  OnePlus: ["Nord", "Nord N10", "Nord N20", "Nord CE", "7T", "8T", "9 Pro", "10 Pro", "11", "12", "Otro modelo"],
+  Realme: ["C21", "C25", "C35", "C55", "8", "9 Pro", "10", "11 Pro", "GT", "Otro modelo"],
+  ZTE: ["Blade A31", "Blade A51", "Blade A52", "Blade A72", "Blade V40", "Axon 30", "Axon 40", "Otro modelo"],
+  Lenovo: ["ThinkPad", "IdeaPad", "Legion", "Yoga", "Tab M10", "Tab P11", "Otro modelo"],
+  Asus: ["Zenfone", "ROG Phone", "VivoBook", "ZenBook", "TUF Gaming", "ROG Strix", "Otro modelo"],
+  Dell: ["Inspiron", "Latitude", "XPS", "Vostro", "Precision", "G Series", "Otro modelo"],
+  HP: ["Pavilion", "EliteBook", "ProBook", "Envy", "Omen", "Victus", "Otro modelo"],
+  Acer: ["Aspire", "Swift", "Nitro", "Predator", "Chromebook", "TravelMate", "Otro modelo"],
+  Sony: ["Xperia 1", "Xperia 5", "Xperia 10", "PlayStation 4", "PlayStation 5", "WH-1000XM", "Otro modelo"],
+  Nintendo: ["Switch", "Switch Lite", "Switch OLED", "3DS", "Wii U", "Otro modelo"],
+  Microsoft: ["Xbox One", "Xbox Series S", "Xbox Series X", "Surface Pro", "Surface Laptop", "Otro modelo"],
+  PlayStation: ["PS4", "PS4 Slim", "PS4 Pro", "PS5", "PS5 Slim", "PS5 Pro", "Otro modelo"],
+  Xbox: ["Xbox One S", "Xbox One X", "Xbox Series S", "Xbox Series X", "Otro modelo"],
+};
+
+export const MODELOS_GENERICOS = ["Modelo no especificado", "Otro modelo"];

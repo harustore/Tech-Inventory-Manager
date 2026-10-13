@@ -10,7 +10,7 @@ import { ArrowLeft, Loader2, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
 import { formatCurrency } from "@/lib/utils";
-import { MARCAS_EQUIPOS } from "@/lib/marcas";
+import { MARCAS_EQUIPOS, MODELOS_GENERICOS, MODELOS_POR_MARCA } from "@/lib/marcas";
 
 export default function InventarioNuevo() {
   const [, setLocation] = useLocation();
@@ -115,7 +115,7 @@ export default function InventarioNuevo() {
 
               <div className="space-y-2">
                 <Label htmlFor="marca">Marca <span className="text-red-500">*</span></Label>
-                <Select required value={formData.marca} onValueChange={(val) => setFormData({...formData, marca: val})}>
+                <Select required value={formData.marca} onValueChange={(val) => setFormData({...formData, marca: val, modelo: ""})}>
                   <SelectTrigger id="marca">
                     <SelectValue placeholder="Selecciona una marca" />
                   </SelectTrigger>
@@ -129,13 +129,16 @@ export default function InventarioNuevo() {
 
               <div className="space-y-2">
                 <Label htmlFor="modelo">Modelo <span className="text-red-500">*</span></Label>
-                <Input 
-                  id="modelo" 
-                  required
-                  placeholder="Ej: iPhone 13 Pro"
-                  value={formData.modelo}
-                  onChange={e => setFormData({...formData, modelo: e.target.value})}
-                />
+                <Select required value={formData.modelo} onValueChange={(val) => setFormData({...formData, modelo: val})}>
+                  <SelectTrigger id="modelo">
+                    <SelectValue placeholder={formData.marca ? "Selecciona un modelo" : "Primero selecciona una marca"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {(MODELOS_POR_MARCA[formData.marca] ?? MODELOS_GENERICOS).map((modelo) => (
+                      <SelectItem key={modelo} value={modelo}>{modelo}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2">
