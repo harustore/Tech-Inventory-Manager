@@ -68,6 +68,8 @@ export const MARCAS_NOTEBOOKS = [
   "Microsoft", "MSI", "Razer", "Samsung", "Xiaomi", "Otra",
 ] as const;
 
+export const MARCAS_SMARTWATCH = ["Apple", "Samsung", "Huawei", "Xiaomi", "Garmin", "Honor", "Amazfit", "Fitbit", "Google", "Motorola", "OnePlus", "Oppo", "Otra"] as const;
+
 export const MODELOS_POR_MARCA: Record<string, string[]> = {
   Apple: [
     "iPhone 11", "iPhone 11 Pro", "iPhone 12", "iPhone 12 Pro", "iPhone 13", "iPhone 13 Pro",
@@ -143,6 +145,21 @@ export const MODELOS_NOTEBOOKS_POR_MARCA: Record<string, string[]> = {
   Razer: ["Blade 14", "Blade 15", "Blade 16", "Blade 18", "Otro modelo"],
   Samsung: ["Galaxy Book4", "Galaxy Book4 Pro", "Galaxy Book4 Ultra", "Galaxy Book5", "Otro modelo"],
   Xiaomi: ["RedmiBook 15", "Mi Notebook Pro", "Xiaomi Book Pro", "Otro modelo"],
+};
+
+export const MODELOS_SMARTWATCH_POR_MARCA: Record<string, string[]> = {
+  Apple: ["Apple Watch SE 2", "Apple Watch SE 3", "Apple Watch Series 9", "Apple Watch Series 10", "Apple Watch Series 11", "Apple Watch Ultra 2", "Apple Watch Ultra 3", "Otro modelo"],
+  Samsung: ["Galaxy Watch6", "Galaxy Watch6 Classic", "Galaxy Watch7", "Galaxy Watch8 40mm", "Galaxy Watch8 44mm", "Galaxy Watch8 Classic", "Galaxy Watch9", "Galaxy Watch Ultra", "Galaxy Watch Ultra2", "Otro modelo"],
+  Huawei: ["Watch Fit 3", "Watch Fit 4", "Watch Fit 4 Pro", "Watch GT 4", "Watch GT 5", "Watch GT 6", "Watch GT 6 Pro", "Watch GT 7 Pro", "Watch 5", "Band 11", "Otro modelo"],
+  Xiaomi: ["Redmi Watch 5 Active", "Redmi Watch 5 Lite", "Redmi Watch 6", "Redmi Watch 6 Lite", "Watch S3", "Watch S4", "Watch S5", "Xiaomi Smart Band 9", "Xiaomi Smart Band 10", "Otro modelo"],
+  Garmin: ["Forerunner 165", "Forerunner 265", "Forerunner 965", "Venu 3", "Venu 4", "vívoactive 5", "Instinct 2 Solar", "Instinct 3", "Fenix 8", "Otro modelo"],
+  Honor: ["Choice Watch", "Choice Watch 2", "Watch 4", "Watch 5", "Watch 6", "Band 9", "Otro modelo"],
+  Amazfit: ["Active", "Active 2", "Balance", "Bip 5", "GTR 4", "GTR 5", "GTS 4", "T-Rex 3", "Otro modelo"],
+  Fitbit: ["Versa 4", "Sense 2", "Charge 6", "Inspire 3", "Luxe", "Otro modelo"],
+  Google: ["Pixel Watch 2", "Pixel Watch 3", "Pixel Watch 4", "Otro modelo"],
+  Motorola: ["Moto Watch 40", "Moto Watch 70", "Moto Watch 100", "Moto Watch 200", "Otro modelo"],
+  OnePlus: ["OnePlus Watch 2", "OnePlus Watch 2R", "OnePlus Watch 3", "Otro modelo"],
+  Oppo: ["Watch X", "Watch X2", "Watch Free", "Otro modelo"],
 };
 
 export const MODELOS_GENERICOS = ["Modelo no especificado", "Otro modelo"];
