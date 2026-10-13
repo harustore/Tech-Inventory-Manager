@@ -57,6 +57,12 @@ export const MARCAS_EQUIPOS = [
   "Otra",
 ] as const;
 
+export const MARCAS_CELULARES = [
+  "Apple", "Asus", "Black Shark", "Google", "Honor", "Huawei", "LG", "Motorola",
+  "Nokia", "Nothing", "OnePlus", "Oppo", "Poco", "Realme", "Redmi", "Samsung",
+  "Sony", "TCL", "Vivo", "Xiaomi", "ZTE", "Otra",
+] as const;
+
 export const MODELOS_POR_MARCA: Record<string, string[]> = {
   Apple: [
     "iPhone 11", "iPhone 11 Pro", "iPhone 12", "iPhone 12 Pro", "iPhone 13", "iPhone 13 Pro",
@@ -91,6 +97,30 @@ export const MODELOS_POR_MARCA: Record<string, string[]> = {
   Microsoft: ["Xbox One", "Xbox Series S", "Xbox Series X", "Surface Pro", "Surface Laptop", "Otro modelo"],
   PlayStation: ["PS4", "PS4 Slim", "PS4 Pro", "PS5", "PS5 Slim", "PS5 Pro", "Otro modelo"],
   Xbox: ["Xbox One S", "Xbox One X", "Xbox Series S", "Xbox Series X", "Otro modelo"],
+};
+
+export const MODELOS_CELULARES_POR_MARCA: Record<string, string[]> = {
+  Apple: ["iPhone 11", "iPhone 12", "iPhone 13", "iPhone 14", "iPhone 15", "iPhone 16", "iPhone 17", "iPhone 18", "iPhone SE", "iPhone Air", "Otro modelo"],
+  Samsung: ["Galaxy A17", "Galaxy A26", "Galaxy A36", "Galaxy A56", "Galaxy S25", "Galaxy S26", "Galaxy S26 FE", "Galaxy S26 Ultra", "Galaxy Z Flip8", "Galaxy Z Fold8", "Otro modelo"],
+  Xiaomi: ["Xiaomi 14T", "Xiaomi 15", "Xiaomi 15T", "Xiaomi 17", "Xiaomi 17 Ultra", "Redmi 15", "Redmi Note 15", "Redmi Note 15 Pro", "Redmi Note 15 Pro+ 5G", "Poco F8", "Poco X8 Pro", "Otro modelo"],
+  Google: ["Pixel 9", "Pixel 9 Pro", "Pixel 9 Pro XL", "Pixel 10", "Pixel 10 Pro", "Pixel 10 Pro XL", "Pixel 11", "Pixel 11 Pro", "Pixel 11 Pro XL", "Otro modelo"],
+  Motorola: ["Moto G56 5G", "Moto G86 Power", "Moto Edge 60", "Edge 60 Fusion", "Edge 60 Pro", "Razr 60", "Razr 60 Ultra", "Otro modelo"],
+  Huawei: ["Pura 70", "Pura 80", "Mate 70", "Mate 80", "Nova 13", "Nova 14 Pro", "Otro modelo"],
+  Honor: ["X5b", "X7c", "X8c", "200 Lite", "400 Lite", "Magic7 Pro", "Magic8 Lite", "Otro modelo"],
+  Oppo: ["A5 Pro", "Reno 14F 5G", "Reno 14", "Reno 14 Pro", "Find X8", "Find X9 Pro", "Otro modelo"],
+  Vivo: ["Y29", "Y39", "V50", "V60", "X200", "X200 Pro", "Otro modelo"],
+  OnePlus: ["Nord 5", "Nord CE5", "OnePlus 13", "OnePlus 13R", "OnePlus 15", "OnePlus 15R", "Otro modelo"],
+  Realme: ["C75", "C85", "14 Pro", "14 Pro+", "GT 7", "GT 7T", "Otro modelo"],
+  Nothing: ["Phone (3)", "Phone (3a)", "Phone (3a) Pro", "Phone (4a)", "Otro modelo"],
+  Sony: ["Xperia 1 VII", "Xperia 1 VIII", "Xperia 10 VII", "Otro modelo"],
+  ZTE: ["Blade A75", "Blade V70", "Axon 50", "Axon 60", "Otro modelo"],
+  TCL: ["50 Pro NXTPAPER", "60 SE", "60 NXTPAPER", "Otro modelo"],
+  Nokia: ["G42", "G60", "X30", "C32", "Otro modelo"],
+  LG: ["K52", "K62", "Velvet", "Wing", "Otro modelo"],
+  Asus: ["Zenfone 11 Ultra", "Zenfone 12 Ultra", "ROG Phone 8", "ROG Phone 9", "Otro modelo"],
+  "Black Shark": ["Black Shark 5", "Black Shark 6", "Black Shark 7", "Otro modelo"],
+  Poco: ["Poco F7", "Poco F8", "Poco X7", "Poco X8 Pro", "Otro modelo"],
+  Redmi: ["Redmi 15", "Redmi Note 15", "Redmi Note 15 Pro", "Redmi Note 15 Pro+ 5G", "Otro modelo"],
 };
 
 export const MODELOS_GENERICOS = ["Modelo no especificado", "Otro modelo"];
