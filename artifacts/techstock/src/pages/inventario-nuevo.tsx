@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useCreateEquipo, Categoria, EstadoEquipoCondicion, FormaPago, useListProveedores } from "@workspace/api-client-react";
+import { useCreateEquipo, Categoria, EstadoEquipoCondicion, FormaPago } from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,6 @@ export default function InventarioNuevo() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const createEquipo = useCreateEquipo();
-  const { data: proveedores } = useListProveedores();
   
   const [formData, setFormData] = useState({
     categoria: Categoria.Celular,
@@ -229,26 +228,10 @@ export default function InventarioNuevo() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="proveedorId">¿A quién se lo compraste?</Label>
-                <Select value={formData.proveedorId} onValueChange={(val) => setFormData({...formData, proveedorId: val})}>
-                  <SelectTrigger id="proveedorId">
-                    <SelectValue placeholder="Sin contacto registrado" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">-- Sin contacto registrado --</SelectItem>
-                    {proveedores?.map(prov => (
-                      <SelectItem key={prov.id} value={prov.id.toString()}>{prov.nombre}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <p className="text-xs text-slate-500 dark:text-slate-400">Sirve para poder ubicarlo si el equipo presenta fallas.</p>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="sellerName">Nombre del vendedor</Label>
+                <Label htmlFor="sellerName">¿A quién le compraste?</Label>
                 <Input 
                   id="sellerName"
-                  placeholder="¿A quién le compraste el equipo?"
+                  placeholder="Nombre de la persona o tienda"
                   value={formData.sellerName}
                   onChange={e => setFormData({...formData, sellerName: e.target.value})}
                 />
