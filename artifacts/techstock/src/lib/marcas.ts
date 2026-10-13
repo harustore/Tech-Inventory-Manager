@@ -107,13 +107,21 @@ export const MODELOS_POR_MARCA: Record<string, string[]> = {
 };
 
 export const MODELOS_CELULARES_POR_MARCA: Record<string, string[]> = {
-  Apple: ["iPhone 11", "iPhone 12", "iPhone 13", "iPhone 14", "iPhone 15", "iPhone 16", "iPhone 17", "iPhone 18", "iPhone SE", "iPhone Air", "Otro modelo"],
-  Samsung: ["Galaxy A17", "Galaxy A26", "Galaxy A36", "Galaxy A56", "Galaxy S25", "Galaxy S26", "Galaxy S26 FE", "Galaxy S26 Ultra", "Galaxy Z Flip8", "Galaxy Z Fold8", "Otro modelo"],
-  Xiaomi: ["Xiaomi 14T", "Xiaomi 15", "Xiaomi 15T", "Xiaomi 17", "Xiaomi 17 Ultra", "Redmi 15", "Redmi Note 15", "Redmi Note 15 Pro", "Redmi Note 15 Pro+ 5G", "Poco F8", "Poco X8 Pro", "Otro modelo"],
+  Apple: ["iPhone 13", "iPhone 13 Pro", "iPhone 13 Pro Max", "iPhone 14", "iPhone 14 Pro", "iPhone 14 Pro Max", "iPhone 15", "iPhone 15 Pro", "iPhone 15 Pro Max", "iPhone 16", "iPhone 16 Pro", "iPhone 16 Pro Max", "iPhone 17", "iPhone 17 Pro", "iPhone 17 Pro Max", "iPhone Air", "iPhone 18", "iPhone 18 Pro", "iPhone 18 Pro Max", "iPhone SE", "Otro modelo"],
+  Samsung: [
+    "Galaxy S22", "Galaxy S22+", "Galaxy S22 Ultra", "Galaxy S23", "Galaxy S23+", "Galaxy S23 Ultra", "Galaxy S24", "Galaxy S24+", "Galaxy S24 Ultra", "Galaxy S24 FE", "Galaxy S25", "Galaxy S25+", "Galaxy S25 Ultra", "Galaxy S25 FE", "Galaxy S26", "Galaxy S26+", "Galaxy S26 Ultra", "Galaxy S26 FE",
+    "Galaxy A24", "Galaxy A25", "Galaxy A26", "Galaxy A27", "Galaxy A34", "Galaxy A35", "Galaxy A36", "Galaxy A37", "Galaxy A54", "Galaxy A55", "Galaxy A56", "Galaxy A57",
+    "Galaxy Z Flip3", "Galaxy Z Flip4", "Galaxy Z Flip5", "Galaxy Z Flip6", "Galaxy Z Flip7", "Galaxy Z Flip8", "Galaxy Z Fold4", "Galaxy Z Fold5", "Galaxy Z Fold6", "Galaxy Z Fold7", "Galaxy Z Fold8", "Otro modelo"
+  ],
+  Xiaomi: [
+    "Redmi Note 13 Pro", "Redmi Note 13 Pro+ 5G", "Redmi Note 14 Pro", "Redmi Note 14 Pro+ 5G", "Redmi Note 15 Pro", "Redmi Note 15 Pro+ 5G", "Redmi Note 16 Pro", "Redmi Note 16 Pro+ 5G", "Redmi Note 17 Pro", "Redmi Note 17 Pro+ 5G",
+    "Xiaomi 14", "Xiaomi 14 Pro", "Xiaomi 14 Ultra", "Xiaomi 15", "Xiaomi 15 Pro", "Xiaomi 15 Ultra", "Xiaomi 16", "Xiaomi 16 Pro", "Xiaomi 16 Ultra", "Xiaomi 17", "Xiaomi 17 Pro", "Xiaomi 17 Ultra",
+    "Xiaomi 14T", "Xiaomi 14T Pro", "Xiaomi 15T", "Xiaomi 15T Pro", "Xiaomi 16T", "Xiaomi 16T Pro", "Xiaomi 17T", "Xiaomi 17T Pro", "Otro modelo"
+  ],
   Google: ["Pixel 9", "Pixel 9 Pro", "Pixel 9 Pro XL", "Pixel 10", "Pixel 10 Pro", "Pixel 10 Pro XL", "Pixel 11", "Pixel 11 Pro", "Pixel 11 Pro XL", "Otro modelo"],
-  Motorola: ["Moto G56 5G", "Moto G86 Power", "Moto Edge 60", "Edge 60 Fusion", "Edge 60 Pro", "Razr 60", "Razr 60 Ultra", "Otro modelo"],
-  Huawei: ["Pura 70", "Pura 80", "Mate 70", "Mate 80", "Nova 13", "Nova 14 Pro", "Otro modelo"],
-  Honor: ["X5b", "X7c", "X8c", "200 Lite", "400 Lite", "Magic7 Pro", "Magic8 Lite", "Otro modelo"],
+  Motorola: ["Edge 60 Fusion", "Edge 60", "Edge 60 Pro", "Edge 60 Ultra", "Edge 70 Fusion", "Edge 70", "Edge 70 Pro", "Edge 70 Ultra", "Razr 60", "Razr 60 Ultra", "Razr 70", "Otro modelo"],
+  Huawei: ["P60 Pro", "Pura 70", "Pura 70 Pro", "Pura 70 Ultra", "Pura 80", "Pura 80 Pro", "Pura 80 Ultra", "Nova 14", "Nova 14 Pro", "Nova 15", "Nova 15 Pro", "Mate 70", "Mate 80", "Otro modelo"],
+  Honor: ["400 Lite", "400", "400 Pro", "Magic5 Pro", "Magic7 Lite", "Magic7 Pro", "Magic8 Lite", "Magic8 Pro", "Otro modelo"],
   Oppo: ["A5 Pro", "Reno 14F 5G", "Reno 14", "Reno 14 Pro", "Find X8", "Find X9 Pro", "Otro modelo"],
   Vivo: ["Y29", "Y39", "V50", "V60", "X200", "X200 Pro", "Otro modelo"],
   OnePlus: ["Nord 5", "Nord CE5", "OnePlus 13", "OnePlus 13R", "OnePlus 15", "OnePlus 15R", "Otro modelo"],
