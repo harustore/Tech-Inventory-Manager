@@ -131,11 +131,6 @@ export default function InventarioDetail() {
       sellerRut: equipo.sellerRut ?? "",
       sellerContact: equipo.sellerContact ?? "",
       purchaseMeetingPlace: equipo.purchaseMeetingPlace ?? "",
-      almacenamiento: equipo.almacenamiento ?? "",
-      ram: equipo.ram ?? "",
-      imei1: equipo.imei1 ?? "",
-      imei2: equipo.imei2 ?? "",
-      imeiSerial: equipo.imeiSerial ?? "",
       accesorios: equipo.accesorios ?? "",
       estado: equipo.estado,
     });
@@ -164,11 +159,6 @@ export default function InventarioDetail() {
         sellerRut: editCompraData.sellerRut || null,
         sellerContact: editCompraData.sellerContact || null,
         purchaseMeetingPlace: editCompraData.purchaseMeetingPlace || null,
-        almacenamiento: editCompraData.almacenamiento || null,
-        ram: editCompraData.ram || null,
-        imei1: editCompraData.imei1 || null,
-        imei2: editCompraData.imei2 || null,
-        imeiSerial: editCompraData.imeiSerial || null,
         accesorios: editCompraData.accesorios || null,
         estado: editCompraData.estado as any,
       }
