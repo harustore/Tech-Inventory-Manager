@@ -22,6 +22,10 @@ export interface EquipoInput {
      * @maximum 100
      */
   bateriaPct?: number;
+  almacenamiento?: string;
+  ram?: string;
+  imei1?: string;
+  imei2?: string;
   imeiSerial?: string;
   estadoEquipoCondicion: EstadoEquipoCondicion;
   fechaCompra: Date;

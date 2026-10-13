@@ -133,6 +133,14 @@ export interface Equipo {
      */
   bateriaPct?: number | null;
   /** @nullable */
+  almacenamiento?: string | null;
+  /** @nullable */
+  ram?: string | null;
+  /** @nullable */
+  imei1?: string | null;
+  /** @nullable */
+  imei2?: string | null;
+  /** @nullable */
   imeiSerial?: string | null;
   estadoEquipoCondicion: EstadoEquipoCondicion;
   estado: EstadoEquipo;
@@ -228,6 +236,10 @@ export interface EquipoInput {
      * @maximum 100
      */
   bateriaPct?: number;
+  almacenamiento?: string;
+  ram?: string;
+  imei1?: string;
+  imei2?: string;
   imeiSerial?: string;
   estadoEquipoCondicion: EstadoEquipoCondicion;
   fechaCompra: string;
@@ -262,6 +274,14 @@ export interface EquipoUpdate {
      * @nullable
      */
   bateriaPct?: number | null;
+  /** @nullable */
+  almacenamiento?: string | null;
+  /** @nullable */
+  ram?: string | null;
+  /** @nullable */
+  imei1?: string | null;
+  /** @nullable */
+  imei2?: string | null;
   /** @nullable */
   imeiSerial?: string | null;
   estadoEquipoCondicion?: EstadoEquipoCondicion;

@@ -25,6 +25,14 @@ export interface Equipo {
      */
   bateriaPct?: number | null;
   /** @nullable */
+  almacenamiento?: string | null;
+  /** @nullable */
+  ram?: string | null;
+  /** @nullable */
+  imei1?: string | null;
+  /** @nullable */
+  imei2?: string | null;
+  /** @nullable */
   imeiSerial?: string | null;
   estadoEquipoCondicion: EstadoEquipoCondicion;
   estado: EstadoEquipo;

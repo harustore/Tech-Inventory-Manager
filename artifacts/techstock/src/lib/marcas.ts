@@ -94,3 +94,5 @@ export const MODELOS_POR_MARCA: Record<string, string[]> = {
 };
 
 export const MODELOS_GENERICOS = ["Modelo no especificado", "Otro modelo"];
+export const ALMACENAMIENTOS = ["No aplica", "32 GB", "64 GB", "128 GB", "256 GB", "512 GB", "1 TB", "2 TB", "Otro"];
+export const RAMS = ["No aplica", "2 GB", "3 GB", "4 GB", "6 GB", "8 GB", "12 GB", "16 GB", "24 GB", "32 GB", "64 GB", "Otro"];

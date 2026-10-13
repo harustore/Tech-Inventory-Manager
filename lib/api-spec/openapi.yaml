@@ -540,6 +540,10 @@ components:
         marca: { type: string }
         modelo: { type: string }
         bateriaPct: { type: ["integer", "null"], minimum: 0, maximum: 100 }
+        almacenamiento: { type: ["string", "null"] }
+        ram: { type: ["string", "null"] }
+        imei1: { type: ["string", "null"] }
+        imei2: { type: ["string", "null"] }
         imeiSerial: { type: ["string", "null"] }
         estadoEquipoCondicion: { $ref: "#/components/schemas/EstadoEquipoCondicion" }
         estado: { $ref: "#/components/schemas/EstadoEquipo" }
@@ -590,6 +594,10 @@ components:
         marca: { type: string, minLength: 1 }
         modelo: { type: string, minLength: 1 }
         bateriaPct: { type: integer, minimum: 0, maximum: 100 }
+        almacenamiento: { type: string }
+        ram: { type: string }
+        imei1: { type: string }
+        imei2: { type: string }
         imeiSerial: { type: string }
         estadoEquipoCondicion: { $ref: "#/components/schemas/EstadoEquipoCondicion" }
         fechaCompra: { type: string, format: date }
@@ -611,6 +619,10 @@ components:
         marca: { type: string, minLength: 1 }
         modelo: { type: string, minLength: 1 }
         bateriaPct: { type: ["integer", "null"], minimum: 0, maximum: 100 }
+        almacenamiento: { type: ["string", "null"] }
+        ram: { type: ["string", "null"] }
+        imei1: { type: ["string", "null"] }
+        imei2: { type: ["string", "null"] }
         imeiSerial: { type: ["string", "null"] }
         estadoEquipoCondicion: { $ref: "#/components/schemas/EstadoEquipoCondicion" }
         fechaCompra: { type: string, format: date }

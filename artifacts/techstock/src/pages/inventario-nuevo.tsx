@@ -10,7 +10,7 @@ import { ArrowLeft, Loader2, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
 import { formatCurrency } from "@/lib/utils";
-import { MARCAS_EQUIPOS, MODELOS_GENERICOS, MODELOS_POR_MARCA } from "@/lib/marcas";
+import { ALMACENAMIENTOS, MARCAS_EQUIPOS, MODELOS_GENERICOS, MODELOS_POR_MARCA, RAMS } from "@/lib/marcas";
 
 export default function InventarioNuevo() {
   const [, setLocation] = useLocation();
@@ -24,6 +24,10 @@ export default function InventarioNuevo() {
     marca: "",
     modelo: "",
     bateriaPct: "",
+    almacenamiento: "",
+    ram: "",
+    imei1: "",
+    imei2: "",
     imeiSerial: "",
     estadoEquipoCondicion: EstadoEquipoCondicion["Usado_-_Excelente"],
     fechaCompra: new Date().toISOString().split('T')[0],
@@ -167,8 +171,34 @@ export default function InventarioNuevo() {
                 />
               </div>
 
+              <div className="space-y-2">
+                <Label htmlFor="almacenamiento">Almacenamiento</Label>
+                <Select value={formData.almacenamiento} onValueChange={(val) => setFormData({...formData, almacenamiento: val})}>
+                  <SelectTrigger id="almacenamiento"><SelectValue placeholder="Selecciona almacenamiento" /></SelectTrigger>
+                  <SelectContent>{ALMACENAMIENTOS.map((valor) => <SelectItem key={valor} value={valor}>{valor}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="ram">RAM</Label>
+                <Select value={formData.ram} onValueChange={(val) => setFormData({...formData, ram: val})}>
+                  <SelectTrigger id="ram"><SelectValue placeholder="Selecciona RAM" /></SelectTrigger>
+                  <SelectContent>{RAMS.map((valor) => <SelectItem key={valor} value={valor}>{valor}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="imei1">IMEI 1</Label>
+                <Input id="imei1" inputMode="numeric" placeholder="Ingresa el IMEI 1" value={formData.imei1} onChange={e => setFormData({...formData, imei1: e.target.value})} />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="imei2">IMEI 2</Label>
+                <Input id="imei2" inputMode="numeric" placeholder="Ingresa el IMEI 2 (opcional)" value={formData.imei2} onChange={e => setFormData({...formData, imei2: e.target.value})} />
+              </div>
+
               <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="imeiSerial">IMEI o Número de Serie</Label>
+                <Label htmlFor="imeiSerial">Número de Serie</Label>
                 <Input 
                   id="imeiSerial" 
                   placeholder="Ingresa el IMEI (celulares) o Serie (otros equipos)"
