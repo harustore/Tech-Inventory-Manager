@@ -10,7 +10,7 @@ import { ArrowLeft, Loader2, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
 import { formatCurrency } from "@/lib/utils";
-import { ALMACENAMIENTOS, MARCAS_CELULARES, MARCAS_EQUIPOS, MODELOS_CELULARES_POR_MARCA, MODELOS_GENERICOS, MODELOS_POR_MARCA, RAMS } from "@/lib/marcas";
+import { ALMACENAMIENTOS, MARCAS_CELULARES, MARCAS_EQUIPOS, MARCAS_NOTEBOOKS, MODELOS_CELULARES_POR_MARCA, MODELOS_GENERICOS, MODELOS_NOTEBOOKS_POR_MARCA, MODELOS_POR_MARCA, RAMS } from "@/lib/marcas";
 
 export default function InventarioNuevo() {
   const [, setLocation] = useLocation();
@@ -124,7 +124,7 @@ export default function InventarioNuevo() {
                     <SelectValue placeholder="Selecciona una marca" />
                   </SelectTrigger>
                   <SelectContent>
-                    {(formData.categoria === Categoria.Celular ? MARCAS_CELULARES : MARCAS_EQUIPOS).map((marca) => (
+                    {(formData.categoria === Categoria.Celular ? MARCAS_CELULARES : formData.categoria === Categoria.Notebook ? MARCAS_NOTEBOOKS : MARCAS_EQUIPOS).map((marca) => (
                       <SelectItem key={marca} value={marca}>{marca}</SelectItem>
                     ))}
                   </SelectContent>
@@ -138,7 +138,7 @@ export default function InventarioNuevo() {
                     <SelectValue placeholder={formData.marca ? "Selecciona un modelo" : "Primero selecciona una marca"} />
                   </SelectTrigger>
                   <SelectContent>
-                    {((formData.categoria === Categoria.Celular ? MODELOS_CELULARES_POR_MARCA : MODELOS_POR_MARCA)[formData.marca] ?? MODELOS_GENERICOS).map((modelo) => (
+                    {((formData.categoria === Categoria.Celular ? MODELOS_CELULARES_POR_MARCA : formData.categoria === Categoria.Notebook ? MODELOS_NOTEBOOKS_POR_MARCA : MODELOS_POR_MARCA)[formData.marca] ?? MODELOS_GENERICOS).map((modelo) => (
                       <SelectItem key={modelo} value={modelo}>{modelo}</SelectItem>
                     ))}
                   </SelectContent>

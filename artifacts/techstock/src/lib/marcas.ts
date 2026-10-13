@@ -63,6 +63,11 @@ export const MARCAS_CELULARES = [
   "Sony", "TCL", "Vivo", "Xiaomi", "ZTE", "Otra",
 ] as const;
 
+export const MARCAS_NOTEBOOKS = [
+  "Acer", "Apple", "Asus", "Dell", "Gigabyte", "HP", "Huawei", "Lenovo", "LG",
+  "Microsoft", "MSI", "Razer", "Samsung", "Xiaomi", "Otra",
+] as const;
+
 export const MODELOS_POR_MARCA: Record<string, string[]> = {
   Apple: [
     "iPhone 11", "iPhone 11 Pro", "iPhone 12", "iPhone 12 Pro", "iPhone 13", "iPhone 13 Pro",
@@ -121,6 +126,23 @@ export const MODELOS_CELULARES_POR_MARCA: Record<string, string[]> = {
   "Black Shark": ["Black Shark 5", "Black Shark 6", "Black Shark 7", "Otro modelo"],
   Poco: ["Poco F7", "Poco F8", "Poco X7", "Poco X8 Pro", "Otro modelo"],
   Redmi: ["Redmi 15", "Redmi Note 15", "Redmi Note 15 Pro", "Redmi Note 15 Pro+ 5G", "Otro modelo"],
+};
+
+export const MODELOS_NOTEBOOKS_POR_MARCA: Record<string, string[]> = {
+  Acer: ["Aspire Lite", "Aspire 5", "Swift Go", "Swift X", "Nitro V 15", "Nitro 16", "Predator Helios Neo 16", "TravelMate", "Otro modelo"],
+  Apple: ["MacBook Neo", "MacBook Air 13", "MacBook Air 15", "MacBook Pro 14", "MacBook Pro 16", "Otro modelo"],
+  Asus: ["Vivobook 15", "Vivobook S 15", "Zenbook 14", "Zenbook S 16", "TUF Gaming A15", "TUF Gaming A16", "ROG Zephyrus G14", "ROG Zephyrus G16", "ROG Strix G16", "Otro modelo"],
+  Dell: ["Inspiron 14", "Inspiron 15", "Latitude 3420", "Latitude 5440", "Vostro 3405", "XPS 13", "XPS 15", "G15 5515", "G16", "Precision", "Otro modelo"],
+  Gigabyte: ["AORUS 15G", "AORUS 15", "AORUS 16", "G5", "G6", "AERO 14", "Otro modelo"],
+  HP: ["Pavilion 14", "Pavilion 15", "Victus 15", "Victus 16", "OMEN 14", "OMEN 16", "Envy 14", "Envy 16", "EliteBook", "ProBook", "Otro modelo"],
+  Huawei: ["MateBook D 14", "MateBook D 16", "MateBook 14", "MateBook X Pro", "Otro modelo"],
+  Lenovo: ["IdeaPad 3", "IdeaPad Slim 5", "ThinkBook 14", "ThinkBook P16 Gen 2", "ThinkPad E14", "ThinkPad T14", "Legion 5", "Legion 5 Pro", "Legion Slim 5", "LOQ 15", "Yoga Slim 7", "Otro modelo"],
+  LG: ["Gram 14", "Gram 16", "Gram 17", "Ultra PC", "Otro modelo"],
+  Microsoft: ["Surface Laptop", "Surface Laptop Studio", "Surface Pro", "Otro modelo"],
+  MSI: ["Modern 14", "Prestige 14", "Katana 15", "Cyborg 15", "Thin 15", "Raider GE68", "Vector 16", "Stealth 16", "Otro modelo"],
+  Razer: ["Blade 14", "Blade 15", "Blade 16", "Blade 18", "Otro modelo"],
+  Samsung: ["Galaxy Book4", "Galaxy Book4 Pro", "Galaxy Book4 Ultra", "Galaxy Book5", "Otro modelo"],
+  Xiaomi: ["RedmiBook 15", "Mi Notebook Pro", "Xiaomi Book Pro", "Otro modelo"],
 };
 
 export const MODELOS_GENERICOS = ["Modelo no especificado", "Otro modelo"];
