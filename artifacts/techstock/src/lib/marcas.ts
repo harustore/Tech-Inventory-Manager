@@ -173,3 +173,14 @@ export const MODELOS_SMARTWATCH_POR_MARCA: Record<string, string[]> = {
 export const MODELOS_GENERICOS = ["Modelo no especificado", "Otro modelo"];
 export const ALMACENAMIENTOS = ["No aplica", "32 GB", "64 GB", "128 GB", "256 GB", "512 GB", "1 TB", "2 TB", "Otro"];
 export const RAMS = ["No aplica", "2 GB", "3 GB", "4 GB", "6 GB", "8 GB", "12 GB", "16 GB", "24 GB", "32 GB", "64 GB", "Otro"];
+
+export function detectarEspecificaciones(texto: string) {
+  const normalizado = texto.toLowerCase();
+  const almacenamiento = normalizado.match(/\b(32|64|128|256|512)\s*gb\b|\b(1|2)\s*tb\b/i);
+  const memoria = normalizado.match(/\b(2|3|4|6|8|12|16|24|32|64)\s*(?:gb\s*)?(?:ram|gb)\b/i);
+  const formato = normalizado.match(/\b(2|3|4|6|8|12|16|24|32|64)\s*\/\s*(32|64|128|256|512)\b/);
+  return {
+    almacenamiento: almacenamiento ? `${almacenamiento[1] ?? almacenamiento[2]} ${almacenamiento[1] ? "GB" : "TB"}` : formato ? `${formato[2]} GB` : "",
+    ram: memoria ? `${memoria[1]} GB` : formato ? `${formato[1]} GB` : "",
+  };
+}

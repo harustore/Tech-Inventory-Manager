@@ -467,6 +467,9 @@ components:
         - en_stock
         - reservado
         - vendido
+        - en_reparacion
+        - devuelto
+        - para_repuestos
 
     FormaPago:
       type: string
@@ -574,6 +577,7 @@ components:
         sellerContact: { type: ["string", "null"], description: "Contacto del vendedor" }
         purchaseMeetingPlace: { type: ["string", "null"], description: "Lugar de encuentro para la compra" }
         comentarios: { type: ["string", "null"] }
+        accesorios: { type: ["string", "null"] }
         createdAt: { type: string, format: date-time }
         updatedAt: { type: string, format: date-time }
 
@@ -600,12 +604,14 @@ components:
         imei2: { type: string }
         imeiSerial: { type: string }
         estadoEquipoCondicion: { $ref: "#/components/schemas/EstadoEquipoCondicion" }
+        estado: { $ref: "#/components/schemas/EstadoEquipo" }
         fechaCompra: { type: string, format: date }
         proveedorId: { type: integer }
         formaPagoCompra: { $ref: "#/components/schemas/FormaPago" }
         precioCompra: { type: number, minimum: 0 }
         gastosExtra: { type: number, minimum: 0, default: 0 }
         comentarios: { type: string }
+        accesorios: { type: string }
         sellerName: { type: string, description: "Nombre del vendedor" }
         sellerRut: { type: string, description: "RUT del vendedor" }
         sellerContact: { type: string, description: "Contacto del vendedor" }
@@ -625,12 +631,14 @@ components:
         imei2: { type: ["string", "null"] }
         imeiSerial: { type: ["string", "null"] }
         estadoEquipoCondicion: { $ref: "#/components/schemas/EstadoEquipoCondicion" }
+        estado: { $ref: "#/components/schemas/EstadoEquipo" }
         fechaCompra: { type: string, format: date }
         proveedorId: { type: ["integer", "null"] }
         formaPagoCompra: { $ref: "#/components/schemas/FormaPago" }
         precioCompra: { type: number, minimum: 0 }
         gastosExtra: { type: number, minimum: 0 }
         comentarios: { type: ["string", "null"] }
+        accesorios: { type: ["string", "null"] }
         fechaVenta: { type: ["string", "null"], format: date }
         plataformaVenta: { type: ["string", "null"] }
         precioVenta: { type: ["number", "null"] }

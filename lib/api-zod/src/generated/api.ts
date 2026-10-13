@@ -136,7 +136,7 @@ export const DeleteProveedorResponse = zod.void()
  * @summary List inventory items
  */
 export const ListEquiposQueryParams = zod.object({
-  "estado": zod.enum(['en_stock', 'reservado', 'vendido']).optional(),
+  "estado": zod.enum(['en_stock', 'reservado', 'vendido', 'en_reparacion', 'devuelto', 'para_repuestos']).optional(),
   "categoria": zod.enum(['Celular', 'Notebook', 'PC Escritorio', 'Consola', 'TV', 'Audifonos', 'Carcasa', 'TV Box', 'Smartwatch', 'Camara', 'Lentes', 'Otro']).optional(),
   "search": zod.coerce.string().optional()
 })
@@ -163,7 +163,7 @@ export const ListEquiposResponseItem = zod.object({
   "imei2": zod.string().nullish(),
   "imeiSerial": zod.string().nullish(),
   "estadoEquipoCondicion": zod.enum(['Nuevo', 'Usado - Excelente', 'Usado - Bueno', 'Usado - Regular', 'Para repuestos']),
-  "estado": zod.enum(['en_stock', 'reservado', 'vendido']).describe('Lifecycle status within inventory'),
+  "estado": zod.enum(['en_stock', 'reservado', 'vendido', 'en_reparacion', 'devuelto', 'para_repuestos']).describe('Lifecycle status within inventory'),
   "fechaCompra": zod.coerce.date(),
   "proveedorId": zod.number().nullish(),
   "proveedorNombre": zod.string().nullish(),
@@ -188,6 +188,7 @@ export const ListEquiposResponseItem = zod.object({
   "sellerContact": zod.string().nullish().describe('Contacto del vendedor'),
   "purchaseMeetingPlace": zod.string().nullish().describe('Lugar de encuentro para la compra'),
   "comentarios": zod.string().nullish(),
+  "accesorios": zod.string().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
 })
@@ -222,12 +223,14 @@ export const CreateEquipoBody = zod.object({
   "imei2": zod.string().optional(),
   "imeiSerial": zod.string().optional(),
   "estadoEquipoCondicion": zod.enum(['Nuevo', 'Usado - Excelente', 'Usado - Bueno', 'Usado - Regular', 'Para repuestos']),
+  "estado": zod.enum(['en_stock', 'reservado', 'vendido', 'en_reparacion', 'devuelto', 'para_repuestos']).optional().describe('Lifecycle status within inventory'),
   "fechaCompra": zod.coerce.date(),
   "proveedorId": zod.number().optional(),
   "formaPagoCompra": zod.enum(['Efectivo', 'Transferencia', 'Tarjeta', 'Otro']),
   "precioCompra": zod.number().min(createEquipoBodyPrecioCompraMin),
   "gastosExtra": zod.number().min(createEquipoBodyGastosExtraMin).default(createEquipoBodyGastosExtraDefault),
   "comentarios": zod.string().optional(),
+  "accesorios": zod.string().optional(),
   "sellerName": zod.string().optional().describe('Nombre del vendedor'),
   "sellerRut": zod.string().optional().describe('RUT del vendedor'),
   "sellerContact": zod.string().optional().describe('Contacto del vendedor'),
@@ -256,7 +259,7 @@ export const CreateEquipoResponse = zod.object({
   "imei2": zod.string().nullish(),
   "imeiSerial": zod.string().nullish(),
   "estadoEquipoCondicion": zod.enum(['Nuevo', 'Usado - Excelente', 'Usado - Bueno', 'Usado - Regular', 'Para repuestos']),
-  "estado": zod.enum(['en_stock', 'reservado', 'vendido']).describe('Lifecycle status within inventory'),
+  "estado": zod.enum(['en_stock', 'reservado', 'vendido', 'en_reparacion', 'devuelto', 'para_repuestos']).describe('Lifecycle status within inventory'),
   "fechaCompra": zod.coerce.date(),
   "proveedorId": zod.number().nullish(),
   "proveedorNombre": zod.string().nullish(),
@@ -281,6 +284,7 @@ export const CreateEquipoResponse = zod.object({
   "sellerContact": zod.string().nullish().describe('Contacto del vendedor'),
   "purchaseMeetingPlace": zod.string().nullish().describe('Lugar de encuentro para la compra'),
   "comentarios": zod.string().nullish(),
+  "accesorios": zod.string().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
 })
@@ -315,7 +319,7 @@ export const GetEquipoResponse = zod.object({
   "imei2": zod.string().nullish(),
   "imeiSerial": zod.string().nullish(),
   "estadoEquipoCondicion": zod.enum(['Nuevo', 'Usado - Excelente', 'Usado - Bueno', 'Usado - Regular', 'Para repuestos']),
-  "estado": zod.enum(['en_stock', 'reservado', 'vendido']).describe('Lifecycle status within inventory'),
+  "estado": zod.enum(['en_stock', 'reservado', 'vendido', 'en_reparacion', 'devuelto', 'para_repuestos']).describe('Lifecycle status within inventory'),
   "fechaCompra": zod.coerce.date(),
   "proveedorId": zod.number().nullish(),
   "proveedorNombre": zod.string().nullish(),
@@ -340,6 +344,7 @@ export const GetEquipoResponse = zod.object({
   "sellerContact": zod.string().nullish().describe('Contacto del vendedor'),
   "purchaseMeetingPlace": zod.string().nullish().describe('Lugar de encuentro para la compra'),
   "comentarios": zod.string().nullish(),
+  "accesorios": zod.string().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
 })
@@ -378,12 +383,14 @@ export const UpdateEquipoBody = zod.object({
   "imei2": zod.string().nullish(),
   "imeiSerial": zod.string().nullish(),
   "estadoEquipoCondicion": zod.enum(['Nuevo', 'Usado - Excelente', 'Usado - Bueno', 'Usado - Regular', 'Para repuestos']).optional(),
+  "estado": zod.enum(['en_stock', 'reservado', 'vendido', 'en_reparacion', 'devuelto', 'para_repuestos']).optional().describe('Lifecycle status within inventory'),
   "fechaCompra": zod.coerce.date().optional(),
   "proveedorId": zod.number().nullish(),
   "formaPagoCompra": zod.enum(['Efectivo', 'Transferencia', 'Tarjeta', 'Otro']).optional(),
   "precioCompra": zod.number().min(updateEquipoBodyPrecioCompraMin).optional(),
   "gastosExtra": zod.number().min(updateEquipoBodyGastosExtraMin).optional(),
   "comentarios": zod.string().nullish(),
+  "accesorios": zod.string().nullish(),
   "fechaVenta": zod.coerce.date().nullish(),
   "plataformaVenta": zod.string().nullish(),
   "precioVenta": zod.number().nullish(),
@@ -422,7 +429,7 @@ export const UpdateEquipoResponse = zod.object({
   "imei2": zod.string().nullish(),
   "imeiSerial": zod.string().nullish(),
   "estadoEquipoCondicion": zod.enum(['Nuevo', 'Usado - Excelente', 'Usado - Bueno', 'Usado - Regular', 'Para repuestos']),
-  "estado": zod.enum(['en_stock', 'reservado', 'vendido']).describe('Lifecycle status within inventory'),
+  "estado": zod.enum(['en_stock', 'reservado', 'vendido', 'en_reparacion', 'devuelto', 'para_repuestos']).describe('Lifecycle status within inventory'),
   "fechaCompra": zod.coerce.date(),
   "proveedorId": zod.number().nullish(),
   "proveedorNombre": zod.string().nullish(),
@@ -447,6 +454,7 @@ export const UpdateEquipoResponse = zod.object({
   "sellerContact": zod.string().nullish().describe('Contacto del vendedor'),
   "purchaseMeetingPlace": zod.string().nullish().describe('Lugar de encuentro para la compra'),
   "comentarios": zod.string().nullish(),
+  "accesorios": zod.string().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
 })
@@ -512,7 +520,7 @@ export const RegistrarVentaEquipoResponse = zod.object({
   "imei2": zod.string().nullish(),
   "imeiSerial": zod.string().nullish(),
   "estadoEquipoCondicion": zod.enum(['Nuevo', 'Usado - Excelente', 'Usado - Bueno', 'Usado - Regular', 'Para repuestos']),
-  "estado": zod.enum(['en_stock', 'reservado', 'vendido']).describe('Lifecycle status within inventory'),
+  "estado": zod.enum(['en_stock', 'reservado', 'vendido', 'en_reparacion', 'devuelto', 'para_repuestos']).describe('Lifecycle status within inventory'),
   "fechaCompra": zod.coerce.date(),
   "proveedorId": zod.number().nullish(),
   "proveedorNombre": zod.string().nullish(),
@@ -537,6 +545,7 @@ export const RegistrarVentaEquipoResponse = zod.object({
   "sellerContact": zod.string().nullish().describe('Contacto del vendedor'),
   "purchaseMeetingPlace": zod.string().nullish().describe('Lugar de encuentro para la compra'),
   "comentarios": zod.string().nullish(),
+  "accesorios": zod.string().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
 })
@@ -601,7 +610,7 @@ export const RegistrarPagoCuotaResponse = zod.object({
   "imei2": zod.string().nullish(),
   "imeiSerial": zod.string().nullish(),
   "estadoEquipoCondicion": zod.enum(['Nuevo', 'Usado - Excelente', 'Usado - Bueno', 'Usado - Regular', 'Para repuestos']),
-  "estado": zod.enum(['en_stock', 'reservado', 'vendido']).describe('Lifecycle status within inventory'),
+  "estado": zod.enum(['en_stock', 'reservado', 'vendido', 'en_reparacion', 'devuelto', 'para_repuestos']).describe('Lifecycle status within inventory'),
   "fechaCompra": zod.coerce.date(),
   "proveedorId": zod.number().nullish(),
   "proveedorNombre": zod.string().nullish(),
@@ -626,6 +635,7 @@ export const RegistrarPagoCuotaResponse = zod.object({
   "sellerContact": zod.string().nullish().describe('Contacto del vendedor'),
   "purchaseMeetingPlace": zod.string().nullish().describe('Lugar de encuentro para la compra'),
   "comentarios": zod.string().nullish(),
+  "accesorios": zod.string().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
 })
@@ -660,7 +670,7 @@ export const EliminarPagoCuotaResponse = zod.object({
   "imei2": zod.string().nullish(),
   "imeiSerial": zod.string().nullish(),
   "estadoEquipoCondicion": zod.enum(['Nuevo', 'Usado - Excelente', 'Usado - Bueno', 'Usado - Regular', 'Para repuestos']),
-  "estado": zod.enum(['en_stock', 'reservado', 'vendido']).describe('Lifecycle status within inventory'),
+  "estado": zod.enum(['en_stock', 'reservado', 'vendido', 'en_reparacion', 'devuelto', 'para_repuestos']).describe('Lifecycle status within inventory'),
   "fechaCompra": zod.coerce.date(),
   "proveedorId": zod.number().nullish(),
   "proveedorNombre": zod.string().nullish(),
@@ -685,6 +695,7 @@ export const EliminarPagoCuotaResponse = zod.object({
   "sellerContact": zod.string().nullish().describe('Contacto del vendedor'),
   "purchaseMeetingPlace": zod.string().nullish().describe('Lugar de encuentro para la compra'),
   "comentarios": zod.string().nullish(),
+  "accesorios": zod.string().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
 })
@@ -719,7 +730,7 @@ export const ReactivarEquipoResponse = zod.object({
   "imei2": zod.string().nullish(),
   "imeiSerial": zod.string().nullish(),
   "estadoEquipoCondicion": zod.enum(['Nuevo', 'Usado - Excelente', 'Usado - Bueno', 'Usado - Regular', 'Para repuestos']),
-  "estado": zod.enum(['en_stock', 'reservado', 'vendido']).describe('Lifecycle status within inventory'),
+  "estado": zod.enum(['en_stock', 'reservado', 'vendido', 'en_reparacion', 'devuelto', 'para_repuestos']).describe('Lifecycle status within inventory'),
   "fechaCompra": zod.coerce.date(),
   "proveedorId": zod.number().nullish(),
   "proveedorNombre": zod.string().nullish(),
@@ -744,6 +755,7 @@ export const ReactivarEquipoResponse = zod.object({
   "sellerContact": zod.string().nullish().describe('Contacto del vendedor'),
   "purchaseMeetingPlace": zod.string().nullish().describe('Lugar de encuentro para la compra'),
   "comentarios": zod.string().nullish(),
+  "accesorios": zod.string().nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
 })

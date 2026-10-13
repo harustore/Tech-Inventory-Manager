@@ -103,6 +103,14 @@ export default function Inventario() {
         return <Badge className="bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-50 dark:bg-amber-500/10 dark:text-amber-300 dark:border-amber-500/20">Reservado</Badge>;
       case "vendido":
         return <Badge className="bg-cyan-50 text-cyan-700 border-cyan-200 hover:bg-cyan-50 dark:bg-cyan-500/10 dark:text-cyan-300 dark:border-cyan-500/20">Vendido</Badge>;
+      case "en_reparacion":
+        return <Badge className="bg-orange-50 text-orange-700 border-orange-200">En reparación</Badge>;
+      case "devuelto":
+        return <Badge className="bg-violet-50 text-violet-700 border-violet-200">Devuelto</Badge>;
+      case "para_repuestos":
+        return <Badge className="bg-red-50 text-red-700 border-red-200">Para repuestos</Badge>;
+      default:
+        return <Badge>Estado desconocido</Badge>;
     }
   };
 
@@ -248,7 +256,7 @@ export default function Inventario() {
               )}
               {estadoFilter !== "todos" && (
                 <span className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 dark:bg-blue-500/10 dark:text-blue-300">
-                  {estadoFilter === "en_stock" ? "En stock" : estadoFilter === "reservado" ? "Reservado" : "Vendido"}
+                  {estadoFilter === "en_stock" ? "En stock" : estadoFilter === "reservado" ? "Reservado" : estadoFilter === "vendido" ? "Vendido" : estadoFilter === "en_reparacion" ? "En reparación" : estadoFilter === "devuelto" ? "Devuelto" : "Para repuestos"}
                 </span>
               )}
               {categoriaFilter !== "todos" && (

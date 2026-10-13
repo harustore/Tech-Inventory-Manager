@@ -16,4 +16,7 @@ export const EstadoEquipo = {
   en_stock: 'en_stock',
   reservado: 'reservado',
   vendido: 'vendido',
+  en_reparacion: 'en_reparacion',
+  devuelto: 'devuelto',
+  para_repuestos: 'para_repuestos',
 } as const;

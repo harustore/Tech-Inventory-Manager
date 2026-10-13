@@ -48,6 +48,9 @@ export const EstadoEquipo = {
   en_stock: 'en_stock',
   reservado: 'reservado',
   vendido: 'vendido',
+  en_reparacion: 'en_reparacion',
+  devuelto: 'devuelto',
+  para_repuestos: 'para_repuestos',
 } as const;
 
 export type FormaPago = typeof FormaPago[keyof typeof FormaPago];
@@ -219,6 +222,8 @@ export interface Equipo {
   purchaseMeetingPlace?: string | null;
   /** @nullable */
   comentarios?: string | null;
+  /** @nullable */
+  accesorios?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -242,6 +247,7 @@ export interface EquipoInput {
   imei2?: string;
   imeiSerial?: string;
   estadoEquipoCondicion: EstadoEquipoCondicion;
+  estado?: EstadoEquipo;
   fechaCompra: string;
   proveedorId?: number;
   formaPagoCompra: FormaPago;
@@ -250,6 +256,7 @@ export interface EquipoInput {
   /** @minimum 0 */
   gastosExtra?: number;
   comentarios?: string;
+  accesorios?: string;
   /** Nombre del vendedor */
   sellerName?: string;
   /** RUT del vendedor */
@@ -285,6 +292,7 @@ export interface EquipoUpdate {
   /** @nullable */
   imeiSerial?: string | null;
   estadoEquipoCondicion?: EstadoEquipoCondicion;
+  estado?: EstadoEquipo;
   fechaCompra?: string;
   /** @nullable */
   proveedorId?: number | null;
@@ -295,6 +303,8 @@ export interface EquipoUpdate {
   gastosExtra?: number;
   /** @nullable */
   comentarios?: string | null;
+  /** @nullable */
+  accesorios?: string | null;
   /** @nullable */
   fechaVenta?: string | null;
   /** @nullable */

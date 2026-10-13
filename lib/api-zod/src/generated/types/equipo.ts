@@ -111,6 +111,8 @@ export interface Equipo {
   purchaseMeetingPlace?: string | null;
   /** @nullable */
   comentarios?: string | null;
+  /** @nullable */
+  accesorios?: string | null;
   createdAt: Date;
   updatedAt: Date;
 }

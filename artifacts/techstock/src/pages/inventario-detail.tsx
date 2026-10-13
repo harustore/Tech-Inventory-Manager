@@ -102,6 +102,8 @@ export default function InventarioDetail() {
     imei1: "",
     imei2: "",
     imeiSerial: "",
+    accesorios: "",
+    estado: "en_stock",
   });
 
   const openEditCompra = () => {
@@ -121,6 +123,8 @@ export default function InventarioDetail() {
       imei1: equipo.imei1 ?? "",
       imei2: equipo.imei2 ?? "",
       imeiSerial: equipo.imeiSerial ?? "",
+      accesorios: equipo.accesorios ?? "",
+      estado: equipo.estado,
     });
     setIsEditCompraOpen(true);
   };
@@ -144,6 +148,8 @@ export default function InventarioDetail() {
         imei1: editCompraData.imei1 || null,
         imei2: editCompraData.imei2 || null,
         imeiSerial: editCompraData.imeiSerial || null,
+        accesorios: editCompraData.accesorios || null,
+        estado: editCompraData.estado as any,
       }
     }, {
       onSuccess: (data) => {
@@ -548,6 +554,24 @@ export default function InventarioDetail() {
                         <SelectItem value="Otro">Otro</SelectItem>
                       </SelectContent>
                     </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-estado">Estado del equipo</Label>
+                    <Select value={editCompraData.estado} onValueChange={(val) => setEditCompraData({...editCompraData, estado: val})}>
+                      <SelectTrigger id="edit-estado"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="en_stock">En stock</SelectItem>
+                        <SelectItem value="reservado">Reservado</SelectItem>
+                        <SelectItem value="en_reparacion">En reparación</SelectItem>
+                        <SelectItem value="devuelto">Devuelto</SelectItem>
+                        <SelectItem value="para_repuestos">Para repuestos</SelectItem>
+                        <SelectItem value="vendido">Vendido</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-accesorios">Accesorios incluidos</Label>
+                    <Input id="edit-accesorios" placeholder="Caja, cargador, cable..." value={editCompraData.accesorios} onChange={e => setEditCompraData({...editCompraData, accesorios: e.target.value})} />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="edit-compra-comentarios">Comentarios</Label>

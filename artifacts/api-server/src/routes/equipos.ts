@@ -88,6 +88,7 @@ function equipoWithProveedorSelection() {
     ventaCuotasPagadas: equiposTable.ventaCuotasPagadas,
     gananciaNeta: equiposTable.gananciaNeta,
     comentarios: equiposTable.comentarios,
+    accesorios: equiposTable.accesorios,
     sellerName: equiposTable.sellerName,
     sellerRut: equiposTable.sellerRut,
     sellerContact: equiposTable.sellerContact,
@@ -181,6 +182,7 @@ router.post("/equipos", async (req, res): Promise<void> => {
         sellerRut: parsed.data.sellerRut,
         sellerContact: parsed.data.sellerContact,
         purchaseMeetingPlace: parsed.data.purchaseMeetingPlace,
+        accesorios: parsed.data.accesorios,
       })
       .returning();
 

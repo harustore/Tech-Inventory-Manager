@@ -72,6 +72,7 @@ export const equiposTable = pgTable("equipos", {
   sellerContact: text("seller_contact"),
   purchaseMeetingPlace: text("purchase_meeting_place"),
   comentarios: text("comentarios"),
+  accesorios: text("accesorios"),
   createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
     .notNull()
     .defaultNow(),

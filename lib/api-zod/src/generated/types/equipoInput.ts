@@ -6,6 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { Categoria } from './categoria';
+import type { EstadoEquipo } from './estadoEquipo';
 import type { EstadoEquipoCondicion } from './estadoEquipoCondicion';
 import type { FormaPago } from './formaPago';
 
@@ -28,6 +29,7 @@ export interface EquipoInput {
   imei2?: string;
   imeiSerial?: string;
   estadoEquipoCondicion: EstadoEquipoCondicion;
+  estado?: EstadoEquipo;
   fechaCompra: Date;
   proveedorId?: number;
   formaPagoCompra: FormaPago;
@@ -36,6 +38,7 @@ export interface EquipoInput {
   /** @minimum 0 */
   gastosExtra?: number;
   comentarios?: string;
+  accesorios?: string;
   /** Nombre del vendedor */
   sellerName?: string;
   /** RUT del vendedor */

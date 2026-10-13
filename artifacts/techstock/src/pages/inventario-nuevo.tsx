@@ -10,7 +10,7 @@ import { ArrowLeft, Loader2, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
 import { formatCurrency } from "@/lib/utils";
-import { ALMACENAMIENTOS, MARCAS_CELULARES, MARCAS_EQUIPOS, MARCAS_NOTEBOOKS, MARCAS_SMARTWATCH, MODELOS_CELULARES_POR_MARCA, MODELOS_GENERICOS, MODELOS_NOTEBOOKS_POR_MARCA, MODELOS_POR_MARCA, MODELOS_SMARTWATCH_POR_MARCA, RAMS } from "@/lib/marcas";
+import { ALMACENAMIENTOS, detectarEspecificaciones, MARCAS_CELULARES, MARCAS_EQUIPOS, MARCAS_NOTEBOOKS, MARCAS_SMARTWATCH, MODELOS_CELULARES_POR_MARCA, MODELOS_GENERICOS, MODELOS_NOTEBOOKS_POR_MARCA, MODELOS_POR_MARCA, MODELOS_SMARTWATCH_POR_MARCA, RAMS } from "@/lib/marcas";
 
 export default function InventarioNuevo() {
   const [, setLocation] = useLocation();
@@ -40,6 +40,7 @@ export default function InventarioNuevo() {
     sellerContact: "",
     purchaseMeetingPlace: "",
     comentarios: ""
+    ,accesorios: ""
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -113,7 +114,7 @@ export default function InventarioNuevo() {
                   required
                   placeholder="Ej: iPhone 13 Pro 128GB Azul"
                   value={formData.equipo}
-                  onChange={e => setFormData({...formData, equipo: e.target.value})}
+                  onChange={e => { const equipo = e.target.value; const detectado = detectarEspecificaciones(equipo); setFormData({...formData, equipo, almacenamiento: formData.almacenamiento || detectado.almacenamiento, ram: formData.ram || detectado.ram}); }}
                 />
               </div>
 
@@ -323,6 +324,11 @@ export default function InventarioNuevo() {
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Costo total: {formatCurrency((Number(formData.precioCompra) || 0) + (Number(formData.gastosExtra) || 0))}</p>
               </div>
               
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="accesorios">Accesorios incluidos</Label>
+                <Input id="accesorios" placeholder="Ej: Caja, cargador, cable, funda" value={formData.accesorios} onChange={e => setFormData({...formData, accesorios: e.target.value})} />
+              </div>
+
               <div className="space-y-2 md:col-span-2">
                 <Label htmlFor="comentarios">Comentarios u observaciones</Label>
                 <Textarea 
