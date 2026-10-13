@@ -10,6 +10,7 @@ import { ArrowLeft, Loader2, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
 import { formatCurrency } from "@/lib/utils";
+import { MARCAS_EQUIPOS } from "@/lib/marcas";
 
 export default function InventarioNuevo() {
   const [, setLocation] = useLocation();
@@ -114,13 +115,16 @@ export default function InventarioNuevo() {
 
               <div className="space-y-2">
                 <Label htmlFor="marca">Marca <span className="text-red-500">*</span></Label>
-                <Input 
-                  id="marca" 
-                  required
-                  placeholder="Ej: Apple"
-                  value={formData.marca}
-                  onChange={e => setFormData({...formData, marca: e.target.value})}
-                />
+                <Select required value={formData.marca} onValueChange={(val) => setFormData({...formData, marca: val})}>
+                  <SelectTrigger id="marca">
+                    <SelectValue placeholder="Selecciona una marca" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {MARCAS_EQUIPOS.map((marca) => (
+                      <SelectItem key={marca} value={marca}>{marca}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2">
