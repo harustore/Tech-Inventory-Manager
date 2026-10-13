@@ -54,6 +54,8 @@ export interface EquipoUpdate {
   /** @nullable */
   plataformaVenta?: string | null;
   /** @nullable */
+  descripcionVenta?: string | null;
+  /** @nullable */
   precioVenta?: number | null;
   ventaFormaPago?: FormaPagoVenta | null;
   /**

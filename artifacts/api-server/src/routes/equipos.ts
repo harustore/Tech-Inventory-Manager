@@ -82,6 +82,7 @@ function equipoWithProveedorSelection() {
     costoTotal: equiposTable.costoTotal,
     fechaVenta: equiposTable.fechaVenta,
     plataformaVenta: equiposTable.plataformaVenta,
+    descripcionVenta: equiposTable.descripcionVenta,
     precioVenta: equiposTable.precioVenta,
     ventaFormaPago: equiposTable.ventaFormaPago,
     ventaNumeroCuotas: equiposTable.ventaNumeroCuotas,
@@ -297,6 +298,9 @@ router.patch("/equipos/:id", async (req, res): Promise<void> => {
     saleFields.plataformaVenta = parsed.data.plataformaVenta !== undefined
       ? parsed.data.plataformaVenta
       : undefined;
+    saleFields.descripcionVenta = parsed.data.descripcionVenta !== undefined
+      ? parsed.data.descripcionVenta
+      : undefined;
     saleFields.precioVenta = newPrecioVenta;
     saleFields.ventaFormaPago = newVentaFormaPago;
     saleFields.ventaNumeroCuotas = newVentaNumeroCuotas;
@@ -448,6 +452,7 @@ router.patch("/equipos/:id/venta", async (req, res): Promise<void> => {
         estado: "vendido",
         fechaVenta,
         plataformaVenta: parsed.data.plataformaVenta,
+        descripcionVenta: parsed.data.descripcionVenta,
         precioVenta: parsed.data.precioVenta,
         ventaFormaPago,
         ventaNumeroCuotas: ventaFormaPago === "Cuotas" ? parsed.data.ventaNumeroCuotas : null,

@@ -161,6 +161,8 @@ export interface Equipo {
   /** @nullable */
   plataformaVenta?: string | null;
   /** @nullable */
+  descripcionVenta?: string | null;
+  /** @nullable */
   precioVenta?: number | null;
   ventaFormaPago?: FormaPagoVenta | null;
   /**
@@ -310,6 +312,8 @@ export interface EquipoUpdate {
   /** @nullable */
   plataformaVenta?: string | null;
   /** @nullable */
+  descripcionVenta?: string | null;
+  /** @nullable */
   precioVenta?: number | null;
   ventaFormaPago?: FormaPagoVenta | null;
   /**
@@ -359,6 +363,7 @@ export interface VentaInput {
   fechaVenta: string;
   /** @minLength 1 */
   plataformaVenta: string;
+  descripcionVenta?: string;
   /**
      * Valor final total de la venta (si es en cuotas, es el total de todas las cuotas).
      * @minimum 0

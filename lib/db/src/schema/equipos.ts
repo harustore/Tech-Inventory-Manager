@@ -49,6 +49,7 @@ export const equiposTable = pgTable("equipos", {
   }).notNull(),
   fechaVenta: date("fecha_venta", { mode: "string" }),
   plataformaVenta: text("plataforma_venta"),
+  descripcionVenta: text("descripcion_venta"),
   precioVenta: numeric("precio_venta", {
     precision: 12,
     scale: 2,

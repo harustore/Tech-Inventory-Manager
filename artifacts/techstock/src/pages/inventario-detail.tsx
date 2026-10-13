@@ -59,6 +59,7 @@ export default function InventarioDetail() {
   const [ventaData, setVentaData] = useState({
     fechaVenta: new Date().toISOString().split('T')[0],
     plataformaVenta: "",
+    descripcionVenta: "",
     precioVenta: "",
     ventaFormaPago: "Contado" as "Contado" | "Cuotas",
     ventaNumeroCuotas: "",
@@ -76,6 +77,7 @@ export default function InventarioDetail() {
   const [editVentaData, setEditVentaData] = useState({
     fechaVenta: "",
     plataformaVenta: "",
+    descripcionVenta: "",
     precioVenta: "",
     ventaFormaPago: "Contado" as "Contado" | "Cuotas",
     ventaNumeroCuotas: "",
@@ -88,6 +90,14 @@ export default function InventarioDetail() {
 
   const [isEditCompraOpen, setIsEditCompraOpen] = useState(false);
   const [editCompraData, setEditCompraData] = useState({
+    marca: "",
+    modelo: "",
+    bateriaPct: "",
+    almacenamiento: "",
+    ram: "",
+    imei1: "",
+    imei2: "",
+    imeiSerial: "",
     fechaCompra: "",
     precioCompra: "",
     gastosExtra: "",
@@ -97,11 +107,6 @@ export default function InventarioDetail() {
     sellerRut: "",
     sellerContact: "",
     purchaseMeetingPlace: "",
-    almacenamiento: "",
-    ram: "",
-    imei1: "",
-    imei2: "",
-    imeiSerial: "",
     accesorios: "",
     estado: "en_stock",
   });
@@ -110,6 +115,14 @@ export default function InventarioDetail() {
     if (!equipo) return;
     setEditCompraData({
       fechaCompra: equipo.fechaCompra ?? new Date().toISOString().split('T')[0],
+      marca: equipo.marca,
+      modelo: equipo.modelo,
+      bateriaPct: equipo.bateriaPct?.toString() ?? "",
+      almacenamiento: equipo.almacenamiento ?? "",
+      ram: equipo.ram ?? "",
+      imei1: equipo.imei1 ?? "",
+      imei2: equipo.imei2 ?? "",
+      imeiSerial: equipo.imeiSerial ?? "",
       precioCompra: equipo.precioCompra?.toString() ?? "",
       gastosExtra: equipo.gastosExtra?.toString() ?? "0",
       formaPagoCompra: equipo.formaPagoCompra,
@@ -135,6 +148,14 @@ export default function InventarioDetail() {
       id: equipoId,
       data: {
         fechaCompra: editCompraData.fechaCompra || undefined,
+        marca: editCompraData.marca,
+        modelo: editCompraData.modelo,
+        bateriaPct: editCompraData.bateriaPct ? Number(editCompraData.bateriaPct) : null,
+        almacenamiento: editCompraData.almacenamiento || null,
+        ram: editCompraData.ram || null,
+        imei1: editCompraData.imei1 || null,
+        imei2: editCompraData.imei2 || null,
+        imeiSerial: editCompraData.imeiSerial || null,
         precioCompra: Number(editCompraData.precioCompra),
         gastosExtra: Number(editCompraData.gastosExtra),
         formaPagoCompra: editCompraData.formaPagoCompra as any,
@@ -168,6 +189,7 @@ export default function InventarioDetail() {
     setEditVentaData({
       fechaVenta: equipo.fechaVenta ?? new Date().toISOString().split('T')[0],
       plataformaVenta: equipo.plataformaVenta ?? "",
+      descripcionVenta: equipo.descripcionVenta ?? "",
       precioVenta: equipo.precioVenta?.toString() ?? "",
       ventaFormaPago: (equipo.ventaFormaPago as "Contado" | "Cuotas") ?? "Contado",
       ventaNumeroCuotas: equipo.ventaNumeroCuotas?.toString() ?? "",
@@ -187,6 +209,7 @@ export default function InventarioDetail() {
       data: {
         fechaVenta: editVentaData.fechaVenta || null,
         plataformaVenta: editVentaData.plataformaVenta || null,
+        descripcionVenta: editVentaData.descripcionVenta || null,
         precioVenta: editVentaData.precioVenta ? Number(editVentaData.precioVenta) : null,
         ventaFormaPago: editVentaData.ventaFormaPago,
         ventaNumeroCuotas: editVentaData.ventaFormaPago === "Cuotas" ? Number(editVentaData.ventaNumeroCuotas) : null,
@@ -227,6 +250,7 @@ export default function InventarioDetail() {
       data: {
         fechaVenta: ventaData.fechaVenta,
         plataformaVenta: ventaData.plataformaVenta,
+        descripcionVenta: ventaData.descripcionVenta || undefined,
         precioVenta: Number(ventaData.precioVenta),
         ventaFormaPago: ventaData.ventaFormaPago,
         ventaNumeroCuotas: ventaData.ventaFormaPago === "Cuotas" ? Number(ventaData.ventaNumeroCuotas) : undefined,
@@ -422,6 +446,10 @@ export default function InventarioDetail() {
                         value={ventaData.plataformaVenta} onChange={e => setVentaData({...ventaData, plataformaVenta: e.target.value})}
                       />
                     </div>
+                    <div className="space-y-2 sm:col-span-2">
+                      <Label htmlFor="descripcionVenta">Descripción para la publicación</Label>
+                      <textarea id="descripcionVenta" rows={5} className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900" placeholder="Describe el equipo, estado, accesorios y condiciones de venta" value={ventaData.descripcionVenta} onChange={e => setVentaData({...ventaData, descripcionVenta: e.target.value})} />
+                    </div>
 
                     <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
                       <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">Datos del Comprador</p>
@@ -517,6 +545,16 @@ export default function InventarioDetail() {
                   <DialogDescription>Corrige el precio, gastos o fecha de adquisición.</DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2"><Label htmlFor="edit-marca">Marca</Label><Input id="edit-marca" value={editCompraData.marca} onChange={e => setEditCompraData({...editCompraData, marca: e.target.value})} /></div>
+                    <div className="space-y-2"><Label htmlFor="edit-modelo">Modelo</Label><Input id="edit-modelo" value={editCompraData.modelo} onChange={e => setEditCompraData({...editCompraData, modelo: e.target.value})} /></div>
+                    <div className="space-y-2"><Label htmlFor="edit-bateria">Salud batería (%)</Label><Input id="edit-bateria" type="number" min="0" max="100" value={editCompraData.bateriaPct} onChange={e => setEditCompraData({...editCompraData, bateriaPct: e.target.value})} /></div>
+                    <div className="space-y-2"><Label htmlFor="edit-almacenamiento-general">Almacenamiento</Label><Input id="edit-almacenamiento-general" value={editCompraData.almacenamiento} onChange={e => setEditCompraData({...editCompraData, almacenamiento: e.target.value})} /></div>
+                    <div className="space-y-2"><Label htmlFor="edit-ram-general">RAM</Label><Input id="edit-ram-general" value={editCompraData.ram} onChange={e => setEditCompraData({...editCompraData, ram: e.target.value})} /></div>
+                    <div className="space-y-2"><Label htmlFor="edit-imei1-general">IMEI 1</Label><Input id="edit-imei1-general" inputMode="numeric" maxLength={15} value={editCompraData.imei1} onChange={e => setEditCompraData({...editCompraData, imei1: e.target.value})} /></div>
+                    <div className="space-y-2"><Label htmlFor="edit-imei2-general">IMEI 2</Label><Input id="edit-imei2-general" inputMode="numeric" maxLength={15} value={editCompraData.imei2} onChange={e => setEditCompraData({...editCompraData, imei2: e.target.value})} /></div>
+                    <div className="space-y-2 col-span-2"><Label htmlFor="edit-serie-general">Número de serie</Label><Input id="edit-serie-general" value={editCompraData.imeiSerial} onChange={e => setEditCompraData({...editCompraData, imeiSerial: e.target.value})} /></div>
+                  </div>
                   <div className="space-y-2">
                     <Label htmlFor="edit-compra-fecha">Fecha de Compra</Label>
                     <Input
@@ -744,6 +782,10 @@ export default function InventarioDetail() {
                           onChange={e => setEditVentaData({...editVentaData, plataformaVenta: e.target.value})}
                         />
                       </div>
+                      <div className="space-y-2 sm:col-span-2">
+                        <Label htmlFor="editDescripcionVenta">Descripción para la publicación</Label>
+                        <textarea id="editDescripcionVenta" rows={5} className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900" placeholder="Descripción que usarás en Marketplace, Instagram, etc." value={editVentaData.descripcionVenta} onChange={e => setEditVentaData({...editVentaData, descripcionVenta: e.target.value})} />
+                      </div>
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
@@ -950,6 +992,12 @@ export default function InventarioDetail() {
                   <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700 dark:text-slate-300">{equipo.comentarios}</p>
                 </div>
               </CardContent>
+            </Card>
+          )}
+          {equipo.descripcionVenta && (
+            <Card className="border-cyan-200 shadow-sm dark:border-cyan-900">
+              <CardHeader className="pb-3"><CardTitle className="text-sm font-medium uppercase tracking-wider text-cyan-700 dark:text-cyan-300">Descripción de publicación</CardTitle></CardHeader>
+              <CardContent><p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700 dark:text-slate-300">{equipo.descripcionVenta}</p></CardContent>
             </Card>
           )}
         </div>
